@@ -1,0 +1,37 @@
+\begin{thebibliography}{1}
+\providecommand{\url}[1]{\texttt{#1}}
+\providecommand{\urlprefix}{URL }
+
+\bibitem{fedyukovichae}
+Fedyukovich, G., Gurfinkel, A., Sharygina, N.: Ae-val: Horn clause-based
+  skolemizer for $\forall\exists$-formulas
+
+\bibitem{fedyukovich2015automated}
+Fedyukovich, G., Gurfinkel, A., Sharygina, N.: Automated discovery of
+  simulation between programs. In: Logic for Programming, Artificial
+  Intelligence, and Reasoning. pp. 606--621. Springer (2015)
+
+\bibitem{Katis15:Realizability}
+Gacek, A., Katis, A., Whalen, M.W., Backes, J., Cofer, D.: Towards
+  realizability checking of contracts using theories. In: NASA Formal Methods,
+  pp. 173--187. Springer (2015)
+
+\bibitem{Katis:machine}
+Katis, A., Gacek, A., Whalen, M.W.: Machine-checked proofs for realizability
+  checking algorithms (2015), submitted \url{http://arxiv.org/abs/1502.01292}
+
+\bibitem{katis2016towards}
+Katis, A., Whalen, M.W., Gacek, A.: Towards synthesis from assume-guarantee
+  contracts involving infinite theories: A preliminary report. arXiv preprint
+  arXiv:1602.00148  (2016)
+
+\bibitem{komuravelli2014smt}
+Komuravelli, A., Gurfinkel, A., Chaki, S.: Smt-based model checking for
+  recursive programs. In: Computer Aided Verification. pp. 17--34. Springer
+  (2014)
+
+\bibitem{loos1993applying}
+Loos, R., Weispfenning, V.: Applying linear quantifier elimination. The
+  Computer Journal  36(5),  450--462 (1993)
+
+\end{thebibliography}

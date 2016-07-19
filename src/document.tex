@@ -1,0 +1,82 @@
+\documentclass[orivec]{llncs}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage{courier}
+\usepackage{algorithmic}
+\usepackage[table,xcdraw]{xcolor}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{mathtools}
+\usepackage[framemethod=TikZ]{mdframed}
+\usepackage[]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{placeins}
+\usepackage{amsmath,amssymb}
+
+%to solve the hyperref problem of jumping to wrong places
+\usepackage[all]{hypcap}
+\usepackage[framemethod=TikZ]{mdframed}
+\usepackage{fancyvrb}
+\usepackage{relsize}
+\graphicspath{{images/}}
+
+\usepackage{float}
+
+\renewcommand{\labelitemi}{\tiny$\blacksquare$}
+
+\newcommand{\andreas}[1]{\textcolor{blue}{Andreas: #1}}
+\newcommand{\mike}[1]{\textcolor{red}{Mike: #1}}
+\newcommand{\andrew}[1]{\textcolor{green}{Andrew: #1}}
+
+\newenvironment{requirement}
+{\vspace{0.05in}
+ \begin{mdframed}[roundcorner=10pt,backgroundcolor=gray!20]}
+{\end{mdframed}}
+
+\begin{document}
+
+\title{Synthesis from Assume-Guarantee Contracts using Inductive Proofs of
+Realizability}
+\author{Andreas Katis, Andrew Gacek, Michael W. Whalen}
+\institute{
+Department of Computer Science and Engineering,\\
+ University of Minnesota, 200 Union Street, Minneapolis, MN 55455,USA\\
+\email{katis001@umn.edu, whalen@cs.umn.edu}
+\and 
+Rockwell Collins Advanced Technology Center\\
+400 Collins Rd. NE, Cedar Rapids, IA, 52498, USA\\
+\email{andrew.gacek@rockwellcollins.com}
+}
+\maketitle
+
+\begin{abstract}
+In recent work, we proposed an extention of our contract-based
+realizability checking algorithm to solve the synthesis problem modulo theories.
+Given the proof of a contract's realizability we apply a sophisticated skolemizer for $\forall\exists$ formulas to extract an implementation composed
+of skolem relations that describe the strategies that the implementation needs
+to follow in order to always comply to the given assume-guarantee contract.
+The algorithm is similar to k-induction model checking, but involves the use of 
+quantifiers to determine implementability.
+
+For the purposes of this paper we developed the proposed synthesis algorithm,
+and successfully applied it to synthesize implementations for simple case
+studies. We informally prove the algorithm's correctness and report our results
+as well as the lessons that we learned during this experiment. Finally, we
+discuss possible future directions that need to be explored to further improve the algorithm's application domain, optimality and efficiency.
+\end{abstract}
+
+\input{introduction}
+\input{synthesis}
+\input{cstudies}
+\input{related}
+\input{futurework}
+
+
+\section*{Acknowledgments}
+This work was funded by DARPA and AFRL under contract 4504789784 (Secure Mathematically-Assured Composition of Control Models), and by NASA under contract NNA13AA21C (Compositional Verification of Flight Critical Systems), and by NSF under grant CNS-1035715 (Assuring the safety, security, and reliability of medical device cyber physical systems).
+\bibliography{document}
+\bibliographystyle{splncs}
+
+\end{document}

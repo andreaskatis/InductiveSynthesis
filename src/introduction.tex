@@ -1,0 +1,39 @@
+\section{Introduction}
+Formal verification is a well-established area of research, with ever increasing
+popularity, in an attempt to provide better tools to software engineers during
+the design and testing phases of a project and effectively reduce its overall
+development cost. A particularly interesting problem in formal verification is
+that of program synthesis, where researchers try to construct efficient algorithms that can
+automatically generate code which is guaranteed to behave correctly based on the
+information provided by the user through formal or informal requirements.
+
+While the problem of synthesis has been explored in a significant amount of
+diverse contexts, in this paper we particularly focus on the automated
+generation of implementations for the leaf-level components of embedded
+systems, using safety properties that are expressed in the form of an
+Assume-Guarantee contract.
+In recent work~\cite{katis2016towards}, we introduced a novel synthesis
+procedure that, given a contract written in AADL, can provide an implementation
+that is able to react to uncontrolled inputs provided by the system's
+environment, while satisfying the restrictions specified in the contract
+assumptions and guarantees. The synthesis algorithm
+is an extension of our previous work on solving the problem of
+realizability modulo infinite theories~\cite{Katis15:Realizability}, using a
+model checking algorithm that has been formally verified in terms of its soundness for realizable
+results~\cite{Katis:machine}. Given the inductive proof of realizability, we
+take advantage of a sophisticated skolemizer for $\forall\exists$ formulas,
+named AE-VAL~\cite{fedyukovich2015automated}, that is able to provide us with
+witnesses of strategies that a synthesized implementation can follow at each
+step of execution. In the context of this paper, we have implemented the synthesis 
+algorithm and exercised it in terms of its performance on two separate case studies. We
+provide an informal proof of the algorithm's correctness regarding the
+implementations that it produces, and discuss our experimental results.
+
+In Section~\ref{sec:synthesis} we provide the necessary background
+definitions that are used in our synthesis algorithm, as well as an informal
+proof of the algorithm's correctness. Section~\ref{sec:cstudies} presents our
+results on using the algorithm to automatically generate leaf-level component
+implementations for different case studies. Finally, in
+Section~\ref{sec:related} we give a brief historical background on the related
+research work on synthesis, and we conclude with a discussion on potential
+future work in Section~\ref{sec:futurework}.

@@ -1,0 +1,22 @@
+\section{Future Work}
+
+While our current approach to program synthesis has been shown to be effective
+in the contracts that we have exercised, there are yet a lot of interesting ways
+to extend and optimize the underlying algorithm, to yield better results in the
+future. An important extension is that of supporting additional theories such as
+integers, which is currently not supported by AE-VAL's model based projection
+technique. To combat the lack of soundness on unrealizable results, and thus
+missing potential synthesized implementations, we will be developing a new
+algorithm that is mainly based on the idea of generating inductive invariants,
+much like the way that is presented in Property Directed Reachability
+algorithms. Finally, another potential optimization that could effectively
+reduce the algorithm's complexity is the further simplification of the
+transition relation that we are currently using, by reducing its complicated
+form through the mapping of common subexpressions on different conditional
+branches. This will also have a direct impact on the skolem relations retrieved
+by AE-VAL, reducing their individual size and improving, thus, the final
+implementation in terms of readability as well as its usability as an
+intermediate representation to the preferred target language.
+
+
+\label{sec:futurework}
