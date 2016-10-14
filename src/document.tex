@@ -37,27 +37,33 @@
 
 \begin{document}
 
-\title{Synthesis from Assume-Guarantee Contracts using Inductive Proofs of
+\title{Synthesis from Assume-Guarantee Contracts using Skolemized Proofs of
 Realizability}
+\author{Andreas Katis\inst{1}, Grigory Fedyukovich\inst{2}, Andrew
+Gacek\inst{3}, John Backes\inst{3}, Michael W. Whalen\inst{1}}%
 \institute{
 Department of Computer Science and Engineering,\\
  University of Minnesota, 200 Union Street, Minneapolis, MN 55455,USA\\
 \email{katis001@umn.edu, whalen@cs.umn.edu}
+\and
+Computer Science and Engineering, University of Washington, Seattle, Washington,
+USA\\
+\email{grigory@cs.washington.edu}
 \and 
 Rockwell Collins Advanced Technology Center\\
 400 Collins Rd. NE, Cedar Rapids, IA, 52498, USA\\
-\email{andrew.gacek@rockwellcollins.com}
+\email{\{andrew.gacek,john.backes\}@rockwellcollins.com}
 }
 \maketitle
 
 \begin{abstract}
-In recent work, we proposed an extention of our contract-based
-realizability checking algorithm to solve the synthesis problem modulo theories.
-Given the proof of a contract's realizability we apply a sophisticated skolemizer for $\forall\exists$ formulas to extract an implementation composed
-of skolem relations that describe the strategies that the implementation needs
-to follow in order to always comply to the given assume-guarantee contract.
+In recent work, we proposed an extension of our realizability checking algorithm
+for assume-guarantee contracts using theories. Given the k-inductive proof of a
+contract's realizability, we use the power of a sophisticated skolemizer for
+$\forall\exists$ formulas to construct an implementation composed of \textit{k}
+skolem functions, guaranteed to comply to the user-defined requirements.
 The algorithm is similar to k-induction model checking, but involves the use of 
-quantifiers to determine implementability.
+quantifiers to determine realizability.
 
 For the purposes of this paper we developed the proposed synthesis algorithm,
 and successfully applied it to synthesize implementations for simple case
