@@ -61,11 +61,21 @@ Rockwell Collins Advanced Technology Center\\
 \maketitle
 
 \begin{abstract}
+\grigory{I think, in the abstract, we need to be more enthusiastic about the contributions.
+Currently, it reads like there is a little of novelty: we extend the prior work, the approach is similar to something else, the evaluation is simple and so on.
+I believe, the abstract should sell the technique, and be precise about the positive evaluation points.
+Also, I would avoid messages like ``In recent work'' and ``our realizability checking algorithm''
+since the reviewers most likely are unaware of them.
+Instead, I would describe a bit what is ``k- inductive proof'' and possibly mention that this proof 
+is not necessarily to be given by your algorithm. This way, the synthesis algorithm 
+will look more generic, and the paper's contributions will be stronger.
+Finally, the abstract should not contain the summary of the paper (i.e., the last two sentences).}
+
 In recent work, we proposed an extension of our realizability checking algorithm
 for assume-guarantee contracts using theories. Given the k-inductive proof of a
-contract's realizability, we use the power of a sophisticated skolemizer for
-$\forall\exists$ formulas to construct an implementation composed of \textit{k}
-skolem functions, guaranteed to comply to the user-defined requirements.
+contract's realizability, represented by the set of \textit{k} valid $\forall\exists$-formulas, we propose
+to extract Skolem functions witnessing the existential quantification, and to compose the Skolem functions into 
+an implementation that is guaranteed to comply with the user-defined requirements.
 The algorithm is similar to k-induction model checking, but involves the use of 
 quantifiers to determine realizability.
 
