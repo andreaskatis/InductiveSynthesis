@@ -14,6 +14,7 @@
 \usepackage[T1]{fontenc}
 \usepackage{placeins}
 \usepackage{amsmath,amssymb}
+\usepackage{xspace}
 
 %to solve the hyperref problem of jumping to wrong places
 \usepackage[all]{hypcap}
@@ -21,14 +22,17 @@
 \usepackage{fancyvrb}
 \usepackage{relsize}
 \graphicspath{{images/}}
-
+\usepackage[boxruled,shortend,linesnumbered,algo2e]{algorithm2e}  % algo2e = use \begin{algorithm2e}
 \usepackage{float}
+
+\newcommand{\aeval}{\textsc{AE-VAL}\xspace}
 
 \renewcommand{\labelitemi}{\tiny$\blacksquare$}
 
 \newcommand{\andreas}[1]{\textcolor{blue}{Andreas: #1}}
 \newcommand{\mike}[1]{\textcolor{red}{Mike: #1}}
 \newcommand{\andrew}[1]{\textcolor{green}{Andrew: #1}}
+\newcommand{\grigory}[1]{\textcolor{brown}{Grigory: #1}}
 
 \newenvironment{requirement}
 {\vspace{0.05in}
@@ -74,6 +78,7 @@ discuss possible future directions that need to be explored to further improve t
 
 \input{introduction}
 \input{synthesis}
+\input{aeval}
 \input{cstudies}
 \input{related}
 \input{futurework}
@@ -82,6 +87,6 @@ discuss possible future directions that need to be explored to further improve t
 \section*{Acknowledgments}
 This work was funded by DARPA and AFRL under contract 4504789784 (Secure Mathematically-Assured Composition of Control Models), and by NASA under contract NNA13AA21C (Compositional Verification of Flight Critical Systems), and by NSF under grant CNS-1035715 (Assuring the safety, security, and reliability of medical device cyber physical systems).
 \bibliography{document}
-\bibliographystyle{splncs}
+\bibliographystyle{splncs03}
 
 \end{document}
