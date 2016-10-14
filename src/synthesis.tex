@@ -129,52 +129,43 @@ i.e. a proof that an implementation exists for the specified
 contract, we can use this proof in order to construct a witness
 implementation that satisfies it. The limited power of SMT solvers
 in terms of solving formulas containing nested quantifiers immediately ruled
-out the prospect of using one as our primary synthesis tool. Fortunately, a
-work from Fedyukovich et al.~\cite{fedyukovichae,fedyukovich2015automated}
-on a skolemizer for $\forall\exists$-formulas modulo theories aleviates this
-problem.
-
-The skolemizer, named AE-VAL, is using the Model-Based Projection technique
-in~\cite{komuravelli2014smt} to check the validity for formulas of the
-form $\forall \vec{x}.
-S(\vec{x}) \Rightarrow \exists \vec{y}. T(\vec{x},\vec{y})$, where $S(\vec{x})$
-and $T(\vec{x},\vec{y})$ are quantifier-free. If the formula is valid, a Skolem
-relation between the universally and existentially quantified variables is
-returned using a modified version of the Loos-Weispfenning quantifier
-elimination procedure~\cite{loos1993applying}, that underapproximates the
-existential part of the formula. The algorithm initially distributes the models
-of the original formula into disjoint uninterpreted partitions, with a local Skolem
-relation being computed for each partition in the process. From there, the use of a
-Horn-solver provides an interpretation for each partition, and a final global Skolem relation is produced.
+out the prospect of using one as our primary synthesis tool. Fortunately, 
+we are able to exploit our prior results in the scope of solving validity and 
+Skolemizing $\forall\exists$-formulas (to be described in Sect.~\ref{sec:aeval}).
 
 The idea behind our approach to solving the synthesis problem is
 straightforward. Consider the checks~\ref{eq:sbcheck} and~\ref{eq:echeck} that
 are used in the realizability checking algorithm. Both checks require
 that the reachable states explored are extendable using
 Definition~\ref{def:extend}.
-The idea then is to use the definition of $Extend_{n}(s)$ as input to AE-VAL,
-which will effectively give us a witness for each of the n times that we run
-\textit{BaseCheck} and a final witness for the inductive case in
-\textit{ExtendCheck}. Of course, $Extend_{n}(s)$ as defined in~\ref{def:extend} cannot
-be directly used for this purpose due to its form. This is not really an
-obstacle though, as we can rewrite the definition:
+The idea then is to decide if  $Extend_{n}(s)$ is valid and generate a witness 
+for each of the $n$ times that we run \textit{BaseCheck} and a final witness 
+for the inductive case in \textit{ExtendCheck}.
 
-\begin{multline*}
-\forall i_1, s_1, \ldots, i_n, s_n.\\ A(s, i_1) \land G_T(s, i_1, s_1)
-\land \cdots \land
-A(s_{n-1}, i_n) \land G_T(s_{n-1}, i_n, s_n)
-\Rightarrow \\
-\forall i.~ A(s_n, i) \Rightarrow \exists s'.~ G_T(s_n, i, s')
-\end{multline*}
-into an equivalent formula of the form $\forall \vec{x}.
-S(\vec{x}) \Rightarrow \exists \vec{y}. T(\vec{x},\vec{y})$ : 
-\begin{multline}
-	\label{ml:extendable2}
-		\forall i_1,s_1,\ldots,i_n,s_n,i. \\
-		A(s,i_1) \wedge G_T(s,i_1,s_1) \wedge \ldots \wedge
-		A(s_{n-1}, i_n) \wedge G_T(s_{n-1},i_n,s_n) \wedge A(s_n,i) \Rightarrow \\
-		\hspace{+2cm} \exists s'. G_T(s_n,i,s')
-	\end{multline}
+%GRIGORY: commented out the translation of A=> B => C into A /\ B => C since it is quite obvious
+
+% Of course, 
+%$Extend_{n}(s)$ as defined in~\eqref{def:extend} cannot
+%be directly used for this purpose due to its form. This is not really an
+%obstacle though, as we can rewrite the definition:
+%
+%\begin{multline*}
+%\forall i_1, s_1, \ldots, i_n, s_n.\\ A(s, i_1) \land G_T(s, i_1, s_1)
+%\land \cdots \land
+%A(s_{n-1}, i_n) \land G_T(s_{n-1}, i_n, s_n)
+%\Rightarrow \\
+%\forall i.~ A(s_n, i) \Rightarrow \exists s'.~ G_T(s_n, i, s')
+%\end{multline*}
+%
+%into an equivalent formula of the form $\forall \vec{x}.
+%S(\vec{x}) \Rightarrow \exists \vec{y}. T(\vec{x},\vec{y})$ : 
+%\begin{multline}
+%	\label{ml:extendable2}
+%		\forall i_1,s_1,\ldots,i_n,s_n,i. \\
+%		A(s,i_1) \wedge G_T(s,i_1,s_1) \wedge \ldots \wedge
+%		A(s_{n-1}, i_n) \wedge G_T(s_{n-1},i_n,s_n) \wedge A(s_n,i) \Rightarrow \\
+%		\hspace{+2cm} \exists s'. G_T(s_n,i,s')
+%	\end{multline}
 
 \begin{figure}
 \begin{small}
@@ -211,22 +202,14 @@ while(1) {
 Thus, we can construct the skeleton of an algorithm as shown in Figure~\ref{fig:algorithm}.  
 We begin by creating an array for each input and history variable up to depth
 $k$, where $k$ is the depth at which we found a solution to our realizability algorithm.
-In each array, the zeroth element is the `current' value of the variable, the first element is the previous value, and the $(k-1)$'th value is the $(k-1)$-step previous value.
+In each array, the zeroth element is the ``current'' value of the variable, the first element is the previous value, and the $(k-1)$'th value is the $(k-1)$-step previous value.
 We then generate witnesses for each of the {\em BaseCheck} instances of
-successive depth using the AE-VAL skolemizer to describe the initial behavior of
+successive depth to describe the initial behavior of
 the implementation up to depth $k$.  This process starts from the memory-free
-description of the initial state ($G_I$).  There are two `helper' operations:
+description of the initial state ($G_I$).  There are two ``helper'' operations:
 {\em update\_array\_history} shifts each array's elements one position forward
 (the $(k-1)$'th value is simply forgotten), and {\em read\_inputs} reads the current values of inputs into the zeroth element of the input variable arrays.  Once the history is entirely initialized using the {\em BaseCheck} witness values, we enter a recurrence loop where we use the solution of the {\em ExtendCheck} to describe the next value of outputs.
  
  \andreas{Add proof of correctness here}
 
 
-The structure of the Skolem relation is simple enough to translate
-into a program in a mainstream language.
-We need implementations that are able to keep track of the
-current state variables, the current inputs, as well as some history
-about the variable values in previous states. This can easily be handled, for
-example, in C with the use of arrays to keep record of each variable's $k$ last
-values, and the use of functions that update each variable's corresponding array
-to reflect the changes following a new step using the transition relation.

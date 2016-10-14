@@ -26,6 +26,7 @@
 \usepackage{float}
 
 \newcommand{\aeval}{\textsc{AE-VAL}\xspace}
+\newcommand{\jkind}{\textsc{JKind}\xspace}
 
 \renewcommand{\labelitemi}{\tiny$\blacksquare$}
 
@@ -76,16 +77,12 @@ and thus solve the problem of program synthesis.
 In this paper, we propose a novel approach to program synthesis guided by the proofs of realizability
  represented by the set of valid $\forall\exists$-formulas.
 In particular, we propose to extract Skolem functions witnessing the existential quantification, and to compose the Skolem functions into an implementation that is guaranteed to comply with the user-defined requirements.
-We implemented the approach for requirements in the form of  Assume-Guarantee contracts, using the
+We implemented the approach for requirements in the form of Assume-Guarantee contracts, using the
 Lustre specification language.
-It naturally extends the realizability check by the JKind model checker.
-Furthermore, we developed a compiler to translate these primitive implementations to the C
-language.
+It naturally extends the realizability check by the \jkind model checker.
+Furthermore, we developed a compiler to translate pure Skolem-containing implementations to the C programming language.
 For a vast variety of models, we test their corresponding
-implementations against the ones provided by LustreC, a compiler from Lustre to
-C implementations, yielding comparable results.
-\grigory{There is a need to the final sentence.. something like ``our C-implementations are better than the ones by  'LustreC.'}
-\qed
+implementations against the ones provided by the LustreC compiler, yielding comparable results.
 
 \vspace{+1em}
 
@@ -118,7 +115,7 @@ With the k-inductive proof as a guide, and a sophisticated tool for
 extracting Skolem functions from $\forall\exists$-formulas, we can effectively synthesize
 implementations that, by definition, are guaranteed to comply with the contract.
 We have incorporated the main synthesis algorithm as an extension to the
-realizability check provided in the JKind model checker, and furthermore
+realizability check provided in the \jkind model checker, and furthermore
 developed a compiler to translate these primitive implementations to the C
 language. 
 
@@ -127,6 +124,7 @@ language.
 \input{introduction}
 \input{synthesis}
 \input{aeval}
+\input{implementation}
 \input{cstudies}
 \input{related}
 \input{futurework}

@@ -1,0 +1,13 @@
+\section{Implementation}
+\label{sec:impl}
+
+\grigory{moved the paragraph from section 2 here. More info about the implementation would be desirable. Some details about smtlib2 -> C conversion, maybe}
+
+The structure of the Skolem relation is simple enough to translate
+into a program in a mainstream language.
+We need implementations that are able to keep track of the
+current state variables, the current inputs, as well as some history
+about the variable values in previous states. This can easily be handled, for
+example, in C with the use of arrays to keep record of each variable's $k$ last
+values, and the use of functions that update each variable's corresponding array
+to reflect the changes following a new step using the transition relation.
