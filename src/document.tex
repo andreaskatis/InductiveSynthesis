@@ -61,15 +61,24 @@ Rockwell Collins Advanced Technology Center\\
 \maketitle
 
 \begin{abstract}
-\grigory{I think, in the abstract, we need to be more enthusiastic about the contributions.
-Currently, it reads like there is a little of novelty: we extend the prior work, the approach is similar to something else, the evaluation is simple and so on.
-I believe, the abstract should sell the technique, and be precise about the positive evaluation points.
-Also, I would avoid messages like ``In recent work'' and ``our realizability checking algorithm''
-since the reviewers most likely are unaware of them.
-Instead, I would describe a bit what is ``k- inductive proof'' and possibly mention that this proof 
-is not necessarily to be given by your algorithm. This way, the synthesis algorithm 
-will look more generic, and the paper's contributions will be stronger.
-Finally, the abstract should not contain the summary of the paper (i.e., the last two sentences).}
+\grigory{version of the abstract:}
+The realizability problem in requirements engineering is to decide existence of an implementation that meets the given formal requirements.
+%Due to the potential conflicts between requirements, many user-defined specifications are proven to be unrealizable.
+A step forward after the realizability is proven is to construct such an implementation automatically,
+and thus solve the problem of program synthesis.
+In this paper, we propose a novel approach to program synthesis guided by the proofs of realizability
+ represented by the set of valid $\forall\exists$-formulas.
+In particular, we propose to extract Skolem functions witnessing the existential quantification, and to compose the Skolem functions into an implementation that is guaranteed to comply with the user-defined requirements.
+We implemented the approach for requirements in the form of  Assume-Guarantee contracts, using the
+Lustre specification language.
+It naturally extends the realizability check by the JKind model checker.
+Furthermore, we developed a compiler to translate these primitive implementations to the C
+language.
+The resulting implementations in C are further being tested and compared against the corresponding implementations provided by LustreC, a compiler from Lustre to C implementations.
+\grigory{There is a need to the final sentence.. something like ``our C-implementations are better than the ones by  'LustreC.'}
+\qed
+
+\vspace{+1em}
 
 Program synthesis is a particularly interesting area of research in
 artificial intelligence, and more recently in formal verification. The main idea
