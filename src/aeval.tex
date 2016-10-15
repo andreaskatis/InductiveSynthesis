@@ -1,7 +1,6 @@
 \newcommand{\such}{\,.\,}
 \newcommand{\vx}{\vec{x}}
 \newcommand{\vy}{\vec{y}}
-\newcommand{\vu}{\vec{u}}
 \newcommand{\Land}{\bigwedge}
 \newcommand{\Lor}{\bigvee}
 \newcommand{\mbp}{\mathit{MBP}}
@@ -76,7 +75,7 @@ $\Land_k \big(y_{j} \sim f^k_j(\vx)\big) \gets \textsc{Rewrite}(\pi_{y_j}(\vx,y_
 Quantifier elimination is a decision procedure that turns a quantified formula into an equivalent quantifier-free formula.
 In addition, the quantifier elimination algorithms are often able to discover a Skolem function that represents witnesses for the existentially quantified individual variables (e.g.,~\cite{DBLP:conf/cav/BalabanovJ11,DBLP:journals/sttt/KuncakMPS13,KLXJOIA,Chakraborty15}).
 %
-Various tasks in verification and synthesis~\cite{DBLP:conf/asplos/Solar-LezamaTBSS06,DBLP:conf/fmcad/CimattiGMT13,DBLP:conf/popl/BeyeneCPR14,DBLP:conf/nfm/GasconT14} rely on efficient techniques to remove existential quantifiers from formulas in first-order logic, thus adjusting the task to be decided by an SMT solver.
+Various tasks in verification and synthesis~\cite{DBLP:conf/fmcad/CimattiGMT13,DBLP:conf/popl/BeyeneCPR14,DBLP:conf/nfm/GasconT14} rely on efficient techniques to remove existential quantifiers from formulas in first-order logic, thus adjusting the task to be decided by an SMT solver.
 In particular, \emph{functional synthesis} aims at computing a function that meets a given input/output relation.
 A function with an input $x$ and an output $y$, specified by a relation $f(x,y)$, can be constructed as a by-product of deciding validity of the formula $\forall x \exists y \such f(x,y)$.
 Due to a well-known \emph{AE-paradigm} (also referred to as \emph{Skolem paradigm}~\cite{DBLP:conf/popl/PnueliR89}),
@@ -93,7 +92,7 @@ Instead, it is enough to operate by (possibly incomplete) sets of models.
 This idea relies on some notion of projection that under-approximates existential quantification.
 In this section, we consider a concept of Model-Based Projections (MBP), recently proposed by~\cite{komuravelli2014smt,Dutertre}.
 
-In the following, we use vector notation to denote sets of variables (and set-theoretic operators of \emph{subset} $\vu \subseteq \vx$, \emph{complement} $\vx_{\vu} = \vx \setminus \vu$, \emph{union} $\vx = \vu \cup \vx_{\vu}$).
+%In the following, we use vector notation to denote sets of variables (and set-theoretic operators of \emph{subset} $\vu \subseteq \vx$, \emph{complement} $\vx_{\vu} = \vx \setminus \vu$, \emph{union} $\vx = \vu \cup \vx_{\vu}$).
 \begin{definition}
 \label{def:mbp}
 An $\mathit{MBP}_{\vy}$ is a function from models of
@@ -264,6 +263,7 @@ Method \textsc{MinimalSkolem} rewrites each clause using the following rules:
      y_j \ge g (\vx) &\!\implies\! y_j = g (\vx)  \notag \\
      y_j < g (\vx) &\!\implies\! y_j = g (\vx) - 1 \notag \\
      y_j > g (\vx) &\!\implies\! y_j = g (\vx) + 1  \notag \\
+     y_j \ge g (\vx) \land y_j \le g (\vx) &\!\implies\! y_j = g (\vx)  \notag \\
      y_j > g_1 (\vx) \land y_j > g_2 (\vx) &\!\implies\! y_j = max(g_1 (\vx), g_2(\vx)) + 1  \notag \\
      y_j < g_1 (\vx) \land y_j < g_2 (\vx) &\!\implies\! y_j = min(g_1 (\vx), g_2(\vx)) - 1  \notag \\
      y_j > g_1 (\vx) \land y_j < g_2 (\vx) &\!\implies\! y_j = \frac{g_2 (\vx) - g_1(\vx)} {2}  \notag \\
