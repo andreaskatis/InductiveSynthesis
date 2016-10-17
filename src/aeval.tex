@@ -20,7 +20,7 @@
 %\SetAlgoNoLine
 \SetKw{KwContinue}{continue}
 \KwIn{$S(\vx), \exists \vy \such T(\vx,\vy)$}
-\KwOut{return value $\in$ \{\valid, \invalid\} of ${S(\vx)\!\! \implies\!\! \exists \vy \such T(\vx,\vy)}$}
+\KwOut{return value $\in \{\valid, \invalid\}$ of ${S(\vx)\!\! \implies\!\! \exists \vy \such T(\vx,\vy)}$}
 \KwData{$\textsc{SmtSolver}$, counter $i$, models $\{m_i\}$, MBPs $\{T_{i}(\vx)\}$, conditions $\{\phi_i({\vx,\vy})\}$}
 \BlankLine
 $\textsc{SmtAdd}(S(\vx))$; \\
@@ -51,19 +51,15 @@ $\textsc{SmtAdd}(\neg {T_{i}})$\label{alg:block}; \\
 \SetInd{0.4em}{0.4em}
 \SetKwFor{ForAll}{forall}{do}{}
 \SetKwFor{For}{for}{do}{}
-\KwIn{$y_j \in \vy$, local Skolem relation \newline $\phi(\vx,\vy) = \Land_{y_j \in \vy}(\psi_{y_j}(\vx,y_{j},\ldots, y_{n}))$}
+\KwIn{$y_j \in \vy$, local Skolem relation $\phi(\vx,\vy) = \Land_{y_j \in \vy}(\psi_{y_j}(\vx,y_{j},\ldots, y_{n}))$}
 \KwOut{factor of the local Skolem refinement $y_j = f_j(\vx)$}
 \KwData{known functions $f_{j+1}(\vx),\ldots,f_{n}(\vx)$}
 \BlankLine
-\BlankLine
-$\pi_{y_j}(\vx,y_{j}) 
-%  [  \equiv \psi_{y_j}(\vx,y_{i}, g_1(\vx),\ldots g_n(\vx)) ]
-  \gets
-  \textsc{Substitute}(\psi_{y_j}(\vx,y_{j},y_{j+1},\ldots,y_{n}), 
-  f_{j+1}(\vx),\ldots,f_{n}(\vx))$\label{alg:loc_subst};\\
-\lIf{$(\pi_{y_j}(\vx,y_{j}) \in \varnothing)$}{\Return $\varnothing$\label{alg:loc_ret_none}}
-$\Land_k \big(y_{j} \sim f^k_j(\vx)\big) \gets \textsc{Rewrite}(\pi_{y_j}(\vx,y_{j}))$\label{alg:loc_rewrite};\\
-\Return $\textsc{MinimalSkolem}\Big(\Land_k \big(y_{j} \sim f^k_j(\vx)\big)\Big)$\label{alg:loc_inst};\\
+\For{$(i = n; i > j; i++)$}{
+  $\psi_{y_j}(\vx,y_{j},\ldots,y_{n}) \gets \textsc{Substitute}(\psi_{y_j}(\vx,y_{j},\ldots,y_{n}) , y_i, f_i(\vx))$\label{alg:loc_subst};\\
+}
+%\lIf{$(\pi_{y_j}(\vx,y_{j}) \in \varnothing)$}{\Return $\varnothing$\label{alg:loc_ret_none}}
+\Return $\textsc{SkolemFunction}\Big(\psi_{y_j}(\vx,y_{j},\ldots,y_{n})  \Big)$\label{alg:loc_inst};\\
 \caption{$\textsc{LocalFactor}(y_j, \phi(\vx,\vy)$)}
 \label{alg:loc}
 \end{algorithm2e}
@@ -124,8 +120,8 @@ LW states that the equation~\eqref{eq:formula_rewrite} holds:
 
 In~\eqref{eq:formula_rewrite}, $\mathit{lits}(T)$ denote the set of literals of $T$, $T[\cdot]$ stands for a \emph{virtual substitution} for the literals containing $y$.
 In particular, $T[e]$ substitutes exact values of $y$ ($y=e$), $T[l+\epsilon]$ substitutes the intervals ($l < y$) of possible values of $y$, $T[-\infty]$ substitutes the rest of the literals.
-Consequently, a function $\mathit{LRAProj_{T}}$ is an implementation of the $\mathit{MBP}$ function for~\eqref{eq:formula_rewrite}:
-
+Consequently, a function $\mathit{LRAProj_{T}}$ is an implementation of the $\mathit{MBP}$ function for~\eqref{eq:formula_rewrite}:%
+%
 \begin{equation}
 \begin{aligned}
 \label{case:proj_define}
@@ -146,58 +142,57 @@ T[-\infty], 		& \mbox{otherwise}
 
 
 
-\subsection{Deciding Validity of $\forall\exists$-Formulas}
+\subsection{Validity and Skolem extraction}
 \label{sim:check}
 
-An algorithm \aeval for deciding validity of $\forall\exists$-formulas and constructing witnessing Skolem relations was presented in~\cite{fedyukovich2015automated}.
-  Without loss of generality, we restrict the input formula to have the form 
-${S(\vx)\implies\exists \vy \such T(\vx,\vy)}$, where
-$S$ has no universal quantifiers, and $T$ is quantifier-free.
+\aevalalgorithm  
 
+Skolemization (i.e., introducing Skolem functions) is a well-known
+technique for removing existential quantifiers in first order formulas.
+%More specifically:
+%
+%\begin{definition}[cf.~\cite{skolem}]
+%\label{def:sk_fun}
+Given a formula ${ \exists y \such \psi(\vx, y)}$,
+a~\emph{Skolem function} for $y$, $\mathit{sk}_{y}(\vx)$ is a function such that
+$\exists y \such \psi(\vx,y)\!\iff\!\psi (\vx, \mathit{sk}_{y} (\vx))$.
+%\end{definition}
+We generalize the definition of a Skolem function for the case of a
+vector of existentially quantified variables $\vy$, by relaxing the
+relationships between elements of $\vx$ and $\vy$.
+Given a formula ${\exists \vy \such \Psi(\vx, \vy)}$, a~\emph{Skolem relation} for $\vy$ is a relation ${\mathit{Sk}_{\vy} (\vx, \vy)}$ such that 1) $\mathit{Sk}_{\vy} (\vx, \vy) \implies \Psi (\vx, \vy)$ and 2) $\exists \vy \such \Psi(\vx, \vy)\!\iff\!\mathit{Sk}_{\vy} (\vx, \vy)$.
+  
 
-\aeval is an extension of the MBP-algorithm in~\cite{komuravelli2014smt}.
-It assumes that for each projection $T_{i}$ there exists a condition $\phi_i$ under which  $T$ is equisatisfiable with $T_{i}$:
-%$\phi_i(\vx,\vy)$ such that~\eqref{eq:phi} holds.
-\begin{equation}
-\label{eq:phi}
-\phi_i(\vx,\vy) \implies \big( T_{i}(\vx) \iff T(\vx,\vy) \big)
-\end{equation}
-Intuitively, each $\phi_i$ captures the substitutions made in $T$ to produce $T_{i}$.
-%(is a condition under which $T$ is equisatisfiable with $T_{i}$).
-We assume that each $\phi_i$ is in the Cartesian form, i.e., a conjunction of
-terms, in which each $y_j \in \vy$ appears at most once:
-\begin{equation}
-\label{eq:phi_conj}
-\phi_i(\vx,\vy) = \Land_{y_j \in \vy}(\psi_{y_j}(\vx,y_{j},\ldots,y_{n}))
-\end{equation}
+The algorithm \aeval for deciding validity and Skolem extraction assumes that a formula $\Psi$ can be transformed
+into the form ${\exists \vy \such \Psi(\vx, \vy)} \equiv {S(\vx)
+  \!\implies\! \exists \vy \such T(\vx,\vy)}$, where $S(\vx)$ has only
+existential quantifiers, and $T(\vx, \vy)$ is quantifier-free.
+%
+\aeval partitions
+the formula, and searches for a witnessing local Skolem relation of
+each partition.  \aeval iteratively constructs a set of MBPs $\{T_i(\vx)\}$, each of which 
+is connected with a so called local Skolem relation $\phi_i(\vx,\vy)$, such that
+$\phi_i(\vx,\vy) \!\implies\! (T_{i}(\vx) \!\iff\!
+  T(\vx,\vy))$ (i.e., that make the corresponding projections equisatisfiable with $T$).
+While the pseudocode of \aeval is shown in Alg.~\ref{alg:ae_val}, we refer the reader to~\cite{fedyukovich2015automated} for
+more detail.
 
-      \aevalalgorithm  
-
-\grigory{to re-iterate}
-
-We write $(T_{i}, \phi_i) \gets
-\textsc{GetMBP} (\vy, m_i, T(\vx, \vy))$ for the invocation of the MBP-algorithm that takes
-a formula $T$, a model $m_i$ of $T$ and a vector of variables $\vy$,
-and returns a projection $T_{i}$ of $T$ based on $m_i$ and the corresponding
-relation $\phi_i$.
-
-
-\aeval is shown in Alg.~\ref{alg:ae_val}.  Given formulas
-$S(\vx)$ and ${\exists \vy \such T(\vx, \vy)}$, it
-decides validity of ${S(\vx)\! \implies\! \exists \vy \!\such\!
-  T(\vx, \vy)}$.  \aeval enumerates the
-models of $S \land T$ and blocks them from $S$.
-In each iteration $i$, it first checks whether
-$S$ is non-empty (line~3) and then looks for a model $m_i$ of $S
-\land T$ (line~\ref{alg:model}).  If $m_i$ is found, \aeval
-gets a projection $T_i$ of $T$ based on $m_i$ (line~\ref{alg:proj})
-and blocks all models contained in $T_i$ from $S$
-(line~\ref{alg:block}).  The algorithm iterates until either it
-finds a model of $S$ that can not be extended to a
-model of $T$ (line~\ref{alg:returnSat}), or all models of $S$
-are blocked (line~\ref{alg:returnUnsat}). In the first case, the input
-formula is invalid. In the second case, every model of $S$ has been extended
-to some model of $T$, and the  formula is valid. 
+%\aeval is shown in Alg.~\ref{alg:ae_val}.  Given formulas
+%$S(\vx)$ and ${\exists \vy \such T(\vx, \vy)}$, it
+%decides validity of ${S(\vx)\! \implies\! \exists \vy \!\such\!
+%  T(\vx, \vy)}$.  \aeval enumerates the
+%models of $S \land T$ and blocks them from $S$.
+%In each iteration $i$, it first checks whether
+%$S$ is non-empty (line~3) and then looks for a model $m_i$ of $S
+%\land T$ (line~\ref{alg:model}).  If $m_i$ is found, \aeval
+%gets a projection $T_i$ of $T$ based on $m_i$ (line~\ref{alg:proj})
+%and blocks all models contained in $T_i$ from $S$
+%(line~\ref{alg:block}).  The algorithm iterates until either it
+%finds a model of $S$ that can not be extended to a
+%model of $T$ (line~\ref{alg:returnSat}), or all models of $S$
+%are blocked (line~\ref{alg:returnUnsat}). In the first case, the input
+%formula is invalid. In the second case, every model of $S$ has been extended
+%to some model of $T$, and the  formula is valid. 
 
 \newcommand{\skolemcases}{%
 \begin{equation}
@@ -212,63 +207,132 @@ to some model of $T$, and the  formula is valid.
 \end{equation}
 }
 
-\textsc{AE-VAL} is designed to
-construct a Skolem relation
-${\mathit{Sk}_{\vy} (\vx, \vy)}$, that maps each
+A Skolem relation
+${\mathit{Sk}_{\vy} (\vx, \vy)}$ by \aeval maps each
 model of $S(\vx)$ to a corresponding model of $T(\vx,\vy)$.
-We use a set of
-projections $\{T_{i}(\vx)\}$ for $T(\vx,\vy)$ and a set of conditions $\{\phi_i
-(\vx, \vy)\}$
-that make the corresponding projections equisatisfiable with $T(\vx,\vy)$.
 Intuitively, $\phi_i$ maps each model of $S \land T_{i}$ to a model of $T$.
-Thus, in order to define the guarded Skolem relation $\mathit{Sk}_{\vy}(\vx, \vy)$ it is enough to 
+Thus, in order to define the  Skolem relation $\mathit{Sk}_{\vy}(\vx, \vy)$ it is enough to 
 match each $\phi_i$ against the corresponding $T_{i}$:
 
 \skolemcases
 
 
-\subsection{Towards Minimal Skolem Refinement}
+\subsection{Refining Skolem Relations into Skolem Functions}
 \label{sec:new}
 
 \localfactoralg
 
-By construction, each local Skolem relation $\phi(\vx,\vy)$ has a form $\Land_{y_j \in \vy}(\psi_{y_j}(\vx,y_{j},\ldots,y_{n}))$.
-Since quantifier elimination in \aeval is applied iteratively for each variable $y_j \in \vy$, $y_j$ may depend on the variables of $y_{j+1},\ldots, y_{n}$ that are still not eliminated in the current iteration $j$.
-Each $\psi_{y_j}(\vx,y_{j},\ldots,y_{n})$ is the conjunction
-$\psi_{y_j}(\vx,y_{j},\ldots,y_{n}) = \Land_{i}(cl_i(\vx,y_{j},\ldots,y_{n}))$,
-where each $cl_i$ is  an (in)equality.
+
+Since \aeval is an extension of the MBP-algorithm mentioned in Sect.~\ref{sec:mbp},
+each $\phi_i$ is constructed from the substitutions made in $T$ to produce $T_{i}$.
+Furthermore, 
+%(is a condition under which $T$ is equisatisfiable with $T_{i}$).
+%We assume that each $\phi_i$ is in the Cartesian form, i.e., a conjunction of
+%terms, in which each $y_j \in \vy$ appears at most once:
+%\begin{equation}
+%\label{eq:phi_conj}
+%\phi_i(\vx,\vy) = \Land_{y_j \in \vy}(\psi_{y_j}(\vx,y_{j},\ldots,y_{n}))
+%\end{equation}
+%
+%By construction, each local Skolem relation $\phi(\vx,\vy)$ has a form $\Land_{y_j \in \vy}(\psi_{y_j}(\vx,y_{j},\ldots,y_{n}))$.
+%Since
+each MBP in \aeval is constructed iteratively for each variable $y_j \in \vy$.
+Thus, $y_j$ may depend on the variables of $y_{j+1},\ldots, y_{n}$ that are still not eliminated in the current iteration $j$.
+%Each $\psi_{y_j}(\vx,y_{j},\ldots,y_{n})$ is the conjunction $\psi_{y_j}(\vx,y_{j},\ldots,y_{n}) = \Land_{i}(cl_i(\vx,y_{j},\ldots,y_{n}))$, where each $cl_i$ is  an (in)equality.
 
 For each $y_j\in \vy$, our goal is to find a Skolem function $f_{y_j}(\vx)$, such that $(y_j = f_{y_j}(\vx)) \!\implies\! \exists y_{j+1},\ldots,y_{n} \such \psi_{y_j}(\vx,y_{j},\ldots,y_{n}) $.
 The idea is presented in Alg.~\ref{alg:loc}.
 The algorithm is applied separately for each $y_j \in \vy$, starting from $y_n$ till $y_1$.
 For each $y_j$, assume, we already established Skolem functions $f_{j+1}(\vx),\ldots,f_{n}(\vx)$ for variables $y_{j+1},\ldots,y_n$ in the previous runs of the algorithm. 
-
-First, the algorithm substitutes each appearance of variables $y_{j+1},\ldots, y_{n}$ in $\psi_{y_j}$ by $f_{j+1}(\vx),\ldots,f_{n}(\vx)$ (line~\ref{alg:loc_subst}).
-If for some variable there is no Skolem function to substitute, the algorithm halts with nothing
-(line~\ref{alg:loc_ret_none}).
-Second, the algorithm normalizes $\pi_{y_j}(\vx,y_{j})$ into the form
-$\Land_k \big(y_{j} \sim f_k(\vx)\big)$, i.e., conjunction of
-expressions, left-hand-sides of which are reserved for $y_j$ and ${\sim
-\in \{<, \le, =, \ge, >\}}$.
-For this, it uses the method \textsc{Rewrite} (line~\ref{alg:loc_rewrite}) that rewrites each clause using the following rule (where $g,h$ - are functions over $\vx$, $p,q$ - rational numbers, $\mathit{sgn}$ - a function, returning the sign of the rational number):
-
-\begin{equation}
-{\Big( (g(\vx)+ p\!\times\!y_j}) \sim ( {h(\vx) + q\!\times\!y_j})\Big) \!\implies\! \Big(\big(\mathit{sgn}(p-q)\times y_j \big) \sim \big( -\frac{g(\vx)}{|p-q|} + \frac{h(\vx)}{|p-q|} \big)\Big)  \notag
-\end{equation}
-Finally the algorithm gets rid of inequalities.
+%
+First, the algorithm substitutes each appearance of variables $y_{j+1},\ldots, y_{n}$ in $\psi_{y_j}$ by $f_{n}(\vx),\ldots,f_{j+1}(\vx)$.
+%If for some variable there is no Skolem function to substitute, the algorithm halts with nothing (line~\ref{alg:loc_ret_none}).
+Second, %the algorithm uses standard LRA-rules to normalize $\pi_{y_j}(\vx,y_{j})$ into the form $\Land_k \big(y_{j} \sim f_k(\vx)\big)$, i.e., conjunction of
+%expressions, left-hand-sides of which are reserved for $y_j$ and ${\sim
+%\in \{<, \le, =, \ge, >\}}$.
+%For this, it uses the method \textsc{Rewrite} (line~\ref{alg:loc_rewrite}) that rewrites each clause using the following rule (where $g,h$ - are functions over $\vx$, $p,q$ - rational numbers, $\mathit{sgn}$ - a function, returning the sign of the rational number):
+%
+%\begin{equation}
+%{\Big( (g(\vx)+ p\!\times\!y_j}) \sim ( {h(\vx) + q\!\times\!y_j})\Big) \!\implies\! \Big(\big(\mathit{sgn}(p-q)\times y_j \big) \sim \big( -\frac{g(\vx)}{|p-q|} + \frac{h(\vx)}{|p-q|} \big)\Big)  \notag
+%\end{equation}
+%Finally 
+the algorithm gets rid of inequalities by transforming them into equalities, thus producing a Skolem function.
+In the rest of the section we show several fundamental rules and properties behind this operation.
 %If there are exist some, $f(\vx)$ defines some interval for the values for $y_j$.
-Method \textsc{MinimalSkolem} rewrites each clause using the following rules:
+%Method \textsc{SkolemFunction} obtains equalities 
+%rewrites each clause using the following rules:
+
+\begin{lemma}
+After all substitutions in line~\ref{alg:loc_subst} of Alg.~\ref{alg:loc}, each $\psi_{y_j}(\vx,y_{j},\ldots,y_{n})$ is a conjunction of the form
+$L_{y_j} \land U_{y_j} \land M_{y_j} \land V_{y_j} \land E_{y_j} \land N_{y_j}$ where
+%
+$L_{y_j} = \Land_{l}(y_j > l(\vx))$, 
+$U_{y_j} = \Land_{u}(y_j < u(\vx))$, 
+$M_{y_j} = \Land_{l}(y_j \ge l(\vx))$, 
+$V_{y_j} = \Land_{u}(y_j \le u(\vx))$, 
+$E_{y_j} = \Land_{e}(y_j = e(\vx))$, 
+$N_{y_j} = \Land_{n}(y_j \neq n(\vx))$.
+%
+\end{lemma}
+\begin{proof}
+Follows directly from~\eqref{case:proj_define}.
+\qed
+\end{proof}
+
+The procedure to extract a Skolem function out of a Skolem relation proceeds by analyzing terms in $L_{y_j}$, $U_{y_j}$, $M_{y_j}$, $V_{y_j}$,$E_{y_j}$ and $N_{y_j}$.
+If there is at least one conjunct $(y_j = e(\vx)) \in E_{y_j}$ then $(y_j = e(\vx))$ itself is a Skolem function.
+Otherwise, the algorithm creates it from the following primitives.
+
+\begin{definition}
+Let $l(\vx)$ and $u(\vx)$ be two linear functions,
+the higher order functions $\mathit{MAX}$, $\mathit{MIN}$, $\mathit{MID}$, $\mathit{LT}$, $\mathit{GT}$ are defined as follows:
 \begin{align}
-     y_j \le g (\vx) &\!\implies\! y_j = g (\vx)  \notag \\
-     y_j \ge g (\vx) &\!\implies\! y_j = g (\vx)  \notag \\
-     y_j < g (\vx) &\!\implies\! y_j = g (\vx) - 1 \notag \\
-     y_j > g (\vx) &\!\implies\! y_j = g (\vx) + 1  \notag \\
-     y_j \ge g (\vx) \land y_j \le g (\vx) &\!\implies\! y_j = g (\vx)  \notag \\
-     y_j > g_1 (\vx) \land y_j > g_2 (\vx) &\!\implies\! y_j = max(g_1 (\vx), g_2(\vx)) + 1  \notag \\
-     y_j < g_1 (\vx) \land y_j < g_2 (\vx) &\!\implies\! y_j = min(g_1 (\vx), g_2(\vx)) - 1  \notag \\
-     y_j > g_1 (\vx) \land y_j < g_2 (\vx) &\!\implies\! y_j = \frac{g_2 (\vx) - g_1(\vx)} {2}  \notag \\
-     ...
+\mathit{MAX}(l, u) (\vx) &= ite (l (\vx) < u (\vx), u(\vx), l(\vx)) \notag \\
+\mathit{MIN}(l, u) (\vx) &= ite (l (\vx) < u (\vx), l(\vx), u(\vx)) \notag \\
+\mathit{MID}(l, u) (\vx) &= \frac{l(\vx) + u(\vx)}{ 2} \notag \\
+\mathit{LT} (u) (\vx) &= u (\vx) -1 \notag \\
+\mathit{GT} (l) (\vx) &= l (\vx) + 1 \notag 
 \end{align}
+\end{definition}
+
+\begin{lemma}
+If $L_{y_j}$ consists of $n>1$ conjuncts then it is equivalent to $y_j > \mathit{MAX} (l_1, \mathit{MAX} (l_2,\ldots \mathit{MAX} (l_{n-1}, l_n) )) (\vx)$.
+If $U_{y_j}$ consists of $n>1$ conjuncts then it is equivalent to $y_j < \mathit{MIN} (u_1, \mathit{MIN} (u_2,\ldots \mathit{MIN} (u_{n-1}, u_n) ))(\vx)$.
+%If  $M_{y_j}$ consists of $n>1$ conjuncts then it is equivalent to $y_j \ge \mathit{MAX} (l_1, \mathit{MAX} (l_2,\ldots \mathit{MAX} (l_{n-1}$, $ l_n) )) (\vx)$.
+%If  $V_{y_j}$ consists of $n>1$ conjuncts then it is equivalent to $y_j \le \mathit{MIN} (u_1$, $\mathit{MIN} (u_2,\ldots \mathit{MIN} (u_{n-1}, u_n) )) (\vx)$.
+\end{lemma}
+Similar for $M_{y_j}$ and for $V_{y_j}$.
+
+\begin{lemma}
+If $L_{y_j}$ consists of 1 conjunct and the rest of $U_{y_j}$, $M_{y_j} $,$V_{y_j}$,$E_{y_j}$ and $N_{y_j}$ are empty then the Skolem can be rewritten into $y_j = \mathit{GT} (l)(\vx)$.
+\end{lemma}
+Similar for $U_{y_j}$ (Skolem  rewritten into $y_j = \mathit{MID} (u)(\vx)$).
+
+\begin{lemma}
+If $L_{y_j}$, $U_{y_j}$  consist of 1 conjunct each, and the rest of $M_{y_j} $,$V_{y_j}$, $E_{y_j}$ and $N_{y_j}$ are empty then the Skolem can be rewritten into $y_j = \mathit{MID} (l, u)(\vx)$. 
+\end{lemma}
+Similar for $M_{y_j}$ and $V_{y_j}$, and for combinations with $L_{y_j}$ and $U_{y_j}$.
 
 
+\begin{lemma}
+If $L_{y_j}$, $U_{y_j}$ and $N_{y_j}$ consist of 1 conjunct each and the rest of $M_{y_j} $,$V_{y_j}$,$E_{y_j}$ and $N_{y_j}$ are empty then the Skolem can be rewritten into $y_j = \mathit{FMID} (l, u, h)(\vx)$ where%
+\begin{align}
+\mathit{FMID}(l, u, h) (\vx) = ite (&\mathit{MID}(l, u) (\vx) = h(\vx),  \notag \\
+                          &\mathit{MID}(l, \mathit{MID}(l, u)) (\vx), \notag \\
+                          &\mathit{MID}(l, u) (\vx)) \notag 
+\end{align}
+\end{lemma}
+Similar for $M_{y_j}$ and $V_{y_j}$. 
+For bigger number of conjuncts of $N_{y_j}$, the Skolem gets rewritten in a similar way cascadically.
 
+
+\begin{lemma}
+If $L_{y_j}$, $N_{y_j}$  consist of 1 conjunct each, and the rest of $M_{y_j} $,$V_{y_j}$, $E_{y_j}$ and $U_{y_j}$ are empty then the Skolem can be rewritten into $y_j = \mathit{FMID} (l, GT(l))(\vx)$. 
+\end{lemma}
+Similar for $M_{y_j}$.
+
+
+\begin{lemma}
+If $U_{y_j}$, $N_{y_j}$  consist of 1 conjunct each, and the rest of $M_{y_j} $,$V_{y_j}$, $E_{y_j}$ and $L_{y_j}$ are empty then the Skolem can be rewritten into $y_j = \mathit{FMID} (LT(u), u)(\vx)$. 
+\end{lemma}
+Similar for $V_{y_j}$.
