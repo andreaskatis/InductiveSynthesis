@@ -49,32 +49,32 @@ $\textsc{SmtAdd}(\neg {T_{i}})$\label{alg:block}; \\
 \SetInd{0.4em}{0.4em}
 \SetKwFor{ForAll}{forall}{do}{}
 \SetKwFor{For}{for}{do}{}
-\KwIn{$y_j \in \vy$, local Skolem relation $\phi(\vx,\vy) = \Land_{y_j \in \vy}(\psi_{y_j}(\vx,y_{j},\ldots, y_{n}))$, Skolem functions $y_{j+1} = f_{j+1}(\vx),\ldots, y_{n} = f_{n}(\vx)$.}
-\KwData{Factored formula $\pi_{y_j}(\vx,y_{j}) = L_{y_j} \land U_{y_j} \land M_{y_j} \land V_{y_j} \land E_{y_j} \land N_{y_j}$; assuming (for simplicity of presentation) that $M_{y_j} = \varnothing \land  V_{y_j} = \varnothing$.}
+\KwIn{$y_j \in \vy$, local Skolem relation $\phi(\vx,\vy) = \Land_{y_j \in \vy}(\psi_j(\vx,y_{j},\ldots, y_{n}))$, Skolem functions $y_{j+1} = f_{j+1}(\vx),\ldots, y_{n} = f_{n}(\vx)$.}
+\KwData{Factored formula $\pi_j(\vx,y_{j}) = L_{\pi_j} \land U_{\pi_j} \land E_{\pi_j} \land N_{\pi_j}$. %; %assuming (for simplicity of presentation) that $M_{\pi_j} = \varnothing \land  V_{\pi_j} = \varnothing$.
+}
 \KwOut{Local Skolem function $y_j = f_j(\vx)$.}
 \BlankLine
-\For{$(i = n; i > j; i++)$}{
-  $\psi_{y_j}(\vx,y_{j},\ldots,y_{n}) \gets \textsc{Substitute}(\psi_{y_j}(\vx,y_{j},\ldots,y_{n}) , y_i, f_i(\vx))$\label{alg:loc_subst};\\
+\For{$(i = n; i > j; i\texttt{-}\texttt{-})$}{
+  $\psi_j(\vx,y_{j},\ldots,y_{n}) \gets \textsc{Substitute}(\psi_j(\vx,y_{j},\ldots,y_{n}) , y_i, f_i(\vx))$\label{alg:loc_subst};\\
 }
 \BlankLine
 
-$\pi_{y_j}(\vx,y_{j}) \gets \psi_{y_j}(\vx,y_{j},\ldots,y_{n})$\label{alg:elim_compl};\\
+$\pi_j(\vx,y_{j}) \gets \psi_j(\vx,y_{j},\ldots,y_{n})$\label{alg:elim_compl};\\
 \BlankLine
 
-\lIf(){$(E_{y_j} \neq \varnothing)$}{\Return $E_{y_j}$}
+\lIf(){$(E_{\pi_j} \neq \varnothing)$}{\Return $E_{\pi_j}$}
 
-$\pi_{y_j}(\vx,y_{j}) \gets \textsc{Merge}(L_{y_j}, \mathit{MAX}, \pi_{y_j}(\vx,y_{j}))$;\\
-$\pi_{y_j}(\vx,y_{j}) \gets \textsc{Merge}(U_{y_j} , \mathit{MIN}, \pi_{y_j}(\vx,y_{j}))$;\\
+$\pi_j(\vx,y_{j}) \gets \textsc{Merge}(L_{\pi_j}, \mathit{MAX}, \pi_j(\vx,y_{j}))$\label{alg:merge1};\\
+$\pi_j(\vx,y_{j}) \gets \textsc{Merge}(U_{\pi_j} , \mathit{MIN}, \pi_j(\vx,y_{j}))$\label{alg:merge2};\\
 \BlankLine
 
-\lIf(){$(U_{y_j} = \varnothing \land N_{y_j} = \varnothing)$}{\Return $\textsc{Rewrite}(L_{y_j} , \mathit{GT}, \pi_{y_j}(\vx,y_{j}))$}
-
-\lIf(){$(L_{y_j} = \varnothing  \land N_{y_j} = \varnothing)$}{\Return $\textsc{Rewrite}(U_{y_j} , \mathit{LT}, \pi_{y_j}(\vx,y_{j}))$}
+\uIf(){$(N_{\pi_j} = \varnothing)$}{
+\lIf(){$(L_{\pi_j} \neq \varnothing \land U_{\pi_j} \neq \varnothing)$}{\Return $\textsc{Rewrite}(L_{\pi_j}  \land U_{\pi_j} , \mathit{MID}, \pi_j(\vx,y_{j}))$\label{alg:rewrite_mid}}
+\lIf(){$(L_{\pi_j} = \varnothing)$}{\Return $\textsc{Rewrite}(U_{\pi_j} , \mathit{LT}, \pi_j(\vx,y_{j}))$\label{alg:rewrite_lt}}
+\lIf(){$(U_{\pi_j} = \varnothing)$}{\Return $\textsc{Rewrite}(L_{\pi_j} , \mathit{GT}, \pi_j(\vx,y_{j}))$\label{alg:rewrite_gt}}
+}
 \BlankLine
-
-\lIf(){$(N_{y_j} = \varnothing)$}{\Return $\textsc{Rewrite}(L_{y_j} \land U_{y_j} , \mathit{MID}, \pi_{y_j}(\vx,y_{j}))$}
-
-\Return $\textsc{Rewrite}(L_{y_j} \land U_{y_j} \land N_{y_j}, \mathit{FMID}, \pi_{y_j}(\vx,y_{j}))$\label{alg:loc_inst};\\
+\lElse{\Return $\textsc{Rewrite}(L_{\pi_j} \land U_{\pi_j} \land N_{\pi_j}, \mathit{FMID}, \pi_j(\vx,y_{j}))$\label{alg:rewrite_fmid}}
 \caption{$\textsc{ExtractSkolemFunction}(y_j, \phi(\vx,\vy)$)}
 \label{alg:loc}
 \end{algorithm2e}
@@ -247,133 +247,124 @@ Furthermore,
 %terms, in which each $y_j \in \vy$ appears at most once:
 %\begin{equation}
 %\label{eq:phi_conj}
-%\phi_i(\vx,\vy) = \Land_{y_j \in \vy}(\psi_{y_j}(\vx,y_{j},\ldots,y_{n}))
+%\phi_i(\vx,\vy) = \Land_{y_j \in \vy}(\psi_j(\vx,y_{j},\ldots,y_{n}))
 %\end{equation}
 %
-%By construction, each local Skolem relation $\phi(\vx,\vy)$ has a form $\Land_{y_j \in \vy}(\psi_{y_j}(\vx,y_{j},\ldots,y_{n}))$.
+%By construction, each local Skolem relation $\phi(\vx,\vy)$ has a form $\Land_{y_j \in \vy}(\psi_j(\vx,y_{j},\ldots,y_{n}))$.
 %Since
 each MBP in \aeval is constructed iteratively for each variable $y_j \in \vy$.
 Thus, $y_j$ may depend on the variables of $y_{j+1},\ldots, y_{n}$ that are still not eliminated in the current iteration $j$.
-%Each $\psi_{y_j}(\vx,y_{j},\ldots,y_{n})$ is the conjunction $\psi_{y_j}(\vx,y_{j},\ldots,y_{n}) = \Land_{i}(cl_i(\vx,y_{j},\ldots,y_{n}))$, where each $cl_i$ is  an (in)equality.
+%Each $\psi_j(\vx,y_{j},\ldots,y_{n})$ is the conjunction $\psi_j(\vx,y_{j},\ldots,y_{n}) = \Land_{i}(cl_i(\vx,y_{j},\ldots,y_{n}))$, where each $cl_i$ is  an (in)equality.
 
-Inequalities in a Skolem relation are the enemies \arie{enemies?!} of program synthesis.
+Inequalities in a Skolem relation are the enemies of program synthesis.
 Indeed, the final implementation should contain assignments to each
-existentially quantified variable, which are in general difficult to
-get. \arie{What is meant by ``difficult''. Difficult computationally,
-  difficult for the current algorithm, etc?}
+existentially quantified variable, which for the current algorithm is difficult to
+get.
 The Skolem relation provided by \aeval should be post-processed to get rid of inequalities.
-We formalize this procedure as finding a Skolem function $f_{y_j}(\vx)$ for each $y_j\in \vy$, such that $(y_j = f_{y_j}(\vx)) \!\implies\! \exists y_{j+1},\ldots,y_{n} \such \psi_{y_j}(\vx,y_{j},\ldots,y_{n}) $.
+We formalize this procedure as finding a Skolem function $f_j(\vx)$ for each $y_j\in \vy$, such that $(y_j = f_j(\vx)) \!\implies\! \exists y_{j+1},\ldots,y_{n} \such \psi_j(\vx,y_{j},\ldots,y_{n})$.
+
 The key idea is presented in Alg.~\ref{alg:loc}.
 The algorithm is applied separately for each $y_j \in \vy$, starting from $y_n$ to $y_1$.
-For each $y_j$, assume, we already established Skolem functions $f_{j+1}(\vx),\ldots,f_{n}(\vx)$ for variables $y_{j+1},\ldots,y_n$ in the previous runs of the algorithm. 
-%
-First, the algorithm substitutes each appearance of variables $y_{j+1},\ldots, y_{n}$ in $\psi_{y_j}$ by $f_{n}(\vx),\ldots,f_{j+1}(\vx)$.
+That is, for iteration $j$, the previous runs of the algorithm  already delivered Skolem functions $f_{j+1}(\vx),\ldots,f_{n}(\vx)$ for variables $y_{j+1},\ldots,y_n$.
+Thus, the first step of the algorithm is to substitute each appearance of variables $y_{j+1},\ldots, y_{n}$ in $\psi_j$ by $f_{n}(\vx),\ldots,f_{j+1}(\vx)$.
 %If for some variable there is no Skolem function to substitute, the algorithm halts with nothing (line~\ref{alg:loc_ret_none}).
-Second, %the algorithm uses standard LRA-rules to normalize $\pi_{y_j}(\vx,y_{j})$ into the form $\Land_k \big(y_{j} \sim f_k(\vx)\big)$, i.e., conjunction of
-%expressions, left-hand-sides of which are reserved for $y_j$ and ${\sim
-%\in \{<, \le, =, \ge, >\}}$.
-%For this, it uses the method \textsc{Rewrite} (line~\ref{alg:loc_rewrite}) that rewrites each clause using the following rule (where $g,h$ - are functions over $\vx$, $p,q$ - rational numbers, $\mathit{sgn}$ - a function, returning the sign of the rational number):
-%
-%\begin{equation}
-%{\Big( (g(\vx)+ p\!\times\!y_j}) \sim ( {h(\vx) + q\!\times\!y_j})\Big) \!\implies\! \Big(\big(\mathit{sgn}(p-q)\times y_j \big) \sim \big( -\frac{g(\vx)}{|p-q|} + \frac{h(\vx)}{|p-q|} \big)\Big)  \notag
-%\end{equation}
-%Finally 
-the algorithm gets rid of inequalities by transforming them into
-equalities, thus producing a Skolem function. \arie{The first part
-  (line~2) is clear, the second part is not. Elaborate more which part
-  of the algorithm are responsible for which inequality
-  elimination. The sets $L$, $U$, $M$, $V$, $E$, $N$, are not
-  defined. It is not clear why $M$ and $V$ are present but assumed to
-  be empty.}
-In the rest of the section, we show several fundamental rules and properties behind this operation.
-For simplicity, we omit some straightforward details on dealing with
-non-strict inequalities ($y_j \ge l(\vx)$ and $y_j \le u(\vx)$) since
-they are similar strict inequalities ($y_j > l(\vx)$ and $y_j < u(\vx)$).
 
+Once formula $\psi_j(\vx,y_{j},\ldots,y_{n})$ is rewritten to form $\pi_j(\vx,y_{j})$ (line~\ref{alg:elim_compl}), the algorithm starts looking for a function $f_j(\vx)$, such that $y_j = f_j(\vx)$.
+In other words, it aims at constructing a graph of a function that is embedded in a relation.
+
+\begin{definition}
+Given a variable $y_j$, a relation $\pi_j(\vx,y_{j})$, and a set $C({\pi_j})$ of linear combinations over $\vx$ appeared in $\pi_j(\vx,y_{j})$, let us denote the following groups of conjuncts, $\pi_j$ is composed from:
+\begin{align*}
+L_{\pi_j} &\triangleq \Land_{l \in C({\pi_j})}(y_j > l(\vx)) &
+U_{\pi_j} &\triangleq \Land_{u \in C({\pi_j})}(y_j < u(\vx)) &  
+M_{\pi_j} &\triangleq \Land_{l \in C({\pi_j})}(y_j \ge l(\vx)) \\
+V_{\pi_j} &\triangleq \Land_{u \in C({\pi_j})}(y_j \le u(\vx))  &
+E_{\pi_j} &\triangleq \Land_{e \in C({\pi_j})}(y_j = e(\vx))  &
+N_{\pi_j} &\triangleq \Land_{h \in C({\pi_j})}(y_j \neq h(\vx))  
+\end{align*}
+\end{definition}
+
+In the rest of the section, we present several primitives needed to construct $y_j = f_j(\vx)$ out of $\pi_j(\vx,y_{j})$.
+For simplicity, we omit some straightforward details on dealing with
+non-strict inequalities consisting in $M_{\pi_j}$ and $V_{\pi_j}$ since
+they are similar strict inequalities consisting in $L_{\pi_j}$ and $U_{\pi_j}$.
+Thus,  without loss of generality, we assume that $M_{\pi_j}$ and $V_{\pi_j}$ are empty.
 %If there are exist some, $f(\vx)$ defines some interval for the values for $y_j$.
 %Method \textsc{SkolemFunction} obtains equalities 
 %rewrites each clause using the following rules:
 
-\grigory{the rest can be compressed if needed}.
 
 \begin{lemma}
-After all substitutions at line~\ref{alg:elim_compl} of Alg.~\ref{alg:loc}, each $\psi_{y_j}(\vx,y_{j},\ldots,y_{n})$ is a conjunction of the form
-$L_{y_j} \land U_{y_j} \land M_{y_j} \land V_{y_j} \land E_{y_j} \land N_{y_j}$ where
-%
-$L_{y_j} = \Land_{l}(y_j > l(\vx))$, 
-$U_{y_j} = \Land_{u}(y_j < u(\vx))$, 
-$M_{y_j} = \Land_{l}(y_j \ge l(\vx))$, 
-$V_{y_j} = \Land_{u}(y_j \le u(\vx))$, 
-$E_{y_j} = \Land_{e}(y_j = e(\vx))$, 
-$N_{y_j} = \Land_{n}(y_j \neq n(\vx))$.
-%
+After all substitutions at line~\ref{alg:elim_compl} of Alg.~\ref{alg:loc}, each $\psi_j(\vx,y_{j},\ldots,y_{n})$ is a conjunction of the form
+$L_{\pi_j} \land U_{\pi_j} \land M_{\pi_j} \land V_{\pi_j} \land E_{\pi_j} \land N_{\pi_j}$.
 \end{lemma}
 \begin{proof}
 Follows directly from~\eqref{case:proj_define}.
 \qed
 \end{proof}
 
-The procedure to extract a Skolem function out of a Skolem relation proceeds by analyzing terms in $L_{y_j}$, $U_{y_j}$, $M_{y_j}$, $V_{y_j}$,$E_{y_j}$ and $N_{y_j}$.
-If there is at least one conjunct $(y_j = e(\vx)) \in E_{y_j}$ then $(y_j = e(\vx))$ itself is a Skolem function.
+The procedure to extract $y_j = f_j(\vx)$ out of $\pi_j(\vx,y_{j})$ proceeds by analyzing terms in $L_{\pi_j}$, $U_{\pi_j}$, $M_{\pi_j}$, $V_{\pi_j}$, $E_{\pi_j}$ and $N_{\pi_j}$.
+If there is at least one conjunct $(y_j = e(\vx)) \in E_{\pi_j}$ then $(y_j = e(\vx))$ itself is a Skolem function.
 Otherwise, the algorithm creates it from the following primitives.
 
 \begin{definition}
 Let $l(\vx)$ and $u(\vx)$ be two linear terms,
 then operators $\mathit{MAX}$, $\mathit{MIN}$, $\mathit{MID}$, $\mathit{LT}$, $\mathit{GT}$ are defined as follows:
 \begin{align*}
-\mathit{MAX}(l, u) (\vx) &= ite (l (\vx) < u (\vx), u(\vx), l(\vx)) \notag &
-\mathit{MIN}(l, u) (\vx) &= ite (l (\vx) < u (\vx), l(\vx), u(\vx)) \notag \\
-\mathit{LT} (u) (\vx) &= u (\vx) -1 \notag &
-\mathit{GT} (l) (\vx) &= l (\vx) + 1 \notag \\
-\mathit{MID}(l, u) (\vx) &= \frac{l(\vx) + u(\vx)}{ 2} \notag 
+\mathit{MAX}(l, u) (\vx) &\triangleq ite (l (\vx) < u (\vx), u(\vx), l(\vx)) \notag &
+\mathit{MIN}(l, u) (\vx) &\triangleq ite (l (\vx) < u (\vx), l(\vx), u(\vx)) \notag \\
+\mathit{LT} (u) (\vx) &\triangleq u (\vx) -1 \notag &
+\mathit{GT} (l) (\vx) &\triangleq l (\vx) + 1 \notag \\
+\mathit{MID}(l, u) (\vx) &\triangleq \frac{l(\vx) + u(\vx)}{ 2} \notag 
 \end{align*}
 \end{definition}
 
 \begin{lemma}
-If $L_{y_j}$ consists of $n>1$ conjuncts then it is equivalent to $y_j > \mathit{MAX} (l_1, \mathit{MAX} (l_2,\ldots \mathit{MAX} (l_{n-1}, l_n) )) (\vx)$.
-If $U_{y_j}$ consists of $n>1$ conjuncts then it is equivalent to $y_j < \mathit{MIN} (u_1, \mathit{MIN} (u_2,\ldots \mathit{MIN} (u_{n-1}, u_n) ))(\vx)$.
-%If  $M_{y_j}$ consists of $n>1$ conjuncts then it is equivalent to $y_j \ge \mathit{MAX} (l_1, \mathit{MAX} (l_2,\ldots \mathit{MAX} (l_{n-1}$, $ l_n) )) (\vx)$.
-%If  $V_{y_j}$ consists of $n>1$ conjuncts then it is equivalent to $y_j \le \mathit{MIN} (u_1$, $\mathit{MIN} (u_2,\ldots \mathit{MIN} (u_{n-1}, u_n) )) (\vx)$.
+If $L_{\pi_j}$ consists of $n>1$ conjuncts then it is equivalent to $y_j > \mathit{MAX} (l_1, \mathit{MAX} (l_2,\ldots \mathit{MAX} (l_{n-1}, l_n) )) (\vx)$.
+If $U_{\pi_j}$ consists of $n>1$ conjuncts then it is equivalent to $y_j < \mathit{MIN} (u_1, \mathit{MIN} (u_2,\ldots \mathit{MIN} (u_{n-1}, u_n) ))(\vx)$.
+%If  $M_{\pi_j}$ consists of $n>1$ conjuncts then it is equivalent to $y_j \ge \mathit{MAX} (l_1, \mathit{MAX} (l_2,\ldots \mathit{MAX} (l_{n-1}$, $ l_n) )) (\vx)$.
+%If  $V_{\pi_j}$ consists of $n>1$ conjuncts then it is equivalent to $y_j \le \mathit{MIN} (u_1$, $\mathit{MIN} (u_2,\ldots \mathit{MIN} (u_{n-1}, u_n) )) (\vx)$.
 \end{lemma}
-Similar for $M_{y_j}$ and for $V_{y_j}$. From this point on, with out
-loss of generality, we assume that each $L_{y_j}$, $U_{y_j}$,
-$M_{y_j}$, $V_{y_j}$ have at most one conjunct.\arie{Check}
+%Similar for $M_{\pi_j}$ and for $V_{\pi_j}$. 
+This primitive is applied (lines~\ref{alg:merge1}-\ref{alg:merge2}) in order to reduce the size of $L_{\pi_j}$ and $U_{\pi_j}$.
+Thus, from this point on, with out
+loss of generality, we assume that each $L_{\pi_j}$ and $U_{\pi_j}$
+%,$M_{\pi_j}$, $V_{\pi_j}$ 
+have at most one conjunct.
 
 \begin{lemma}
-If $L_{y_j}$ consists of 1 conjunct and the rest of $U_{y_j}$, $M_{y_j} $,$V_{y_j}$,$E_{y_j}$ and $N_{y_j}$ are empty then the Skolem can be rewritten into $y_j = \mathit{GT} (l)(\vx)$.
+If $L_{\pi_j}$, $U_{\pi_j}$ consist of one conjunct each, and $E_{\pi_j}$ and $N_{\pi_j}$ are empty then the Skolem can be rewritten into $y_j = \mathit{MID} (l, u)(\vx)$. 
 \end{lemma}
-Similar for $U_{y_j}$ (Skolem  rewritten into $y_j = \mathit{MID} (u)(\vx)$).
+%Similar for $M_{\pi_j}$ and $V_{\pi_j}$, and for combinations with $L_{\pi_j}$ and $U_{\pi_j}$.
+This primitive is applied (line~\ref{alg:rewrite_mid}) in case if the graph of a Skolem function can be constructed exactly in the middle of the two graphs for the lower- and the upper boundaries for the Skolem relation.
+Otherwise, if some of the boundaries are missing, but still $N_{\pi_j}$ is empty (lines~\ref{alg:rewrite_lt}-\ref{alg:rewrite_gt})  the following primitive is applied:
 
 \begin{lemma}
-If $L_{y_j}$, $U_{y_j}$  consist of 1 conjunct each, and the rest of $M_{y_j} $,$V_{y_j}$, $E_{y_j}$ and $N_{y_j}$ are empty then the Skolem can be rewritten into $y_j = \mathit{MID} (l, u)(\vx)$. 
+If $L_{\pi_j}$ consists of one conjunct and the rest of $U_{\pi_j}$, $E_{\pi_j}$ and $N_{\pi_j}$ are empty then the Skolem can be rewritten into $y_j = \mathit{GT} (l)(\vx)$.
+If $U_{\pi_j}$ consists of one conjunct and the rest of $L_{\pi_j}$, $E_{\pi_j}$ and $N_{\pi_j}$ are empty then the Skolem can be rewritten into $y_j = \mathit{LT} (l)(\vx)$.
 \end{lemma}
-Similar for $M_{y_j}$ and $V_{y_j}$, and for combinations with $L_{y_j}$ and $U_{y_j}$.
 
+Finally, the cases when $N_{\pi_j}$ is not empty, should be handled separately.
+For this, we introduce another higher-order function $\mathit{FMID}$  that for the given $l$, $u$ and $h$ and each $\vx$ outputs either $\mathit{MID}(l,u)$ or  $\mathit{MID}(l,\mathit{MID}(l,u))$ in case if $\mathit{MID}(l,u)$ is equal to $h$.
 
 \begin{lemma}
-  \arie{It is not clear where $h$ comes from}
-If $L_{y_j}$, $U_{y_j}$ and $N_{y_j}$ consist of 1 conjunct each and the rest of $M_{y_j} $,$V_{y_j}$,$E_{y_j}$ and $N_{y_j}$ are empty then the Skolem can be rewritten into $y_j = \mathit{FMID} (l, u, h)(\vx)$, where%
+If each of $L_{\pi_j}$, $U_{\pi_j}$ and $N_{\pi_j}$ consist of one conjunct and $E_{\pi_j}$ and $N_{\pi_j}$ are empty then the Skolem can be rewritten into $y_j = \mathit{FMID} (l, u, h)(\vx)$, where%
 \begin{align}
 \mathit{FMID}(l, u, h) (\vx) = ite (&\mathit{MID}(l, u) (\vx) = h(\vx),  \notag \\
                           &\mathit{MID}(l, \mathit{MID}(l, u)) (\vx), \notag \\
                           &\mathit{MID}(l, u) (\vx)) \notag 
 \end{align}
 \end{lemma}
-Similar for $M_{y_j}$ and $V_{y_j}$. 
-For bigger number of conjuncts of $N_{y_j}$, the Skolem gets rewritten
-in a similar way cascadically\arie{Not a word}.
+%Similar for $M_{\pi_j}$ and $V_{\pi_j}$. 
+For bigger number of conjuncts of $N_{\pi_j}$, the Skolem gets rewritten
+in a similar way recursively.
 
 
 \begin{lemma}
-If $L_{y_j}$, $N_{y_j}$  consist of 1 conjunct each, and the rest of $M_{y_j} $,$V_{y_j}$, $E_{y_j}$ and $U_{y_j}$ are empty then the Skolem can be rewritten into $y_j = \mathit{FMID} (l, GT(l))(\vx)$. 
+If each of $L_{\pi_j}$ and $N_{\pi_j}$  consist of one conjunct, and $E_{\pi_j}$ and $U_{\pi_j}$ are empty then the Skolem can be rewritten into $y_j = \mathit{FMID} (l, GT(l))(\vx)$. 
+If each of $U_{\pi_j}$, $N_{\pi_j}$  consist of one conjunct, and the rest of $M_{\pi_j} $,$V_{\pi_j}$, $E_{\pi_j}$ and $L_{\pi_j}$ are empty then the Skolem can be rewritten into $y_j = \mathit{FMID} (LT(u), u)(\vx)$. 
 \end{lemma}
-Similar for $M_{y_j}$.
-
-
-\begin{lemma}
-If $U_{y_j}$, $N_{y_j}$  consist of 1 conjunct each, and the rest of $M_{y_j} $,$V_{y_j}$, $E_{y_j}$ and $L_{y_j}$ are empty then the Skolem can be rewritten into $y_j = \mathit{FMID} (LT(u), u)(\vx)$. 
-\end{lemma}
-Similar for $V_{y_j}$.
+%Similar for $V_{\pi_j}$.
 
 
 \begin{theorem}[Soundness]
