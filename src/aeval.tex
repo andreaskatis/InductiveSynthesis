@@ -242,7 +242,7 @@ match each $\phi_i$ against the corresponding $T_{i}$:
 
 
 Since \aeval is an extension of the MBP-algorithm mentioned in Sect.~\ref{sec:mbp},
-each $\phi_i$ is constructed from the substitutions made in $T$ to produce $T_{i}$.
+each $\phi_i$ (in~\eqref{case:skolem}) is constructed from the substitutions made in $T$ to produce $T_{i}$.
 Furthermore, 
 %(is a condition under which $T$ is equisatisfiable with $T_{i}$).
 %We assume that each $\phi_i$ is in the Cartesian form, i.e., a conjunction of
@@ -258,8 +258,11 @@ each MBP in \aeval is constructed iteratively for each variable $y_j \in \vy$.
 Thus, $y_j$ may depend on the variables of $y_{j+1},\ldots, y_{n}$ that are still not eliminated in the current iteration $j$.
 %Each $\psi_{y_j}(\vx,y_{j},\ldots,y_{n})$ is the conjunction $\psi_{y_j}(\vx,y_{j},\ldots,y_{n}) = \Land_{i}(cl_i(\vx,y_{j},\ldots,y_{n}))$, where each $cl_i$ is  an (in)equality.
 
-Inequalities in a Skolem relation are the enemies of program synthesis.
-Indeed, the final implementation should contain assignments to each existentially quantified variable, which are in general difficult to get.
+Inequalities in a Skolem relation are the enemies \arie{enemies?!} of program synthesis.
+Indeed, the final implementation should contain assignments to each
+existentially quantified variable, which are in general difficult to
+get. \arie{What is meant by ``difficult''. Difficult computationally,
+  difficult for the current algorithm, etc?}
 The Skolem relation provided by \aeval should be post-processed to get rid of inequalities.
 We formalize this procedure as finding a Skolem function $f_{y_j}(\vx)$ for each $y_j\in \vy$, such that $(y_j = f_{y_j}(\vx)) \!\implies\! \exists y_{j+1},\ldots,y_{n} \such \psi_{y_j}(\vx,y_{j},\ldots,y_{n}) $.
 The key idea is presented in Alg.~\ref{alg:loc}.
@@ -277,9 +280,17 @@ Second, %the algorithm uses standard LRA-rules to normalize $\pi_{y_j}(\vx,y_{j}
 %{\Big( (g(\vx)+ p\!\times\!y_j}) \sim ( {h(\vx) + q\!\times\!y_j})\Big) \!\implies\! \Big(\big(\mathit{sgn}(p-q)\times y_j \big) \sim \big( -\frac{g(\vx)}{|p-q|} + \frac{h(\vx)}{|p-q|} \big)\Big)  \notag
 %\end{equation}
 %Finally 
-the algorithm gets rid of inequalities by transforming them into equalities, thus producing a Skolem function.
-In the rest of the section we show several fundamental rules and properties behind this operation.
-For simplicity, we omit some straightforward details on dealing with inequalities of the form $y_j \ge l(\vx)$ or $y_j \le u(\vx)$ since they are similar to $y_j > l(\vx)$ or $y_j < u(\vx)$.
+the algorithm gets rid of inequalities by transforming them into
+equalities, thus producing a Skolem function. \arie{The first part
+  (line~2) is clear, the second part is not. Elaborate more which part
+  of the algorithm are responsible for which inequality
+  elimination. The sets $L$, $U$, $M$, $V$, $E$, $N$, are not
+  defined. It is not clear why $M$ and $V$ are present but assumed to
+  be empty.}
+In the rest of the section, we show several fundamental rules and properties behind this operation.
+For simplicity, we omit some straightforward details on dealing with
+non-strict inequalities ($y_j \ge l(\vx)$ and $y_j \le u(\vx)$) since
+they are similar strict inequalities ($y_j > l(\vx)$ and $y_j < u(\vx)$).
 
 %If there are exist some, $f(\vx)$ defines some interval for the values for $y_j$.
 %Method \textsc{SkolemFunction} obtains equalities 
@@ -309,15 +320,15 @@ If there is at least one conjunct $(y_j = e(\vx)) \in E_{y_j}$ then $(y_j = e(\v
 Otherwise, the algorithm creates it from the following primitives.
 
 \begin{definition}
-Let $l(\vx)$ and $u(\vx)$ be two linear functions,
-the higher order functions $\mathit{MAX}$, $\mathit{MIN}$, $\mathit{MID}$, $\mathit{LT}$, $\mathit{GT}$ are defined as follows:
-\begin{align}
-\mathit{MAX}(l, u) (\vx) &= ite (l (\vx) < u (\vx), u(\vx), l(\vx)) \notag \\
+Let $l(\vx)$ and $u(\vx)$ be two linear terms,
+then operators $\mathit{MAX}$, $\mathit{MIN}$, $\mathit{MID}$, $\mathit{LT}$, $\mathit{GT}$ are defined as follows:
+\begin{align*}
+\mathit{MAX}(l, u) (\vx) &= ite (l (\vx) < u (\vx), u(\vx), l(\vx)) \notag &
 \mathit{MIN}(l, u) (\vx) &= ite (l (\vx) < u (\vx), l(\vx), u(\vx)) \notag \\
-\mathit{MID}(l, u) (\vx) &= \frac{l(\vx) + u(\vx)}{ 2} \notag \\
-\mathit{LT} (u) (\vx) &= u (\vx) -1 \notag \\
-\mathit{GT} (l) (\vx) &= l (\vx) + 1 \notag 
-\end{align}
+\mathit{LT} (u) (\vx) &= u (\vx) -1 \notag &
+\mathit{GT} (l) (\vx) &= l (\vx) + 1 \notag \\
+\mathit{MID}(l, u) (\vx) &= \frac{l(\vx) + u(\vx)}{ 2} \notag 
+\end{align*}
 \end{definition}
 
 \begin{lemma}
@@ -326,7 +337,9 @@ If $U_{y_j}$ consists of $n>1$ conjuncts then it is equivalent to $y_j < \mathit
 %If  $M_{y_j}$ consists of $n>1$ conjuncts then it is equivalent to $y_j \ge \mathit{MAX} (l_1, \mathit{MAX} (l_2,\ldots \mathit{MAX} (l_{n-1}$, $ l_n) )) (\vx)$.
 %If  $V_{y_j}$ consists of $n>1$ conjuncts then it is equivalent to $y_j \le \mathit{MIN} (u_1$, $\mathit{MIN} (u_2,\ldots \mathit{MIN} (u_{n-1}, u_n) )) (\vx)$.
 \end{lemma}
-Similar for $M_{y_j}$ and for $V_{y_j}$.
+Similar for $M_{y_j}$ and for $V_{y_j}$. From this point on, with out
+loss of generality, we assume that each $L_{y_j}$, $U_{y_j}$,
+$M_{y_j}$, $V_{y_j}$ have at most one conjunct.\arie{Check}
 
 \begin{lemma}
 If $L_{y_j}$ consists of 1 conjunct and the rest of $U_{y_j}$, $M_{y_j} $,$V_{y_j}$,$E_{y_j}$ and $N_{y_j}$ are empty then the Skolem can be rewritten into $y_j = \mathit{GT} (l)(\vx)$.
@@ -340,7 +353,8 @@ Similar for $M_{y_j}$ and $V_{y_j}$, and for combinations with $L_{y_j}$ and $U_
 
 
 \begin{lemma}
-If $L_{y_j}$, $U_{y_j}$ and $N_{y_j}$ consist of 1 conjunct each and the rest of $M_{y_j} $,$V_{y_j}$,$E_{y_j}$ and $N_{y_j}$ are empty then the Skolem can be rewritten into $y_j = \mathit{FMID} (l, u, h)(\vx)$ where%
+  \arie{It is not clear where $h$ comes from}
+If $L_{y_j}$, $U_{y_j}$ and $N_{y_j}$ consist of 1 conjunct each and the rest of $M_{y_j} $,$V_{y_j}$,$E_{y_j}$ and $N_{y_j}$ are empty then the Skolem can be rewritten into $y_j = \mathit{FMID} (l, u, h)(\vx)$, where%
 \begin{align}
 \mathit{FMID}(l, u, h) (\vx) = ite (&\mathit{MID}(l, u) (\vx) = h(\vx),  \notag \\
                           &\mathit{MID}(l, \mathit{MID}(l, u)) (\vx), \notag \\
@@ -348,7 +362,8 @@ If $L_{y_j}$, $U_{y_j}$ and $N_{y_j}$ consist of 1 conjunct each and the rest of
 \end{align}
 \end{lemma}
 Similar for $M_{y_j}$ and $V_{y_j}$. 
-For bigger number of conjuncts of $N_{y_j}$, the Skolem gets rewritten in a similar way cascadically.
+For bigger number of conjuncts of $N_{y_j}$, the Skolem gets rewritten
+in a similar way cascadically\arie{Not a word}.
 
 
 \begin{lemma}
@@ -370,3 +385,8 @@ Iterative application of Alg.~\ref{alg:loc} to all variables $y_n,\ldots,y_1$ re
 Follows from the case analysis that applies the lemmas above.
 \qed
 \end{proof}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "document"
+%%% End:
