@@ -35,6 +35,7 @@
 \newcommand{\mike}[1]{\textcolor{red}{Mike: #1}}
 \newcommand{\andrew}[1]{\textcolor{green}{Andrew: #1}}
 \newcommand{\grigory}[1]{\textcolor{brown}{Grigory: #1}}
+\newcommand{\arie}[1]{\textcolor{purple}{[Arie: #1]}}
 
 \newenvironment{requirement}
 {\vspace{0.05in}
@@ -90,46 +91,46 @@ meaningful results.
 
 \vspace{+1em}
 
-Program synthesis is a particularly interesting area of research in
-artificial intelligence, and more recently in formal verification. The main idea
-is generate efficient implementations for systems, using the system-specific
-requirements as the only source of information. This is especially important for
-the case of embedded systems that are meant to be used as leaf-level,
-independent components of a bigger, more complex hierarchical architecture.
-
-One of the very challenging problems in requirements engineering is for one to
-decide whether the documented requirements are good enough to pivot the
-development of an implementation that is guaranteed to meet them, given any circumstance.
-This is mostly known as the implementability, or realizability problem.
-Misconceptions and conflicts between requirements may occur during this process, and might not be
-easy to detect without the use of sophisticated tools, meaning that the engineer
-can end up with specification for which an implementation does not even exist.
-This fact alone can impose a big overhead in the system's development cycle, both in time and in cost of development.
-Having a proof of realizability  for our requirements though, among other
-interesting requirement characteristics, directly implies that we can
-construct an implementation for them. Furthermore, if used properly, the same
-proof can be actually used to construct such an implementation automatically,
-and thus solve the problem of program synthesis.
-
-In the context of this paper, we propose a program synthesis algorithm for
-requirements written in the form of an Assume-Guarantee contract, using the
-Lustre specification language. The algorithm relies heavily on the proof of
-the contract's realizability, using an approach that is very similar to k-induction model checking, with the additional use of quantifiers.
-With the k-inductive proof as a guide, and a sophisticated tool for
-extracting Skolem functions from $\forall\exists$-formulas, we can effectively synthesize
-implementations that, by definition, are guaranteed to comply with the contract.
-We have incorporated the main synthesis algorithm as an extension to the
-realizability check provided in the JKind model checker, and furthermore
-developed a compiler to translate these primitive implementations to the C
-language.
+%Program synthesis is a particularly interesting area of research in
+%artificial intelligence, and more recently in formal verification. The main idea
+%is generate efficient implementations for systems, using the system-specific
+%requirements as the only source of information. This is especially important for
+%the case of embedded systems that are meant to be used as leaf-level,
+%independent components of a bigger, more complex hierarchical architecture.
+%
+%One of the very challenging problems in requirements engineering is for one to
+%decide whether the documented requirements are good enough to pivot the
+%development of an implementation that is guaranteed to meet them, given any circumstance.
+%This is mostly known as the implementability, or realizability problem.
+%Misconceptions and conflicts between requirements may occur during this process, and might not be
+%easy to detect without the use of sophisticated tools, meaning that the engineer
+%can end up with specification for which an implementation does not even exist.
+%This fact alone can impose a big overhead in the system's development cycle, both in time and in cost of development.
+%Having a proof of realizability  for our requirements though, among other
+%interesting requirement characteristics, directly implies that we can
+%construct an implementation for them. Furthermore, if used properly, the same
+%proof can be actually used to construct such an implementation automatically,
+%and thus solve the problem of program synthesis.
+%
+%In the context of this paper, we propose a program synthesis algorithm for
+%requirements written in the form of an Assume-Guarantee contract, using the
+%Lustre specification language. The algorithm relies heavily on the proof of
+%the contract's realizability, using an approach that is very similar to k-induction model checking, with the additional use of quantifiers.
+%With the k-inductive proof as a guide, and a sophisticated tool for
+%extracting Skolem functions from $\forall\exists$-formulas, we can effectively synthesize
+%implementations that, by definition, are guaranteed to comply with the contract.
+%We have incorporated the main synthesis algorithm as an extension to the
+%realizability check provided in the \jkind model checker, and furthermore
+%developed a compiler to translate these primitive implementations to the C
+%language. 
 
 \end{abstract}
 
 \input{introduction}
 \input{synthesis}
 \input{aeval}
-\input{experiment}
 \input{implementation}
+\input{experiment}
 \input{related}
 \input{futurework}
 

@@ -19,9 +19,9 @@
 \SetKwFor{While}{forever}{do}{}
 %\SetAlgoNoLine
 \SetKw{KwContinue}{continue}
-\KwIn{$S(\vx), \exists \vy \such T(\vx,\vy)$}
-\KwOut{return value $\in \{\valid, \invalid\}$ of ${S(\vx)\!\! \implies\!\! \exists \vy \such T(\vx,\vy)}$}
-\KwData{$\textsc{SmtSolver}$, counter $i$, models $\{m_i\}$, MBPs $\{T_{i}(\vx)\}$, conditions $\{\phi_i({\vx,\vy})\}$}
+\KwIn{$S(\vx), \exists \vy \such T(\vx,\vy)$.}
+\KwOut{Return value $\in \{\valid, \invalid\}$ of ${S(\vx)\!\! \implies\!\! \exists \vy \such T(\vx,\vy)}$.}
+\KwData{$\textsc{SmtSolver}$, counter $i$, models $\{m_i\}$, MBPs $\{T_{i}(\vx)\}$, conditions $\{\phi_i({\vx,\vy})\}$.}
 \BlankLine
 $\textsc{SmtAdd}(S(\vx))$; \\
 $i \gets 0$; \\
@@ -40,7 +40,7 @@ $\textsc{SmtPop}()$;\\
 $\textsc{SmtAdd}(\neg {T_{i}})$\label{alg:block}; \\
 }
 %\Return $res$;
-\caption{\aeval \Big($S(\vx), \exists \vy \such T(\vx,\vy)$\Big)}
+\caption{\aeval \Big($S(\vx), \exists \vy \such T(\vx,\vy)$\Big), cf.~\cite{fedyukovich2015automated} }
 \label{alg:ae_val}
 \end{algorithm2e}
 }
@@ -51,16 +51,33 @@ $\textsc{SmtAdd}(\neg {T_{i}})$\label{alg:block}; \\
 \SetInd{0.4em}{0.4em}
 \SetKwFor{ForAll}{forall}{do}{}
 \SetKwFor{For}{for}{do}{}
-\KwIn{$y_j \in \vy$, local Skolem relation $\phi(\vx,\vy) = \Land_{y_j \in \vy}(\psi_{y_j}(\vx,y_{j},\ldots, y_{n}))$}
-\KwOut{factor of the local Skolem refinement $y_j = f_j(\vx)$}
-\KwData{known functions $f_{j+1}(\vx),\ldots,f_{n}(\vx)$}
+\KwIn{$y_j \in \vy$, local Skolem relation $\phi(\vx,\vy) = \Land_{y_j \in \vy}(\psi_{y_j}(\vx,y_{j},\ldots, y_{n}))$, Skolem functions $y_{j+1} = f_{j+1}(\vx),\ldots, y_{n} = f_{n}(\vx)$.}
+\KwData{Factored formula $\pi_{y_j}(\vx,y_{j}) = L_{y_j} \land U_{y_j} \land M_{y_j} \land V_{y_j} \land E_{y_j} \land N_{y_j}$; assuming (for simplicity of presentation) that $M_{y_j} = \varnothing \land  V_{y_j} = \varnothing$.}
+\KwOut{Local Skolem function $y_j = f_j(\vx)$.}
 \BlankLine
 \For{$(i = n; i > j; i++)$}{
   $\psi_{y_j}(\vx,y_{j},\ldots,y_{n}) \gets \textsc{Substitute}(\psi_{y_j}(\vx,y_{j},\ldots,y_{n}) , y_i, f_i(\vx))$\label{alg:loc_subst};\\
 }
-%\lIf{$(\pi_{y_j}(\vx,y_{j}) \in \varnothing)$}{\Return $\varnothing$\label{alg:loc_ret_none}}
-\Return $\textsc{SkolemFunction}\Big(\psi_{y_j}(\vx,y_{j},\ldots,y_{n})  \Big)$\label{alg:loc_inst};\\
-\caption{$\textsc{LocalFactor}(y_j, \phi(\vx,\vy)$)}
+\BlankLine
+
+$\pi_{y_j}(\vx,y_{j}) \gets \psi_{y_j}(\vx,y_{j},\ldots,y_{n})$\label{alg:elim_compl};\\
+\BlankLine
+
+\lIf(){$(E_{y_j} \neq \varnothing)$}{\Return $E_{y_j}$}
+
+$\pi_{y_j}(\vx,y_{j}) \gets \textsc{Merge}(L_{y_j}, \mathit{MAX}, \pi_{y_j}(\vx,y_{j}))$;\\
+$\pi_{y_j}(\vx,y_{j}) \gets \textsc{Merge}(U_{y_j} , \mathit{MIN}, \pi_{y_j}(\vx,y_{j}))$;\\
+\BlankLine
+
+\lIf(){$(U_{y_j} = \varnothing \land N_{y_j} = \varnothing)$}{\Return $\textsc{Rewrite}(L_{y_j} , \mathit{GT}, \pi_{y_j}(\vx,y_{j}))$}
+
+\lIf(){$(L_{y_j} = \varnothing  \land N_{y_j} = \varnothing)$}{\Return $\textsc{Rewrite}(U_{y_j} , \mathit{LT}, \pi_{y_j}(\vx,y_{j}))$}
+\BlankLine
+
+\lIf(){$(N_{y_j} = \varnothing)$}{\Return $\textsc{Rewrite}(L_{y_j} \land U_{y_j} , \mathit{MID}, \pi_{y_j}(\vx,y_{j}))$}
+
+\Return $\textsc{Rewrite}(L_{y_j} \land U_{y_j} \land N_{y_j}, \mathit{FMID}, \pi_{y_j}(\vx,y_{j}))$\label{alg:loc_inst};\\
+\caption{$\textsc{ExtractSkolemFunction}(y_j, \phi(\vx,\vy)$)}
 \label{alg:loc}
 \end{algorithm2e}
 }
@@ -71,13 +88,14 @@ $\textsc{SmtAdd}(\neg {T_{i}})$\label{alg:block}; \\
 Quantifier elimination is a decision procedure that turns a quantified formula into an equivalent quantifier-free formula.
 In addition, the quantifier elimination algorithms are often able to discover a Skolem function that represents witnesses for the existentially quantified individual variables (e.g.,~\cite{DBLP:conf/cav/BalabanovJ11,DBLP:journals/sttt/KuncakMPS13,KLXJOIA,Chakraborty15}).
 %
-Various tasks in verification and synthesis~\cite{DBLP:conf/fmcad/CimattiGMT13,DBLP:conf/popl/BeyeneCPR14,DBLP:conf/nfm/GasconT14} rely on efficient techniques to remove existential quantifiers from formulas in first-order logic, thus adjusting the task to be decided by an SMT solver.
+Various tasks in verification and synthesis~\cite{DBLP:conf/fmcad/CimattiGMT13,DBLP:conf/popl/BeyeneCPR14,DBLP:conf/nfm/GasconT14} rely on efficient techniques to remove existential quantifiers from formulas in first order logic, thus adjusting the task to be decided by an SMT solver.
 In particular, \emph{functional synthesis} aims at computing a function that meets a given input/output relation.
 A function with an input $x$ and an output $y$, specified by a relation $f(x,y)$, can be constructed as a by-product of deciding validity of the formula $\forall x \exists y \such f(x,y)$.
 Due to a well-known \emph{AE-paradigm} (also referred to as \emph{Skolem paradigm}~\cite{DBLP:conf/popl/PnueliR89}),
 the formula $\forall x \exists y \such f(x,y)$ is equivalent to the formula $\exists \mathit{sk} \; \forall x \such f(x, \mathit{sk}(x))$, which means existence of a Skolem function $\mathit{sk}$, such that $f(x,\mathit{sk}(x))$ holds for every $x$.
-Thus the key feature in  modern quantifier elimination approaches is their ability to produce witnessing Skolem function.
+Thus the key feature in modern quantifier elimination approaches is their ability to produce witnessing Skolem function.
 
+In the rest of the section, we briefly describe the prior work on \aeval to be able (in Sect.~\ref{sec:new}) to present the key contributions on delivering Skolem functions appropriate for the program synthesis from proofs of realizability.
 
 \subsection{Model-Based Projection for Linear Rational Arithmetic}
 \label{sec:mbp}
@@ -224,7 +242,7 @@ match each $\phi_i$ against the corresponding $T_{i}$:
 
 
 Since \aeval is an extension of the MBP-algorithm mentioned in Sect.~\ref{sec:mbp},
-each $\phi_i$ is constructed from the substitutions made in $T$ to produce $T_{i}$.
+each $\phi_i$ (in~\eqref{case:skolem}) is constructed from the substitutions made in $T$ to produce $T_{i}$.
 Furthermore, 
 %(is a condition under which $T$ is equisatisfiable with $T_{i}$).
 %We assume that each $\phi_i$ is in the Cartesian form, i.e., a conjunction of
@@ -240,9 +258,15 @@ each MBP in \aeval is constructed iteratively for each variable $y_j \in \vy$.
 Thus, $y_j$ may depend on the variables of $y_{j+1},\ldots, y_{n}$ that are still not eliminated in the current iteration $j$.
 %Each $\psi_{y_j}(\vx,y_{j},\ldots,y_{n})$ is the conjunction $\psi_{y_j}(\vx,y_{j},\ldots,y_{n}) = \Land_{i}(cl_i(\vx,y_{j},\ldots,y_{n}))$, where each $cl_i$ is  an (in)equality.
 
-For each $y_j\in \vy$, our goal is to find a Skolem function $f_{y_j}(\vx)$, such that $(y_j = f_{y_j}(\vx)) \!\implies\! \exists y_{j+1},\ldots,y_{n} \such \psi_{y_j}(\vx,y_{j},\ldots,y_{n}) $.
-The idea is presented in Alg.~\ref{alg:loc}.
-The algorithm is applied separately for each $y_j \in \vy$, starting from $y_n$ till $y_1$.
+Inequalities in a Skolem relation are the enemies \arie{enemies?!} of program synthesis.
+Indeed, the final implementation should contain assignments to each
+existentially quantified variable, which are in general difficult to
+get. \arie{What is meant by ``difficult''. Difficult computationally,
+  difficult for the current algorithm, etc?}
+The Skolem relation provided by \aeval should be post-processed to get rid of inequalities.
+We formalize this procedure as finding a Skolem function $f_{y_j}(\vx)$ for each $y_j\in \vy$, such that $(y_j = f_{y_j}(\vx)) \!\implies\! \exists y_{j+1},\ldots,y_{n} \such \psi_{y_j}(\vx,y_{j},\ldots,y_{n}) $.
+The key idea is presented in Alg.~\ref{alg:loc}.
+The algorithm is applied separately for each $y_j \in \vy$, starting from $y_n$ to $y_1$.
 For each $y_j$, assume, we already established Skolem functions $f_{j+1}(\vx),\ldots,f_{n}(\vx)$ for variables $y_{j+1},\ldots,y_n$ in the previous runs of the algorithm. 
 %
 First, the algorithm substitutes each appearance of variables $y_{j+1},\ldots, y_{n}$ in $\psi_{y_j}$ by $f_{n}(\vx),\ldots,f_{j+1}(\vx)$.
@@ -256,14 +280,26 @@ Second, %the algorithm uses standard LRA-rules to normalize $\pi_{y_j}(\vx,y_{j}
 %{\Big( (g(\vx)+ p\!\times\!y_j}) \sim ( {h(\vx) + q\!\times\!y_j})\Big) \!\implies\! \Big(\big(\mathit{sgn}(p-q)\times y_j \big) \sim \big( -\frac{g(\vx)}{|p-q|} + \frac{h(\vx)}{|p-q|} \big)\Big)  \notag
 %\end{equation}
 %Finally 
-the algorithm gets rid of inequalities by transforming them into equalities, thus producing a Skolem function.
-In the rest of the section we show several fundamental rules and properties behind this operation.
+the algorithm gets rid of inequalities by transforming them into
+equalities, thus producing a Skolem function. \arie{The first part
+  (line~2) is clear, the second part is not. Elaborate more which part
+  of the algorithm are responsible for which inequality
+  elimination. The sets $L$, $U$, $M$, $V$, $E$, $N$, are not
+  defined. It is not clear why $M$ and $V$ are present but assumed to
+  be empty.}
+In the rest of the section, we show several fundamental rules and properties behind this operation.
+For simplicity, we omit some straightforward details on dealing with
+non-strict inequalities ($y_j \ge l(\vx)$ and $y_j \le u(\vx)$) since
+they are similar strict inequalities ($y_j > l(\vx)$ and $y_j < u(\vx)$).
+
 %If there are exist some, $f(\vx)$ defines some interval for the values for $y_j$.
 %Method \textsc{SkolemFunction} obtains equalities 
 %rewrites each clause using the following rules:
 
+\grigory{the rest can be compressed if needed}.
+
 \begin{lemma}
-After all substitutions in line~\ref{alg:loc_subst} of Alg.~\ref{alg:loc}, each $\psi_{y_j}(\vx,y_{j},\ldots,y_{n})$ is a conjunction of the form
+After all substitutions at line~\ref{alg:elim_compl} of Alg.~\ref{alg:loc}, each $\psi_{y_j}(\vx,y_{j},\ldots,y_{n})$ is a conjunction of the form
 $L_{y_j} \land U_{y_j} \land M_{y_j} \land V_{y_j} \land E_{y_j} \land N_{y_j}$ where
 %
 $L_{y_j} = \Land_{l}(y_j > l(\vx))$, 
@@ -284,15 +320,15 @@ If there is at least one conjunct $(y_j = e(\vx)) \in E_{y_j}$ then $(y_j = e(\v
 Otherwise, the algorithm creates it from the following primitives.
 
 \begin{definition}
-Let $l(\vx)$ and $u(\vx)$ be two linear functions,
-the higher order functions $\mathit{MAX}$, $\mathit{MIN}$, $\mathit{MID}$, $\mathit{LT}$, $\mathit{GT}$ are defined as follows:
-\begin{align}
-\mathit{MAX}(l, u) (\vx) &= ite (l (\vx) < u (\vx), u(\vx), l(\vx)) \notag \\
+Let $l(\vx)$ and $u(\vx)$ be two linear terms,
+then operators $\mathit{MAX}$, $\mathit{MIN}$, $\mathit{MID}$, $\mathit{LT}$, $\mathit{GT}$ are defined as follows:
+\begin{align*}
+\mathit{MAX}(l, u) (\vx) &= ite (l (\vx) < u (\vx), u(\vx), l(\vx)) \notag &
 \mathit{MIN}(l, u) (\vx) &= ite (l (\vx) < u (\vx), l(\vx), u(\vx)) \notag \\
-\mathit{MID}(l, u) (\vx) &= \frac{l(\vx) + u(\vx)}{ 2} \notag \\
-\mathit{LT} (u) (\vx) &= u (\vx) -1 \notag \\
-\mathit{GT} (l) (\vx) &= l (\vx) + 1 \notag 
-\end{align}
+\mathit{LT} (u) (\vx) &= u (\vx) -1 \notag &
+\mathit{GT} (l) (\vx) &= l (\vx) + 1 \notag \\
+\mathit{MID}(l, u) (\vx) &= \frac{l(\vx) + u(\vx)}{ 2} \notag 
+\end{align*}
 \end{definition}
 
 \begin{lemma}
@@ -301,7 +337,9 @@ If $U_{y_j}$ consists of $n>1$ conjuncts then it is equivalent to $y_j < \mathit
 %If  $M_{y_j}$ consists of $n>1$ conjuncts then it is equivalent to $y_j \ge \mathit{MAX} (l_1, \mathit{MAX} (l_2,\ldots \mathit{MAX} (l_{n-1}$, $ l_n) )) (\vx)$.
 %If  $V_{y_j}$ consists of $n>1$ conjuncts then it is equivalent to $y_j \le \mathit{MIN} (u_1$, $\mathit{MIN} (u_2,\ldots \mathit{MIN} (u_{n-1}, u_n) )) (\vx)$.
 \end{lemma}
-Similar for $M_{y_j}$ and for $V_{y_j}$.
+Similar for $M_{y_j}$ and for $V_{y_j}$. From this point on, with out
+loss of generality, we assume that each $L_{y_j}$, $U_{y_j}$,
+$M_{y_j}$, $V_{y_j}$ have at most one conjunct.\arie{Check}
 
 \begin{lemma}
 If $L_{y_j}$ consists of 1 conjunct and the rest of $U_{y_j}$, $M_{y_j} $,$V_{y_j}$,$E_{y_j}$ and $N_{y_j}$ are empty then the Skolem can be rewritten into $y_j = \mathit{GT} (l)(\vx)$.
@@ -315,7 +353,8 @@ Similar for $M_{y_j}$ and $V_{y_j}$, and for combinations with $L_{y_j}$ and $U_
 
 
 \begin{lemma}
-If $L_{y_j}$, $U_{y_j}$ and $N_{y_j}$ consist of 1 conjunct each and the rest of $M_{y_j} $,$V_{y_j}$,$E_{y_j}$ and $N_{y_j}$ are empty then the Skolem can be rewritten into $y_j = \mathit{FMID} (l, u, h)(\vx)$ where%
+  \arie{It is not clear where $h$ comes from}
+If $L_{y_j}$, $U_{y_j}$ and $N_{y_j}$ consist of 1 conjunct each and the rest of $M_{y_j} $,$V_{y_j}$,$E_{y_j}$ and $N_{y_j}$ are empty then the Skolem can be rewritten into $y_j = \mathit{FMID} (l, u, h)(\vx)$, where%
 \begin{align}
 \mathit{FMID}(l, u, h) (\vx) = ite (&\mathit{MID}(l, u) (\vx) = h(\vx),  \notag \\
                           &\mathit{MID}(l, \mathit{MID}(l, u)) (\vx), \notag \\
@@ -323,7 +362,8 @@ If $L_{y_j}$, $U_{y_j}$ and $N_{y_j}$ consist of 1 conjunct each and the rest of
 \end{align}
 \end{lemma}
 Similar for $M_{y_j}$ and $V_{y_j}$. 
-For bigger number of conjuncts of $N_{y_j}$, the Skolem gets rewritten in a similar way cascadically.
+For bigger number of conjuncts of $N_{y_j}$, the Skolem gets rewritten
+in a similar way cascadically\arie{Not a word}.
 
 
 \begin{lemma}
@@ -336,3 +376,17 @@ Similar for $M_{y_j}$.
 If $U_{y_j}$, $N_{y_j}$  consist of 1 conjunct each, and the rest of $M_{y_j} $,$V_{y_j}$, $E_{y_j}$ and $L_{y_j}$ are empty then the Skolem can be rewritten into $y_j = \mathit{FMID} (LT(u), u)(\vx)$. 
 \end{lemma}
 Similar for $V_{y_j}$.
+
+
+\begin{theorem}[Soundness]
+Iterative application of Alg.~\ref{alg:loc} to all variables $y_n,\ldots,y_1$ returns a local Skolem function to be used in~\eqref{case:skolem}.
+\end{theorem}
+\begin{proof}
+Follows from the case analysis that applies the lemmas above.
+\qed
+\end{proof}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "document"
+%%% End:
