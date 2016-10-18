@@ -1,0 +1,84 @@
+\begin{thebibliography}{10}
+\providecommand{\url}[1]{\texttt{#1}}
+\providecommand{\urlprefix}{URL }
+
+\bibitem{DBLP:conf/cav/BalabanovJ11}
+Balabanov, V., Jiang, J.R.: {Resolution Proofs and Skolem Functions in QBF
+  Evaluation and Applications}. In: {CAV}. LNCS, vol. 6806, pp. 149--164 (2011)
+
+\bibitem{DBLP:conf/popl/BeyeneCPR14}
+Beyene, T.A., Chaudhuri, S., Popeea, C., Rybalchenko, A.: A constraint-based
+  approach to solving games on infinite graphs. In: POPL. pp. 221--234. ACM
+  (2014)
+
+\bibitem{DBLP:conf/fmcad/CimattiGMT13}
+Cimatti, A., Griggio, A., Mover, S., Tonetta, S.: Parameter synthesis with
+  {IC3}. In: {FMCAD}. pp. 165--168. {IEEE} (2013)
+
+\bibitem{Dutertre}
+Dutertre, B.: {Solving Exists/Forall Problems With Yices}. In: SMT Workshop
+  (2015), extended abstract
+
+\bibitem{fedyukovich2015automated}
+Fedyukovich, G., Gurfinkel, A., Sharygina, N.: Automated discovery of
+  simulation between programs. In: Logic for Programming, Artificial
+  Intelligence, and Reasoning. pp. 606--621. Springer (2015)
+
+\bibitem{Katis15:Realizability}
+Gacek, A., Katis, A., Whalen, M.W., Backes, J., Cofer, D.: Towards
+  realizability checking of contracts using theories. In: NASA Formal Methods,
+  pp. 173--187. Springer (2015)
+
+\bibitem{DBLP:conf/nfm/GasconT14}
+Gasc{\'{o}}n, A., Tiwari, A.: {A Synthesized Algorithm for Interactive
+  Consistency}. In: {NFM}. LNCS, vol. 8430, pp. 270--284 (2014)
+
+\bibitem{Ghass16}
+Ghassabani, E., Gacek, A., Whalen, M.W.: Efficient generation of inductive
+  validity cores for safety properties. In: FSE2016: ACM Sigsoft International
+  Symposium on the Foundations of Software Engineering (2016)
+
+\bibitem{Hagen08:FMCAD}
+Hagen, G., Tinelli, C.: Scaling up the formal verification of lustre programs
+  with smt-based techniques. In: Formal Methods in Computer-Aided Design, 2008.
+  FMCAD '08. pp. 1--9 (Nov 2008)
+
+\bibitem{KLXJOIA}
+Heule, M., Seidl, M., Biere, A.: {Efficient Extraction of Skolem Functions from
+  QRAT Proofs}. In: FMCAD. pp. 107--114. {IEEE} (2014)
+
+\bibitem{lustrev6}
+Jahier, E., Raymond, P., Halbwachs, N.: {The Lustre V6 Reference Manual},
+  \url{http://www-verimag.imag.fr/Lustre-V6.html}
+
+\bibitem{Chakraborty15}
+John, A.K., Shah, S., Chakraborty, S., Trivedi, A., Akshay, S.: {Skolem
+  Functions for Factored Formulas}. In: FMCAD. pp. 73--80. {IEEE} (2015)
+
+\bibitem{Katis:machine}
+Katis, A., Gacek, A., Whalen, M.W.: Machine-checked proofs for realizability
+  checking algorithms (2015), submitted \url{http://arxiv.org/abs/1502.01292}
+
+\bibitem{katis2016towards}
+Katis, A., Whalen, M.W., Gacek, A.: Towards synthesis from assume-guarantee
+  contracts involving infinite theories: A preliminary report. arXiv preprint
+  arXiv:1602.00148  (2016)
+
+\bibitem{komuravelli2014smt}
+Komuravelli, A., Gurfinkel, A., Chaki, S.: Smt-based model checking for
+  recursive programs. In: Computer Aided Verification. vol. 8559, pp. 17--34.
+  Springer (2014)
+
+\bibitem{DBLP:journals/sttt/KuncakMPS13}
+Kuncak, V., Mayer, M., Piskac, R., Suter, P.: Functional synthesis for linear
+  arithmetic and sets. {STTT}  15(5-6),  455--474 (2013)
+
+\bibitem{loos1993applying}
+Loos, R., Weispfenning, V.: Applying linear quantifier elimination. The
+  Computer Journal  36(5),  450--462 (1993)
+
+\bibitem{DBLP:conf/popl/PnueliR89}
+Pnueli, A., Rosner, R.: On the synthesis of a reactive module. In: POPL. pp.
+  179--190. {ACM} Press (1989)
+
+\end{thebibliography}
