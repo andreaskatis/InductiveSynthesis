@@ -1,3 +1,40 @@
+\newcommand{\realizable}{\textsc{realizable}}
+\newcommand{\unrealizable}{\textsc{unrealizable}}
+\newcommand{\skolems}{\textit{Skolems}}
+
+\newcommand{\synthesisalgorithm}{
+\begin{algorithm2e}[]
+\SetAlgoSkip{}
+\SetKwFor{While}{forever}{do}{}
+\SetKw{KwContinue}{continue}
+\KwIn{Assume-Guarantee Contract in Lustre, $(A,G)$}
+\KwOut{Skolem collection \skolems, \\ \hspace{+1.3cm} Return value $\in
+\{\realizable, \unrealizable\}$ of ${(A,G)}$.}
+\BlankLine
+$i \gets 0$;\\
+$\textsc{BaseCheckEngine.SmtAdd}(\lnot BaseCheck(i))$;
+$\textsc{ExtendCheckEngine.SmtAdd}(\lnot ExtendCheck(i))$;
+\\
+\While{}{
+	$i$++;\\
+	\lIf(\label{alg:returnUnsat}){$(BaseCheckEngine.\isSat(\textsc{SmtSolve}()))$}
+	{
+		\Return
+		\unrealizable 
+	}
+	$\textsc{SkolemsAdd}(\aeval(BaseCheck(i))$;\\
+	\lIf(\label{alg:returnSat}){$(ExtendCheckEngine.\isUnSat(\textsc{SmtSolve}()))$}
+	{
+		$\textsc{SkolemsAdd}(\aeval(ExtendCheck(i)))$;\\
+		\Return \skolems, \realizable
+	}
+}
+\caption{Synthesis from Assume-Guarantee Contracts}
+\label{alg:synthesis}
+\end{algorithm2e}
+}
+
+
 \section{Synthesis from Assume-Guarantee Contracts}
 \label{sec:synthesis}
 
@@ -126,12 +163,10 @@ soundness, for the cases where it reports that a contract is realizable.
 %While the implemented algorithm on realizability provided us with meaningful
 %results during the verification of several contracts, 
 The most important outcome of the work on realizability is that it 
- could be further used for solving a more complex problem of
-\emph{program synthesis}, i.e., to automatically
-derive implementations, given the same set of requirements as for the realizability checking.
-Whenever a proof that a desired implementation for the given 
-contract exists,  we can use this proof in order to construct a witness
-implementation that satisfies the contract. 
+ can be further used for solving the more complex problem of
+\emph{program synthesis} i.e., to automatically
+derive implementations, from the proof of the contract's
+realizability.
 %The limited power of SMT solvers
 %in terms of solving formulas containing nested quantifiers immediately ruled
 %out the prospect of using one as our primary synthesis tool. Fortunately, 
@@ -151,6 +186,28 @@ In the first order logic, witnesses for valid $\forall\exists$-formulas are repr
 Intuitively, a Skolem function expresses a connection between all universally quantified variables in the left-hand-side of the $\forall\exists$-formulas~\eqref{eq:sbcheck} and~\eqref{eq:echeck} and the existentially quantified variable $s'$ in the right-hand-side of the the formulas.
 Our algorithm automatically generates such Skolem functions
 while solving the validity of~\eqref{eq:sbcheck} and~\eqref{eq:echeck} and is described in details Sect.~\ref{sec:aeval}.
+
+\synthesisalgorithm
+
+
+Algorithm~\ref{alg:synthesis} provides a summary of the synthesis algorithm,
+showing how it extends our previous work on realizability checking. During the
+k-induction, and for every step for which the negation of \textit{BaseCheck(n)}
+is not satisfiable, we feed the corresponding $\forall\exists$-formula to
+AE-VAL. A formula that is not satisfiable means that its negation is valid, and
+as such we expect AE-VAL to strengthen \textit{BaseCheck(n)}'s
+proof of validity. In addition to this proof, AE-VAL also returns a
+Skolem function that essentially assigns specific values to the existentially quantified
+variables, i.e. the output variables, in order to traverse into a
+new state, without violating the contract. We keep repeating this process,
+accumulating Skolem functions as long as the corresponding
+\textit{BaseCheck(n)} is true. As soon as the inductive
+step of \textit{ExtendCheck(n)} passes, we have a complete k-inductive proof
+stating that the contract is realizable. We then complete our synthesis
+procedure by generating a Skolem function that corresponds to the inductive
+step, and return the collection of the Skolem functions to the user.
+
+
 
 %GRIGORY: commented out the translation of A=> B => C into A /\ B => C since it is quite obvious
 
@@ -207,52 +264,69 @@ while solving the validity of~\eqref{eq:sbcheck} and~\eqref{eq:echeck} and is de
 %\label{fig:algorithm}
 %\end{figure}
 
-\begin{algorithm2e}[tb!]
+\begin{algorithm2e}[]
 \SetAlgoSkip{}
 \SetKwFor{While}{forever}{do}{}
-\KwIn{\grigory{tbd}}
+\BlankLine
+  \textsc{assign\_GI\_witness\_to\_S()}; 	\Comment{Initialize  state values in
+  arrays of size $k$ each.}\\
 
 \BlankLine
-  \textsc{assign\_GI\_witness\_to\_S()}; 	\Comment{Initialize  state values in an array of size $k$.}\\
-  \textsc{update\_array\_history()}\;
-
-\BlankLine
-  \textsc{read\_inputs()}; 		\Comment{Perform bounded ``base check'' synthesis}\\
-  \textsc{base\_check\_1\_solution()}\;
-  \textsc{update\_array\_history()}\;
+  \textsc{read\_inputs()}; 		\Comment{Transition using BaseCheck
+  witness}\\
+  \textsc{Skolems[1]()}\;
   $\ldots$\\
   \textsc{read\_inputs()}\;
-  \textsc{base\_check\_k\_solution()}\;
-  \textsc{update\_array\_history()}\;
+  \textsc{Skolems[k]()}\;
   
 \BlankLine  
 
 \While{}{  
- \textsc{read\_inputs()}; 		\Comment{Perform recurrence from ``extends'' check}\\
- \textsc{extend\_check\_k\_solution()}\;
+ \textsc{read\_inputs()}; 		\Comment{Transition using ExtendCheck
+ witness}\\
+ \textsc{Skolems[k]()}\;
  \textsc{update\_array\_history()}\;
 }
 
-\caption{Synthesized implementation.}
+\caption{Structure of implementation.}
 \label{alg:synt}
 \end{algorithm2e}
 
-\grigory{The algorithm description should be improved. Currently it mixes both, the synthesized implementation, and the synthesis procedure itself. There is an infinite loop that clearly belongs to the implementation, but the reviewers may misunderstand it. Of course, we should explicitly point that the synthesis procedure always terminates since there is a need to solve and skolemize finite number of formulas.}
+%\grigory{The algorithm description should be improved. Currently it mixes both,
+% the synthesized implementation, and the synthesis procedure itself. There is an infinite loop that clearly belongs to the implementation, but the reviewers may misunderstand it. Of course, we should explicitly point that the synthesis procedure always terminates since there is a need to solve and skolemize finite number of formulas.}
 
-Thus, we can construct the skeleton of an algorithm as shown in Alg.~\ref{alg:synt}.  
-The algorithm stars (method \textsc{assign\_GI\_witness\_to\_S()}) with creating an array for each input and history variable up to depth
-$k$, where $k$ is the depth at which we found a solution to our realizability algorithm.
-In each array, the zeroth element is the ``current'' value of the variable, the first element is the previous value, and the $(k-1)$'th value is the $(k-1)$-step previous value.
+With a collection of Skolems at hand, we are able to construct the skeleton of
+a candidate implementation as shown in Alg.~\ref{alg:synt}.
+The implementation begins (method \textsc{assign\_GI\_witness\_to\_S()}) by
+creating an array for each state variable up to depth $k$, where $k$ is the
+depth at which we found a solution to our realizability algorithm.
+In each array, the $i$-th element, with $0\leq i \leq k$, corresponds to the
+value assigned to the variable after the call to $i$-th Skolem function. As
+such, the $k$ elements of the array correspond to the $k$ Skolem
+functions produced by the $\mathit{BaseCheck}$ process, while the last element
+is also used by the Skolem function generated from the formula corresponding to
+the $\mathit{ExtendCheck}$ process.
 
-The algorithm then generates witnesses for each of the $\mathit{BaseCheck}$ instances of
-successive depth to describe the initial behavior of
+The algorithm then uses the Skolem functions generated by \aeval for each
+of the $\mathit{BaseCheck}$ instances to describe the initial behavior of
 the implementation up to depth $k$.  This process starts from the memory-free
 description of the initial state ($G_I$). 
 There are two ``helper'' operations:
 \textsc{update\_array\_history()} shifts each element in the arrays one position forward
-(the $(k-1)$'th value is simply forgotten), and \textsc{read\_inputs()} reads the current values of inputs into the zeroth element of the input variable arrays.  Once the history is entirely initialized using the $\mathit{BaseCheck}$ witness values, 
-the algorithm generates a witness for the $\mathit{ExtendCheck}$ instance to describe the recurrent behavior of
-the implementation, i.e., the next value of outputs in each iteration in the infinite loop.
+(the $(0)$'th value is simply forgotten), and \textsc{read\_inputs()} reads the
+current values of inputs into the $i$-th element of the input variable arrays,
+where $i$ represents the $i$-th step of the process.
+Once the history is entirely initialized using the $\mathit{BaseCheck}$ witness values,
+we add the Skolem function that represents the witness for the
+$\mathit{ExtendCheck}$ instance to describe the recurrent behavior of the implementation, i.e.,
+the next value of outputs in each iteration in the infinite loop.
+
+For the purposes of this paper, we developed\footnote{You can find the translation tool at
+https://github.com/andrewkatis/SMTLib2C} a translation tool to reconstruct
+the collections of Skolem functions returned by our synthesis algorithm, to C
+implementations, following the steps presented by
+Alg.~\ref{alg:synt}. The performance of the resulting implementations are
+being presented in Section~\ref{sec:experiment}.
 
  \andreas{Add proof of correctness here}
  
@@ -314,22 +388,24 @@ realizable. We provide the model as an input to JKind, and observe the results.
 The model is sufficiently simple to be declared as realizable by the tool, and
 thus can be further examined in terms of synthesizing a representative
 implementation. Using the k-inductive proof of realizability, which happens to
-be of length $k = 1$, we forward the two $\forall\exists$-formulas (one for the
-base check, and one for the inductive check) to be skolemized by AE-VAL. From
-this process, we receive two Skolem functions, that effectively describe
+be of length $k = 1$, we forward the two $\forall\exists$-formulas ($k=0$ for
+the base check, and $k=1$ for the inductive check) to be skolemized by AE-VAL.
+From this process, we receive two Skolem functions, that effectively describe
 possible assignments to the local variables of the specification, as well as the
 output \textit{state} (we can effectively decide what is an output by excluding
-it from the list of arguments in the \textit{--\%REALIZABLE} query above). We
-can then use these two Skolem functions to construct the final implementation
+it from the list of arguments in the \textit{--\%REALIZABLE} query in
+Fig~\ref{fg:example}).
+We can then use these two Skolem functions to construct the final implementation
 following the outline provided in Alg.~\ref{alg:synt}. Due to the fact that the
-implementation is too long to be included here (135 Lines of Code), we do not
+implementation is too long to be included here (135 lines of code), we do not
 present its actual form. The main idea involves the redefinition of each
 variable in the model as an array of size equal to the proof's length $k$, and,
 using the $k$-th element of each array as the corresponding output of the call
 to $k$-th Skolem function. After this initialization process, we use an infinite
 loop to assign new values to the element corresponding to the last Skolem
 function, to cover the inductive step of the original proof. One of the
-interesting features that come from using a k-inductive proof is that we can
-possible refer to up to $k-1$ values of each variable in the past, and as such
-an update process occurs in between each iteration of the infinite loop, to only
-keep the latest k values assigned to each element of each array.
+interesting features that come from using Lustre in conjunction with a
+k-inductive proof is that we can possibly have properties in the model that
+refer to up to $k-1$ values of each variable in the past, and as such an update
+process occurs in between each iteration of the infinite loop, to ensure that we
+only keep the $k$ latest values of each array.
