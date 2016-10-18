@@ -255,5 +255,81 @@ the algorithm generates a witness for the $\mathit{ExtendCheck}$ instance to des
 the implementation, i.e., the next value of outputs in each iteration in the infinite loop.
 
  \andreas{Add proof of correctness here}
+ 
+ \subsection{Running Example}
+ 
+ To further understand the concepts described in this paper, we provide a simple
+ running example that is representative of what happens internally during a
+ single run of the synthesis algorithm. Figure~\ref{fg:example} is showing a
+ simple automaton that we will be using as the example. To the right, we can see
+ the requirements that were written for the automaton in the Lustre language.
+ The specification mentions one input, namely $x$. While the $state$ variable
+ would otherwise be considered as the output in the resulting implementation,
+ we use a simple hack that prevents us from explicitly defining how it should
+ be assigned, by adding it as an actual input to the specification. In addition
+ to the previous, can see that there are 4 properties to be checked, along with a
+ JKind-specific query on the specification's realizability. Properties
+ \textit{prop2} and \textit{prop3} are used to indirectly summarize parts of the
+ possible transitions in the automaton. Properties \textit{prop1} and
+ \textit{prop4} are requirements with respect to two local variables, \textit{bias}
+ and \textit{bias\char`_max}. Variable \textit{bias} calculates the number of successive
+ ones or zeros read by the automaton, while \textit{bias\char`_max} is used as a flag
+ to indicate that at least two zeros or two ones have been read in a row.
+ 
+\begin{figure}[H]
+\begin{minipage}[c]{0.35\textwidth}
+\centering
+\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{example}
+\end{minipage}
+\begin{minipage}[c]{0.7\textwidth}
+ \begin{Verbatim}[fontsize=\scriptsize]
+node top(x : bool; state: int) returns (  );
+var
+  bias : int;
+  prop1, prop2, prop3, prop4, prop_all : bool;
+  bias_max : bool;
+let
 
+  bias = 0 -> (if x then 1 else -1) + pre(bias);
+  bias_max = false ->
+	(bias >= 2 or bias <= -2) or pre(bias_max);
+  prop1 = (state = 0 => (bias = 0));
+  prop2 = true ->
+  	(pre(state = 0) and x) => state = 2;
+  prop3 = true ->
+  	(pre(state = 0) and not x) => state = 1;
+  prop4 = bias_max => state = 3;
+  prop_all = prop1 and prop2 and prop3 and prop4;
+  --%PROPERTY prop_all;
+  --%REALIZABLE x;
+tel;
+ \end{Verbatim}
+\end{minipage}
+\caption{Automaton and Requirements for running example}
+\label{fg:example}
+\end{figure}
 
+Considering these requirements, we want an answer to whether this model is
+realizable. We provide the model as an input to JKind, and observe the results.
+The model is sufficiently simple to be declared as realizable by the tool, and
+thus can be further examined in terms of synthesizing a representative
+implementation. Using the k-inductive proof of realizability, which happens to
+be of length $k = 1$, we forward the two $\forall\exists$-formulas (one for the
+base check, and one for the inductive check) to be skolemized by AE-VAL. From
+this process, we receive two Skolem functions, that effectively describe
+possible assignments to the local variables of the specification, as well as the
+output \textit{state} (we can effectively decide what is an output by excluding
+it from the list of arguments in the \textit{--\%REALIZABLE} query above). We
+can then use these two Skolem functions to construct the final implementation
+following the outline provided in Alg.~\ref{alg:synt}. Due to the fact that the
+implementation is too long to be included here (135 Lines of Code), we do not
+present its actual form. The main idea involves the redefinition of each
+variable in the model as an array of size equal to the proof's length $k$, and,
+using the $k$-th element of each array as the corresponding output of the call
+to $k$-th Skolem function. After this initialization process, we use an infinite
+loop to assign new values to the element corresponding to the last Skolem
+function, to cover the inductive step of the original proof. One of the
+interesting features that come from using a k-inductive proof is that we can
+possible refer to up to $k-1$ values of each variable in the past, and as such
+an update process occurs in between each iteration of the infinite loop, to only
+keep the latest k values assigned to each element of each array.
