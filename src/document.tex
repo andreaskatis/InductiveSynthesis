@@ -15,7 +15,8 @@
 \usepackage{placeins}
 \usepackage{amsmath,amssymb}
 \usepackage{xspace}
-
+\usepackage{caption} 
+\captionsetup[table]{skip=10pt}
 %to solve the hyperref problem of jumping to wrong places
 \usepackage[all]{hypcap}
 \usepackage[framemethod=TikZ]{mdframed}
@@ -82,8 +83,8 @@ It naturally extends the realizability check by the JKind model checker.
 Furthermore, we developed a compiler to translate these primitive implementations to the C
 language.
 For a vast variety of models, we test their corresponding
-implementations against the ones provided by LustreC, a compiler from Lustre to
-C implementations, yielding comparable results.
+implementations against the ones provided by the LustreV6 compiler, yielding
+meaningful results.
 \grigory{There is a need to the final sentence.. something like ``our C-implementations are better than the ones by  'LustreC.'}
 \qed
 
@@ -127,7 +128,7 @@ language.
 \input{introduction}
 \input{synthesis}
 \input{aeval}
-\input{cstudies}
+\input{experiment}
 \input{related}
 \input{futurework}
 
