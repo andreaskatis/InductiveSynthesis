@@ -2,3 +2,6 @@ tmp/document.log
 tmp/document.log
 tmp/document.aux
 tmp/document.blg
+*.7z
+*.log
+*.aux

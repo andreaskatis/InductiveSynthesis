@@ -20,20 +20,20 @@ assumptions and guarantees. The synthesis algorithm
 is an extension of our previous work on solving the problem of
 realizability modulo infinite theories~\cite{Katis15:Realizability}, using a
 model checking algorithm that has been formally verified in terms of its soundness for realizable
-results~\cite{Katis:machine}. Given the inductive proof of realizability, we
+results~\cite{katis2015machine}. Given the inductive proof of realizability, we
 take advantage of a sophisticated skolemizer for $\forall\exists$ formulas,
 named AE-VAL~\cite{fedyukovich2015automated}, that is able to provide us with
 witnesses of strategies that a synthesized implementation can follow at each
 step of execution. In the context of this paper, we have implemented the synthesis 
-algorithm and exercised it in terms of its performance on two separate case studies. We
+algorithm and exercised it in terms of its performance on several models. We
 provide an informal proof of the algorithm's correctness regarding the
 implementations that it produces, and discuss our experimental results.
 
 In Section~\ref{sec:synthesis} we provide the necessary background
 definitions that are used in our synthesis algorithm, as well as an informal
-proof of the algorithm's correctness. Section~\ref{sec:cstudies} presents our
-results on using the algorithm to automatically generate leaf-level component
-implementations for different case studies. Finally, in
-Section~\ref{sec:related} we give a brief historical background on the related
-research work on synthesis, and we conclude with a discussion on potential
-future work in Section~\ref{sec:futurework}.
+proof of the algorithm's correctness. Section~\ref{sec:aeval} contains the
+core formal notions behind on which the AE-VAL Skolemizer is based, as well
+as the adjustments that were done for it to better support the needs of this
+work. Section~\ref{sec:experiment} presents our results on using the algorithm
+to automatically generate leaf-level component implementations for different case studies.
+Finally, in Section~\ref{sec:related} we give a brief historical background on the related research work on synthesis, and we conclude with a discussion on potential future work in Section~\ref{sec:futurework}.

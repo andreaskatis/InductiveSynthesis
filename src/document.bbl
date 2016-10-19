@@ -24,6 +24,10 @@ Fedyukovich, G., Gurfinkel, A., Sharygina, N.: Automated discovery of
   simulation between programs. In: Logic for Programming, Artificial
   Intelligence, and Reasoning. pp. 606--621. Springer (2015)
 
+\bibitem{jkind}
+Gacek, A.: {JK}ind -- an infinite-state model checker for safety properties in
+  {Lustre}. \url{http://loonwerks.com/tools/jkind.html} (2016)
+
 \bibitem{Katis15:Realizability}
 Gacek, A., Katis, A., Whalen, M.W., Backes, J., Cofer, D.: Towards
   realizability checking of contracts using theories. In: NASA Formal Methods,
@@ -37,6 +41,10 @@ Gasc{\'{o}}n, A., Tiwari, A.: {A Synthesized Algorithm for Interactive
 Ghassabani, E., Gacek, A., Whalen, M.W.: Efficient generation of inductive
   validity cores for safety properties. In: FSE2016: ACM Sigsoft International
   Symposium on the Foundations of Software Engineering (2016)
+
+\bibitem{Hagen08:kind}
+Hagen, G.: Verifying safety properties of {L}ustre programs: an {SMT}-based
+  approach. Ph.D. thesis, University of Iowa (December 2008)
 
 \bibitem{Hagen08:FMCAD}
 Hagen, G., Tinelli, C.: Scaling up the formal verification of lustre programs
@@ -55,9 +63,10 @@ Jahier, E., Raymond, P., Halbwachs, N.: {The Lustre V6 Reference Manual},
 John, A.K., Shah, S., Chakraborty, S., Trivedi, A., Akshay, S.: {Skolem
   Functions for Factored Formulas}. In: FMCAD. pp. 73--80. {IEEE} (2015)
 
-\bibitem{Katis:machine}
+\bibitem{katis2015machine}
 Katis, A., Gacek, A., Whalen, M.W.: Machine-checked proofs for realizability
-  checking algorithms (2015), submitted \url{http://arxiv.org/abs/1502.01292}
+  checking algorithms. In: Working Conference on Verified Software: Theories,
+  Tools, and Experiments. pp. 110--123. Springer (2015)
 
 \bibitem{katis2016towards}
 Katis, A., Whalen, M.W., Gacek, A.: Towards synthesis from assume-guarantee
@@ -80,5 +89,9 @@ Loos, R., Weispfenning, V.: Applying linear quantifier elimination. The
 \bibitem{DBLP:conf/popl/PnueliR89}
 Pnueli, A., Rosner, R.: On the synthesis of a reactive module. In: POPL. pp.
   179--190. {ACM} Press (1989)
+
+\bibitem{Coqmanual}
+{The Coq Development Team}: The {C}oq {P}roof {A}ssistant {R}eference {M}anual.
+  INRIA, 8.4 edn. (2012-2014)
 
 \end{thebibliography}

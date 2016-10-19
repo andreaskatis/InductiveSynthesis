@@ -1,13 +1,27 @@
 \section{Implementation}
 \label{sec:impl}
 
-\grigory{moved the paragraph from section 2 here. More info about the implementation would be desirable. Some details about smtlib2 -> C conversion, maybe}
+% \grigory{moved the paragraph from section 2 here. More info about the implementation would be desirable. Some details about smtlib2 -> C conversion, maybe}
 
-The structure of the Skolem relation is simple enough to translate
-into a program in a mainstream language.
-We need implementations that are able to keep track of the
-current state variables, the current inputs, as well as some history
-about the variable values in previous states. This can easily be handled, for
-example, in C with the use of arrays to keep record of each variable's $k$ last
-values, and the use of functions that update each variable's corresponding array
-to reflect the changes following a new step using the transition relation.
+The synthesis algorithm presented in this work is currently a feature provided
+by JKind~\cite{jkind}, a re-implementation of the KIND model
+checker~\cite{Hagen08:kind} in Java. Each model is described using the Lustre
+Specification language, which is used as an intermediate language to formally verify contracts in the
+Assume-Guarantee Reasoning (AGREE) framework~\cite{NFM2012:CoGaMiWhLaLu}.
+Internally, JKind is using two parallel engines in order to construct a
+k-inductive proof for the property of interest. The first order formulas that
+are being constructed are then feeded to the Z3 SMT
+solver~\cite{DeMoura08:z3} which provides state of the art support for reasoning
+over quantifiers and incremental search.
+
+Provided with the assumption that the check queries are satisfiable according to
+the results received by the SMT solver, we proceed to construct a collection of
+Skolem functions using the \aeval skolemizer. \andreas{Add \aeval related
+implementation details here.}
+
+The final step of our implementation involved the creation of a specific purpose
+translation tool, which is currently called SMTLib2C~\footnote{The source code
+is available at https://github.com/andrewkatis/SMTLib2C}. The translation tool
+is still at a very primitive state in terms of optimizations, a goal that we
+eventually want to address as part of our future work.
+
