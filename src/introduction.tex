@@ -1,33 +1,48 @@
 \section{Introduction}
+\grigory{The intro needs work. What's the main challenge? Why do we start with formal verification, and with synthesis or realizability checking?}
 Formal verification is a well-established area of research, with ever increasing
 popularity, in an attempt to provide better tools to software engineers during
 the design and testing phases of a project and effectively reduce its overall
-development cost. A particularly interesting problem in formal verification is
-that of program synthesis, where researchers try to construct efficient algorithms that can
+development cost. A particularly interesting problem in formal verification \grigory{this is not 100\% right, since program synthesis spreads far beyond program verification. There are many applications of synthesis that are not based on verification.} is
+that of program synthesis aiming to construct efficient algorithms that can
 automatically generate code which is guaranteed to behave correctly based on the
 information provided by the user through formal or informal requirements.
+\grigory{informal requirements? how come?}
 
-While the problem of synthesis has been explored in a significant amount of
-diverse contexts, in this paper we particularly focus on the automated
+Program synthesis has been applied in a significant amount of
+diverse contexts, \grigory{citations?}, but to the best of our knowledge there is no application yet that ....%
+ \grigory{what's the best novelty in our synthesis application?}
+In this paper, we focus on the automated
 generation of implementations for the leaf-level components of embedded
 systems, using safety properties that are expressed in the form of an
 Assume-Guarantee contract.
-In recent work~\cite{katis2016towards}, we introduced a novel synthesis
-procedure that, given a contract written in AADL, can provide an implementation
-that is able to react to uncontrolled inputs provided by the system's
-environment, while satisfying the restrictions specified in the contract
-assumptions and guarantees. The synthesis algorithm
-is an extension of our previous work on solving the problem of
+In recent work~\cite{katis2016towards}, we presented an idea for the Skolem-guided synthesis algorithm
+that given a contract written in AADL would check realizability and derive an implementation,
+but we did not implement it due to significant limitations in our Skolemizer~\cite{fedyukovich2015automated}.
+\grigory{need to show other weaknesses of the previous work. Otherwise the reviewers may say ``not enough contributions''.}
+%, can provide an implementation
+%that is able to react to uncontrolled inputs provided by the system's
+%environment, while satisfying the restrictions specified in the contract
+%assumptions and guarantees. 
+
+The synthesis algorithm is an extension of our previous work on solving the problem of
 realizability modulo infinite theories~\cite{Katis15:Realizability}, using a
 model checking algorithm that has been formally verified in terms of its soundness for realizable
-results~\cite{katis2015machine}. Given the inductive proof of realizability, we
-take advantage of a sophisticated skolemizer for $\forall\exists$ formulas,
-named AE-VAL~\cite{fedyukovich2015automated}, that is able to provide us with
+results~\cite{katis2015machine}.
+\grigory{as we agreed earlier, there could be more description on k-induction}
+ Given the inductive proof of realizability, we generate Skolem functions which are the
 witnesses of strategies that a synthesized implementation can follow at each
-step of execution. In the context of this paper, we have implemented the synthesis 
+step of execution. 
+
+\grigory{Let us invent a name for ``of our extension to \jkind's
+realizability checking algorithm to support synthesis'' and use it everywhere.
+The working name is \jkindsynt.}
+
+We have implemented the synthesis 
 algorithm and exercised it in terms of its performance on several models. We
 provide an informal proof of the algorithm's correctness regarding the
 implementations that it produces, and discuss our experimental results.
+\grigory{need more info here. some executive summary of the evaluation section.}
 
 In Section~\ref{sec:synthesis} we provide the necessary background
 definitions that are used in our synthesis algorithm, as well as an informal

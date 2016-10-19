@@ -3,27 +3,31 @@
 \newcommand{\skolems}{\textit{Skolems}}
 
 \newcommand{\synthesisalgorithm}{
-\begin{algorithm2e}[]
+\begin{algorithm2e}[tb]
 \SetAlgoSkip{}
 \SetKwFor{While}{forever}{do}{}
 \SetKw{KwContinue}{continue}
 \KwIn{Assume-Guarantee Contract in Lustre, $(A,G)$}
 \KwOut{Skolem collection \skolems, \\ \hspace{+1.3cm} Return value $\in
-\{\realizable, \unrealizable\}$ of ${(A,G)}$.}
+\{\realizable, \unrealizable\}$ of ${(A,G)}$.
+\grigory{currently, it looks like the same job for realizability is performed twice. 
+\aeval also does validity check (i.e., checks that the negated formula is unsat), otherwise no skolems can be generated.
+I suggest to optimize it in the algorithm. Also, what is BaseCheckEngine and ExtendCheckEngine? are they simple two instances of the SMT solver?}
+}
 \BlankLine
 $i \gets 0$;\\
-$\textsc{BaseCheckEngine.SmtAdd}(\lnot BaseCheck(i))$;
+$\textsc{BaseCheckEngine.SmtAdd}(\lnot BaseCheck(i))$\;
 $\textsc{ExtendCheckEngine.SmtAdd}(\lnot ExtendCheck(i))$;
 \\
 \While{}{
 	$i$++;\\
-	\lIf(\label{alg:returnUnsat}){$(BaseCheckEngine.\isSat(\textsc{SmtSolve}()))$}
+	\uIf(\label{alg:returnUnsat}){$(BaseCheckEngine.\isSat(\textsc{SmtSolve}()))$}
 	{
 		\Return
 		\unrealizable 
 	}
 	$\textsc{SkolemsAdd}(\aeval(BaseCheck(i))$;\\
-	\lIf(\label{alg:returnSat}){$(ExtendCheckEngine.\isUnSat(\textsc{SmtSolve}()))$}
+	\uIf(\label{alg:returnSat}){$(ExtendCheckEngine.\isUnSat(\textsc{SmtSolve}()))$}
 	{
 		$\textsc{SkolemsAdd}(\aeval(ExtendCheck(i)))$;\\
 		\Return \skolems, \realizable
@@ -38,20 +42,23 @@ $\textsc{ExtendCheckEngine.SmtAdd}(\lnot ExtendCheck(i))$;
 \section{Synthesis from Assume-Guarantee Contracts}
 \label{sec:synthesis}
 
-In this section we provide a summary of the formal background
-that has already been established in previous work, regarding an algorithm that
-is able to generate leaf-level component implementations using only the
-information provided by the user through requirements expressed in the form of an
-Assume-Guarantee contract. Our approach mainly supports the Linear Real
-Arithmetic (LRA) theory, and to a certain extend the theory of integers (LIA),
-mainly due to the limitations imposed by the underlying machinery. We
-begin with a brief description of an Assume-Guarantee contract, and
-move on to discuss the specifics of our program synthesis procedure,
-which depends on our earlier work towards solving the problem of realizability
-checking of contracts.
-Finally, we enrich our formal definitions with an informal proof of the
-algorithm's correctness in terms of the successfully synthesized
-implementations.
+%GRIGORY: no need to repeat the things since they all are mentioned in the intro (a couple of paragraphs above)
+%
+In this section we provide %a summary of the formal background
+%that has already been established in previous work, regarding an algorithm that
+%is able to generate leaf-level component implementations using only the
+%information provided by the user through requirements expressed in the form of an
+%Assume-Guarantee contract. Our approach supports the Linear Real
+%Arithmetic (LRA) theory.
+%mainly due to the limitations imposed by the underlying machinery.
+% We begin with 
+a brief background on Assume-Guarantee contracts, 
+proceed with summarizing our earlier results on realizability
+checking of contracts, and finally
+present our program synthesis procedure.
+%Finally, we enrich our formal definitions with an informal proof of the
+%algorithm's correctness in terms of the successfully synthesized
+%implementations.
 
 \subsection{Assume-Guarantee Contracts}
 
@@ -66,7 +73,7 @@ set of valid inputs a system can process, while the \emph{guarantees} dictate
 how the system should behave, using properties that precisely describe
 the kinds of valid outputs that it may return to its environment.
 
-\begin{figure}[H]
+\begin{figure}[t!]
 	\centering
 	\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{real1-crop}    	
 	\caption{Example of an Assume-Guarantee contract}
@@ -153,7 +160,8 @@ $\forall\exists$-formulas are valid:%
 \end{equation}
 
 The realizability checking algorithm has been used to effectively find cases
-where the traditional consistency check failed to detect conflicts between
+where the traditional consistency check \grigory{what is the traditional consistency check? How does it help to the further discussion? In general, the smaller background the better.}
+failed to detect conflicts between
 stated requirements in case studies of different complexity and importance. It
 has also been formally verified using the Coq proof assistant in terms of its
 soundness, for the cases where it reports that a contract is
@@ -161,6 +169,7 @@ realizable~\cite{katis2015machine}.
 
 \subsection{Program Synthesis from Proofs of Realizability}
 
+\grigory{need to clearly say what is new and what is old in the section}
 %While the implemented algorithm on realizability provided us with meaningful
 %results during the verification of several contracts, 
 The most important outcome of the work on realizability is that it 
@@ -193,11 +202,13 @@ while solving the validity of~\eqref{eq:sbcheck} and~\eqref{eq:echeck} and is de
 
 Algorithm~\ref{alg:synthesis} provides a summary of the synthesis algorithm,
 showing how it extends our previous work on realizability checking. During the
-k-induction, and for every step for which the negation of \textit{BaseCheck(n)}
+k-induction, 
+\grigory{I suggest to say something like that ``Since proving validity and Skolemization are closely related tasks, we create the $\forall\exists$-formula'' for the \textit{BaseCheck(n)} and push it to the \aeval. The output is valid/invalid, and (in case of valid) also a Skolem function''.}
+and for every step for which the negation of \textit{BaseCheck(n)}
 is not satisfiable, we feed the corresponding $\forall\exists$-formula to
-AE-VAL. A formula that is not satisfiable means that its negation is valid, and
-as such we expect AE-VAL to strengthen \textit{BaseCheck(n)}'s
-proof of validity. In addition to this proof, AE-VAL also returns a
+\aeval. A formula that is not satisfiable means that its negation is valid, and
+as such we expect \aeval to strengthen \textit{BaseCheck(n)}'s
+proof of validity. In addition to this proof, \aeval also returns a
 Skolem function that essentially assigns specific values to the existentially quantified
 variables, i.e. the output variables, in order to traverse into a
 new state, without violating the contract. We keep repeating this process,
@@ -265,7 +276,7 @@ step, and return the collection of the Skolem functions to the user.
 %\label{fig:algorithm}
 %\end{figure}
 
-\begin{algorithm2e}[]
+\begin{algorithm2e}[tb]
 \SetAlgoSkip{}
 \SetKwFor{While}{forever}{do}{}
 \BlankLine
@@ -293,11 +304,8 @@ step, and return the collection of the Skolem functions to the user.
 \label{alg:synt}
 \end{algorithm2e}
 
-%\grigory{The algorithm description should be improved. Currently it mixes both,
-% the synthesized implementation, and the synthesis procedure itself. There is an infinite loop that clearly belongs to the implementation, but the reviewers may misunderstand it. Of course, we should explicitly point that the synthesis procedure always terminates since there is a need to solve and skolemize finite number of formulas.}
-
-With a collection of Skolems at hand, we are able to construct the skeleton of
-a candidate implementation as shown in Alg.~\ref{alg:synt}.
+Given a collection of Skolems, it remains to plug them into an implementation skeleton of
+ shown in Alg.~\ref{alg:synt}.
 The implementation begins (method \textsc{assign\_GI\_witness\_to\_S()}) by
 creating an array for each state variable up to depth $k$, where $k$ is the
 depth at which we found a solution to our realizability algorithm.
@@ -322,8 +330,9 @@ we add the Skolem function that represents the witness for the
 $\mathit{ExtendCheck}$ instance to describe the recurrent behavior of the implementation, i.e.,
 the next value of outputs in each iteration in the infinite loop.
 
+\grigory{I think, in this section we can skip this paragraph since it clearly belongs to Sect.5}
 For the purposes of this paper, we developed\footnote{You can find the translation tool at
-https://github.com/andrewkatis/SMTLib2C} a translation tool to reconstruct
+\url{https://github.com/andrewkatis/SMTLib2C}.} a translation tool to reconstruct
 the collections of Skolem functions returned by our synthesis algorithm, to C
 implementations, following the steps presented by
 Alg.~\ref{alg:synt}. The performance of the resulting implementations are
@@ -334,31 +343,39 @@ correctness, we wrote machine-checked proofs regarding the validity of \textit{B
 \textit{ExtendCheck(n)}, when Skolem functions are used as witness states
 towards synthesizing the implementations. The entirety of the models explored in
 this paper only involved proofs of realizability of length $k$ equal to 0 or
-1~\footnote{The proofs can be found at https://github.com/andrewkatis/Coq}.
+1%
+\footnote{The proofs can be found at \url{https://github.com/andrewkatis/Coq}.}.
 As such, we limited our proofs of soundness to these two specific cases. We hope
 to extend the proofs to capture any arbitrary $k$ as part of our future work.
 The corresponding were written and proved using the Coq proof
 assistant~\cite{Coqmanual}.
- 
+
+\grigory{I suggest to put the main soundness theorem (without a proof) here.}
 
  \subsection{Running Example}
  
- To further understand the concepts described in this paper, we provide a simple
- running example that is representative of what happens internally during a
- single run of the synthesis algorithm. Figure~\ref{fg:example} is showing a
- simple automaton that we will be using as the example. To the right, we can see
- the requirements that were written for the automaton in the Lustre language.
- The specification mentions one input, namely $x$. While the $state$ variable
- would otherwise be considered as the output in the resulting implementation,
- we use a simple hack that prevents us from explicitly defining how it should
- be assigned, by adding it as an actual input to the specification. In addition
- to the previous, can see that there are 4 properties to be checked, along with a
- JKind-specific query on the specification's realizability. Properties
- \textit{prop2} and \textit{prop3} are used to indirectly summarize parts of the
- possible transitions in the automaton. Properties \textit{prop1} and
- \textit{prop4} are requirements with respect to two local variables, \textit{bias}
- and \textit{bias\char`_max}. Variable \textit{bias} calculates the number of successive
- ones or zeros read by the automaton, while \textit{bias\char`_max} is used as a flag
+ % GRIGORY: obvious sentence 
+ %To further understand the concepts described in this paper, we provide a simple
+ %running example that is representative of what happens internally during a
+ %single run of the synthesis algorithm. 
+ 
+ Fig.~\ref{fg:example} shows a
+ simple but yet representative example to our approach.
+ This is an automaton and the requirements for the automaton in the Lustre language.
+ There are input variables \texttt{x} and \texttt{state} (the latter variable is added to the inputs since
+ otherwise it would be considered as the output in the resulting implementation).
+ Variable \texttt{state} is also the output variable (otherwise it would be specified in the list of arguments of the \texttt{--\%REALIZABLE} query).
+ %GRIGORY: I think, it is pretty clear:
+ %we use a simple hack that prevents us from explicitly defining how it should
+ %be assigned, by adding it as an actual input to the specification.
+ %
+ There are four properties to be checked along with a
+ \jkind-specific query on realizability of the spec. Properties
+ \texttt{prop2} and \texttt{prop3} are used to indirectly summarize parts of the
+ possible transitions in the automaton. Properties \texttt{prop1} and
+ \texttt{prop4} are the requirements with respect to two local variables, \texttt{bias}
+ and \texttt{bias\char`_max}. Variable \texttt{bias} calculates the number of successive
+ ones or zeros read by the automaton, while \texttt{bias\char`_max} is used as a flag
  to indicate that at least two zeros or two ones have been read in a row.
  
 \begin{figure}[H]
@@ -374,7 +391,6 @@ var
   prop1, prop2, prop3, prop4, prop_all : bool;
   bias_max : bool;
 let
-
   bias = 0 -> (if x then 1 else -1) + pre(bias);
   bias_max = false ->
 	(bias >= 2 or bias <= -2) or pre(bias_max);
@@ -394,28 +410,40 @@ tel;
 \label{fg:example}
 \end{figure}
 
-Considering these requirements, we want an answer to whether this model is
-realizable. We provide the model as an input to JKind, and observe the results.
-The model is sufficiently simple to be declared as realizable by the tool, and
-thus can be further examined in terms of synthesizing a representative
-implementation. Using the k-inductive proof of realizability, which happens to
-be of length $k = 1$, we forward the two $\forall\exists$-formulas ($k=0$ for
-the base check, and $k=1$ for the inductive check) to be skolemized by AE-VAL.
-From this process, we receive two Skolem functions, that effectively describe
-possible assignments to the local variables of the specification, as well as the
-output \textit{state} (we can effectively decide what is an output by excluding
-it from the list of arguments in the \textit{--\%REALIZABLE} query in
-Fig~\ref{fg:example}).
-We can then use these two Skolem functions to construct the final implementation
-following the outline provided in Alg.~\ref{alg:synt}. Due to the fact that the
-implementation is too long to be included here (135 lines of code), we do not
-present its actual form\footnote{The implementation for the
-example is available at }.
-The main idea involves the redefinition of each variable in the model as an array of size equal to the proof's length $k$, and,
-using the $k$-th element of each array as the corresponding output of the call
+% GRIGORY: this sentence is too high-level and too application-specific. I'd start with something more general.
+%Considering these requirements, we want an answer to whether this model is
+%realizable. We provide the model as an input to \jkind, and observe the results.
+
+Realizability check is needed to identify whether this user-defined model
+ has potential conflicts between the requirements.
+The model from the example is obviously realizable and has
+%, and
+%thus can be further examined in terms of synthesizing a representative
+%implementation. 
+%Using 
+the k-inductive proof of length $k = 1$.
+The two corresponding $\forall\exists$-formulas ($k=0$ for
+the base check, and $k=1$ for the inductive check) are valid, and thus  \aeval
+extracts two witnessing Skolem functions
+%From this process, we receive two Skolem functions, 
+that effectively describe
+ assignments to the local variables of the specification, as well as to \texttt{state}.
+\grigory{will try to put a snippet of the formula here.} 
+
+The Skolem functions are used to construct the final implementation
+following the outline provided in Alg.~\ref{alg:synt}. 
+It is 135 lines of code, and due to the space constraints we do not
+present it here%
+\footnote{The implementation for the
+example is available at \url{http://}.}.
+The main idea is to redefine each variable in the model 
+as an array of size equal to $k$ and
+to use the $k$-th element of each array as the corresponding output of the call
 to $k$-th Skolem function. After this initialization process, we use an infinite
 loop to assign new values to the element corresponding to the last Skolem
-function, to cover the inductive step of the original proof. One of the
+function, to cover the inductive step of the original proof. 
+\grigory{I'm not sure what you mean by the last sentence. It is long and difficult to parse. If it has some general observation about the algorithm, maybe it makes sense to move to Sect. 2.4?}
+One of the
 interesting features that come from using Lustre in conjunction with a
 k-inductive proof is that we can possibly have properties in the model that
 refer to up to $k-1$ values of each variable in the past, and as such an update

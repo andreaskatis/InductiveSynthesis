@@ -28,6 +28,8 @@
 
 \newcommand{\aeval}{\textsc{AE-VAL}\xspace}
 \newcommand{\jkind}{\textsc{JKind}\xspace}
+\newcommand{\jkindsynt}{\textsc{JKindSynt}\xspace} % working name, feel free to rename it
+\newcommand{\lustrev}{\textsc{LustreV6}\xspace}
 
 \newcommand{\isSat}{\textsc{isSat}\xspace}
 \newcommand{\isUnSat}{\textsc{isUnsat}\xspace}
@@ -86,13 +88,8 @@ Lustre specification language.
 It naturally extends the realizability check by the \jkind model checker.
 Furthermore, we developed a compiler to translate pure Skolem-containing implementations to the C programming language.
 For a vast variety of models, we test their corresponding
-implementations against the ones provided by the LustreV6 compiler, yielding
+implementations against the ones provided by the \lustrev compiler, yielding
 meaningful results.
-%\grigory{There is a need to the final sentence.. something like ``our
-% C-implementations are better than the ones by  'LustreC.'}
-\qed
-
-\vspace{+1em}
 
 %Program synthesis is a particularly interesting area of research in
 %artificial intelligence, and more recently in formal verification. The main idea
@@ -136,6 +133,7 @@ meaningful results.
 \input{experiment}
 \input{related}
 \input{futurework}
+\input{conclusion}
 
 
 \section*{Acknowledgments}

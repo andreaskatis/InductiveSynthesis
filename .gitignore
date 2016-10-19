@@ -2,6 +2,10 @@ tmp/document.log
 tmp/document.log
 tmp/document.aux
 tmp/document.blg
+src/document.bbl
+src/document.aux
+src/document.log
+out/document.synctex.gz
 *.7z
 *.log
 *.aux
