@@ -18,7 +18,7 @@ $BaseResult \gets \textsc{BaseCheckEngine.\aeval}(BaseCheck(i))$\;
 $ExtendResult \gets \textsc{ExtendCheckEngine.\aeval}(ExtendCheck(i))$;
 \\
 \While{}{	
-	\uIf(\label{alg:returnUnsat}){(\textsc{BaseCheckEngine}.\isValid($BaseResult$))$}
+	\uIf(\label{alg:returnUnsat}){(\textsc{BaseCheckEngine}.\isValid($BaseResult$))}
 	{
 		\Return
 		\unrealizable 
