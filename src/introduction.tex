@@ -1,4 +1,42 @@
+\newcommand{\toolname}{RealSynth}
+
+\mike{What should tool name be?  KindSyn, RealSyn, jsyn ``jason''.  I have defined it by command to make it easy to replace.}
+
 \section{Introduction}
+Automated synthesis research is concerned with discovering efficient algorithms to construct candidate programs that are guaranteed to comply with predefined temporal specifications.  This problem has been well studied for propositional specifications, especially for (subsets of) LTL~\cite{gulwani2010dimensions}.  More recently, the problem of synthesizing programs for richer theories has been examined, including work in {\em template synthesis}~\cite{srivastava2013template}, which attempts to find programs that match a certain shape (the template), and {\em inductive synthesis}, which attempts to use counterexample-based refinement to solve synthesis problems~\cite{flener2001inductive}.  Such techniques have been widely used for stateless formulas over arithmetic domains~\cite{reynoldscounterexample}.  
+
+\mike{[More here about alternate approaches?]}
+
+In this paper, we propose a new approach that can synthesize programs that do not have to conform to specific template shapes for arbitrary {\em assume/guarantee contracts} containing safety properties involving linear integer arithmetic\mike{is this right?}.  Although the technique is not guaranteed to succeed or terminate, but we have used it to successfully synthesize a range of programs over non-trivial contracts.  \mike{What is our ``hook''?  Why is this *better* than other approaches to synthesis - this (unwritten) sentence is critically important}.
+
+Our approach is built on previous work determining the {\em realizability} of contracts involving infinite theories such as linear integer/real arithmetic and/or uninterpreted functions~\cite{Katis15:Realizability,katis2015machine}.  The algorithm, explained in Section~\ref{sec:synthesis}, uses a quantified variant of k-induction that can be checked by any SMT solver that supports quantification.  Notionally, it checks whether a sequence of states satisfy the contract of depth $k$ is sufficient to guarantee the existence of a successor state that satisfies the contract for an arbitrary input.  An outer loop of the algorithm increases $k$ until either a solution or counterexample is found.  
+
+The step from realizability to synthesis involves moving from the existence of a witness (as can be provided by an SMT solver such as z3 or cvc4) to the witness itself.  For this, the most important obstacle is the (in)ability of the SMT solver to handle higher-order quantification. Fortunately, interesting directions to solving this problem have already surfaced, either by extending an SMT solver with native synthesis capabilities\cite{reynoldscounterexample}, or by providing external algorithms that reduce the problem by efficient quantifier elimination methods~\cite{fedyukovichae}.  Our synthesis relies on our previous implementation for realizability checking and the skolemization procedure implemented in the AE-VAL tool~\cite{fedyukovichae}.
+
+
+This paper presents how these ideas can be combined to create a reasonable sequential synthesis approach, which we call \toolname.  It applies the realizability checker from~\cite{Katis15:Realizability} and then extracts a Skolem witness formula from the AE-VAL tool~\cite{fedyukovichae} that can immediately be turned into a C program.  In order to support synthesis, several changes were required to the quantifier-elimination approach to produce Skolem {\em functions} rather than {\em relations}.  The main contributions of the work are therefore:
+\begin{itemize}
+	\item \mike{ANDREAS: Something about the algorithm and the generality of our approach over and above previous approaches}
+	\item \mike{GRIGORE: Something about improvements to AEVal to support synthesis}
+	\item A prototype tool implementing the algorithm
+	\item An experiment demonstrating the application of the tool on various benchmark examples
+\end{itemize}
+
+\noindent This paper presents the first full exposition of the idea, which was originally proposed in a workshop paper without an implementation or experiment~\cite{Katis16}.
+
+In Section~\ref{sec:synthesis} we provide the necessary background
+definitions that are used in our synthesis algorithm, as well as an informal
+proof of the algorithm's correctness. Section~\ref{sec:aeval} contains the
+core formal notions behind on which the AE-VAL Skolemizer is based, as well
+as the adjustments that were done for it to better support the needs of this
+work. Section~\ref{sec:experiment} presents our results on using the algorithm
+to automatically generate leaf-level component implementations for different case studies.
+Finally, in Section~\ref{sec:related} we give a brief historical background on the related research work on synthesis, and we conclude with a discussion on potential future work in Section~\ref{sec:futurework}.
+
+\iffalse
+
+
+
 \grigory{The intro needs work. What's the main challenge? Why do we start with formal verification, and with synthesis or realizability checking?}
 Formal verification is a well-established area of research, with ever increasing
 popularity, in an attempt to provide better tools to software engineers during
@@ -23,7 +61,7 @@ but we did not implement it due to significant limitations in our Skolemizer~\ci
 %, can provide an implementation
 %that is able to react to uncontrolled inputs provided by the system's
 %environment, while satisfying the restrictions specified in the contract
-%assumptions and guarantees. 
+%assumptions and guarantees.
 
 The synthesis algorithm is an extension of our previous work on solving the problem of
 realizability modulo infinite theories~\cite{Katis15:Realizability}, using a
@@ -32,23 +70,16 @@ results~\cite{katis2015machine}.
 \grigory{as we agreed earlier, there could be more description on k-induction}
  Given the inductive proof of realizability, we generate Skolem functions which are the
 witnesses of strategies that a synthesized implementation can follow at each
-step of execution. 
+step of execution.
 
 \grigory{Let us invent a name for ``of our extension to \jkind's
 realizability checking algorithm to support synthesis'' and use it everywhere.
 The working name is \jkindsynt.}
 
-We have implemented the synthesis 
+We have implemented the synthesis
 algorithm and exercised it in terms of its performance on several models. We
 provide an informal proof of the algorithm's correctness regarding the
 implementations that it produces, and discuss our experimental results.
 \grigory{need more info here. some executive summary of the evaluation section.}
 
-In Section~\ref{sec:synthesis} we provide the necessary background
-definitions that are used in our synthesis algorithm, as well as an informal
-proof of the algorithm's correctness. Section~\ref{sec:aeval} contains the
-core formal notions behind on which the AE-VAL Skolemizer is based, as well
-as the adjustments that were done for it to better support the needs of this
-work. Section~\ref{sec:experiment} presents our results on using the algorithm
-to automatically generate leaf-level component implementations for different case studies.
-Finally, in Section~\ref{sec:related} we give a brief historical background on the related research work on synthesis, and we conclude with a discussion on potential future work in Section~\ref{sec:futurework}.
+\fi
