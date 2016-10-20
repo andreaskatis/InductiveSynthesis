@@ -18,7 +18,7 @@ It is more general than previous approaches for temporal synthesis involving the
 
 Our approach is built on previous work determining the {\em realizability} of contracts involving infinite theories such as linear integer/real arithmetic and/or uninterpreted functions~\cite{Katis15:Realizability,katis2015machine}.  The algorithm, explained in Section~\ref{sec:synthesis}, uses a quantified variant of k-induction that can be checked by any SMT solver that supports quantification.  Notionally, it checks whether a sequence of states satisfy the contract of depth $k$ is sufficient to guarantee the existence of a successor state that satisfies the contract for an arbitrary input.  An outer loop of the algorithm increases $k$ until either a solution or counterexample is found.
 
-The step from realizability to synthesis involves moving from the existence of a witness (as can be provided by an SMT solver such as z3 or cvc4) to the witness itself.  For this, the most important obstacle is the (in)ability of the SMT solver to handle higher-order quantification. Fortunately, interesting directions to solving this problem have already surfaced, either by extending an SMT solver with native synthesis capabilities\cite{reynoldscounterexample}, or by providing external algorithms that reduce the problem by efficient quantifier elimination methods~\cite{fedyukovichae}.  Our synthesis relies on our previous implementation for realizability checking and the skolemization procedure implemented in the AE-VAL tool~\cite{fedyukovichae}.
+The step from realizability to synthesis involves moving from the existence of a witness (as can be provided by an SMT solver such as Z3 or CVC4) to the witness itself.  For this, the most important obstacle is the (in)ability of the SMT solver to handle higher-order quantification. Fortunately, interesting directions to solving this problem have already surfaced, either by extending an SMT solver with native synthesis capabilities~\cite{reynoldscounterexample}, or by providing external algorithms that reduce the problem by efficient quantifier elimination methods~\cite{fedyukovichae}.  Our synthesis relies on our previous implementation for realizability checking and the skolemization procedure implemented in the AE-VAL tool~\cite{fedyukovichae}.
 
 
 We combined the above ideas to create a reasonable sequential synthesis
@@ -34,7 +34,7 @@ approach, which we call \toolname.  It applies the realizability checker from~\c
 
 \noindent This paper presents the first full exposition of the idea, which was originally proposed in a workshop paper without an implementation or experiment~\cite{katis2016towards}.
 
-In Section~\ref{sec:synthesis} we provide the necessary background
+In Section~\ref{sec:synthesis}, we provide the necessary background
 definitions that are used in our synthesis algorithm, as well as an informal
 proof of the algorithm's correctness. Section~\ref{sec:aeval} contains the
 core formal notions on which the AE-VAL Skolemizer is based, as well
@@ -95,3 +95,8 @@ implementations that it produces, and discuss our experimental results.
 \grigory{need more info here. some executive summary of the evaluation section.}
 
 \fi 
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "document"
+%%% End:
