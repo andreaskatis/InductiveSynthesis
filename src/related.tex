@@ -1,2 +1,54 @@
 \section{Related Work}
+
+Research in the field of program synthesis attributes its origins in the 1970s,
+when Zohar Manna and Richard Waldinger first introduced a synthesis procedure
+using theorem proving.~\cite{manna1971toward}. Almost two decades later, Amir
+Pnueli and Roni Rosner were the first to propose a way to synthesize
+implementations for temporal specifications~\cite{Pnueli89}. This work also
+involved the first formal definition of a reactive system's realizability,
+defined by the authors using the term implementability.
+
+Since then, a vast variety of techniques have been developed. Efficient
+algorithms were proposed for subsets of propositional LTL
+\cite{Klein10,tomita2016safraless,ehlers2010symbolic,cheng2016structural} simple
+LTL formulas \cite{Bohy12,hagihara2016simple,Tini03}, as well as other temporal
+logics \cite{benevs2012factorization,monmege2016real,Hamza10}, such as SIS \cite{Aziz95}.
+Component-based approaches have also been explored in~\cite{Chatterjee07,dammyou}.
+
+Sumit Gulwani in 20120 published a survey on which he discribed the
+potential future directions of program synthesis research~\cite{gulwani2010dimensions}.
+The approaches that have been proposed are many, and differ on many aspects,
+either in terms of the specifications that are being exercised, or the reasoning
+behind the synthesis algorithm itself. Template-based
+synthesis~\cite{srivastava2013template} is focused on the exploration of
+programs that satisfy a specification that is refined after each
+iteration, following the basic principles of deductive synthesis. Inductive
+synthesis is an active area of research where the main goal
+is the generation of an inductive invariant that can be used to describe the
+space of programs that are guaranteed to satisfy the given
+specification~\cite{flener2001inductive}.
+This idea is mainly supported by the use of SMT solvers to guide the invariant
+refinement through traces that violate the requirements, known as
+counterexamples. Recently published work on extending SMT solvers with
+counterexample-guided synthesis shows that they can eventually be
+used as an alternative to solving the problem under certain domains of
+arithmetic~\cite{reynoldscounterexample}. Reactive synthesis has also
+been explored in the context involving propositional formulas for safety
+specifications~\cite{bloem2016satisfiability}. Finally, functional synthesis is
+used in applications where only a partial implementation exists, and the user needs an automated way to complete the missing parts of the program~\cite{kneuss2013integrating}.
+
+A rather important contribution in the area is the recently published work by
+Leonid Ryzhyk and Adam Walker~\cite{ryzhykdeveloping}, where they share their
+experience in developing and using a reactive synthesis tool for controllers in
+an industrial environment. While the authors emphasize that the research on
+program synthesis is still at a very early stage for the technique to be
+essential to industrial applications, they note its potential advantages in terms
+of improving the overall development cycle of software.
+
+To the best of our knowledge our work is the first complete attempt on providing
+a synthesis algorithm for an assume-guarantee framework, using infinite theories.
+We take advantage of a sophisticated solver that is able to reason about the
+validity of the intermediate formulas that construct a k-inductive proof, as
+well as provide witnesses for these formulas through the use of Skolem
+functions.
 \label{sec:related}
