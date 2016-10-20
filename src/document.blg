@@ -1,0 +1,17 @@
+This is BibTeX, Version 0.99dThe top-level auxiliary file: document.aux
+The style file: splncs03.bst
+Database file #1: document.bib
+Repeated entry---line 490 of file document.bib
+ : @article{bradley11
+ :                   ,
+I'm skipping whatever remains of this entry
+Repeated entry---line 497 of file document.bib
+ : @incollection{cimatti2014ic3
+ :                             ,
+I'm skipping whatever remains of this entry
+Warning--I didn't find a database entry for "Katis16"
+Warning--empty journal in fedyukovichae
+Warning--empty year in fedyukovichae
+Warning--empty journal in reynoldscounterexample
+Warning--empty year in reynoldscounterexample
+(There were 2 error messages)
