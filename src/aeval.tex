@@ -83,76 +83,76 @@ $\pi_j(\vx,y_{j}) \gets \textsc{Merge}(U_{\pi_j} , \mathit{MIN}, \pi_j(\vx,y_{j}
 \section{Witnessing existential quantifiers with \aeval}
 \label{sec:aeval}
 
-Quantifier elimination is a decision procedure that turns a quantified formula into an equivalent quantifier-free formula.
-In addition, the quantifier elimination algorithms are often able to discover a Skolem function that represents witnesses for the existentially quantified individual variables (e.g.,~\cite{DBLP:conf/cav/BalabanovJ11,kuncak2013functional,KLXJOIA,Chakraborty15}).
+%Quantifier elimination is a decision procedure that turns a quantified formula into an equivalent quantifier-free formula.
+%In addition, the quantifier elimination algorithms are often able to discover a Skolem function that represents witnesses for the existentially quantified individual variables (e.g.,~\cite{DBLP:conf/cav/BalabanovJ11,kuncak2013functional,KLXJOIA,Chakraborty15}).
+%%
+%Various tasks in verification and synthesis~\cite{DBLP:conf/fmcad/CimattiGMT13,DBLP:conf/popl/BeyeneCPR14,DBLP:conf/nfm/GasconT14} rely on efficient techniques to remove existential quantifiers from formulas in first order logic, thus adjusting the task to be decided by an SMT solver.
+%In particular, \emph{functional synthesis} aims at computing a function that meets a given input/output relation.
+%A function with an input $x$ and an output $y$, specified by a relation $f(x,y)$, can be constructed as a by-product of deciding validity of the formula $\forall x \exists y \such f(x,y)$.
+%Due to a well-known \emph{AE-paradigm} (also referred to as \emph{Skolem paradigm}~\cite{DBLP:conf/popl/PnueliR89}),
+%the formula $\forall x \exists y \such f(x,y)$ is equivalent to the formula $\exists \mathit{sk} \; \forall x \such f(x, \mathit{sk}(x))$, which means existence of a Skolem function $\mathit{sk}$, such that $f(x,\mathit{sk}(x))$ holds for every $x$.
+%Thus the key feature in modern quantifier elimination approaches is their ability to produce witnessing Skolem function.
+
+In this section, we briefly describe the prior work on \aeval to be able (in Sect.~\ref{sec:new}) to present the key contributions on delivering Skolem functions appropriate for the program synthesis from proofs of realizability.
+
+%\subsection{Model-Based Projection for Linear Rational Arithmetic}
+%\label{sec:mbp}
 %
-Various tasks in verification and synthesis~\cite{DBLP:conf/fmcad/CimattiGMT13,DBLP:conf/popl/BeyeneCPR14,DBLP:conf/nfm/GasconT14} rely on efficient techniques to remove existential quantifiers from formulas in first order logic, thus adjusting the task to be decided by an SMT solver.
-In particular, \emph{functional synthesis} aims at computing a function that meets a given input/output relation.
-A function with an input $x$ and an output $y$, specified by a relation $f(x,y)$, can be constructed as a by-product of deciding validity of the formula $\forall x \exists y \such f(x,y)$.
-Due to a well-known \emph{AE-paradigm} (also referred to as \emph{Skolem paradigm}~\cite{DBLP:conf/popl/PnueliR89}),
-the formula $\forall x \exists y \such f(x,y)$ is equivalent to the formula $\exists \mathit{sk} \; \forall x \such f(x, \mathit{sk}(x))$, which means existence of a Skolem function $\mathit{sk}$, such that $f(x,\mathit{sk}(x))$ holds for every $x$.
-Thus the key feature in modern quantifier elimination approaches is their ability to produce witnessing Skolem function.
-
-In the rest of the section, we briefly describe the prior work on \aeval to be able (in Sect.~\ref{sec:new}) to present the key contributions on delivering Skolem functions appropriate for the program synthesis from proofs of realizability.
-
-\subsection{Model-Based Projection for Linear Rational Arithmetic}
-\label{sec:mbp}
-
-Quantifier elimination of a formula $\exists \vy \such T(\vx,\vy)$ is an expensive procedure that typically proceeds by enumerating all models of an extended formula $T(\vx,\vy)$.
-However, in some applications, the quantifier-free formula, fully equivalent to $\exists \vy \such T(\vx,\vy)$, is not even needed.
-Instead, it is enough to operate by (possibly incomplete) sets of models.
-This idea relies on some notion of projection that under-approximates existential quantification.
-In this section, we consider a concept of Model-Based Projections (MBP), recently proposed by~\cite{komuravelli2014smt,Dutertre}.
-
-%In the following, we use vector notation to denote sets of variables (and set-theoretic operators of \emph{subset} $\vu \subseteq \vx$, \emph{complement} $\vx_{\vu} = \vx \setminus \vu$, \emph{union} $\vx = \vu \cup \vx_{\vu}$).
-\begin{definition}
-\label{def:mbp}
-An $\mathit{MBP}_{\vy}$ is a function from models of
-$T(\vx,\vy)$ to $\vy$-free formulas
-iff:
-\begin{gather}
-\text{if }m\models T(\vx,\vy) \text{ then } m\models \mathit{MBP}_{\vy}(m,T) \label{mbp.cond1}\\
-\mathit{MBP}_{\vy}(m,T) \!\implies\! \exists \vy \such T(\vx,\vy) \label{mbp.cond2}
-\end{gather}
-\end{definition}
-
-There are finitely many MBPs for fixed  $\vy$ and $T$ and different models $m_1,\ldots,m_n$ (for some $n$):
-$T_{1}(\vx),  \ldots, T_{n}(\vx)$, such that
-$\exists \vy \such T(\vx,\vy) = \Lor_{i=1}^{n} T_{i}(\vx)$. 
-
-A possible way of implementing an MBP-algorithm was proposed in~\cite{komuravelli2014smt}.
-It is based on Loos-Weispfenning (LW)  quantifier-elimination method~\cite{loos1993applying} for Linear Rational Arithmetic (LRA).
-Consider formula $\exists \vy \such T(\vx,\vy)$, where $T$ is quantifier-free.
-In our simplified presentation,
-$\vy$ is singleton, $T$ is in Negation Normal Form (that allows the operator $\neg$ to be applied only to variables), and $y$ appears in the literals only of the form ${y=e}$, ${l<y}$ or ${y<u}$, where $l,u,e$ are $y$-free.
-LW states that the equation~\eqref{eq:formula_rewrite} holds:
-
-\begin{equation}
-  \exists y \such T (\vx) \equiv \Big( \Lor_{(y = e) \in \mathit{lits}(T)}{T[e]} \lor
-  	\Lor_{(l < y) \in \mathit{lits} (T)}{T [l + \epsilon]} \lor
-	T[-\infty] \Big)\label{eq:formula_rewrite}
-\end{equation} 
-\smallskip  
-
-In~\eqref{eq:formula_rewrite}, $\mathit{lits}(T)$ denote the set of literals of $T$, $T[\cdot]$ stands for a \emph{virtual substitution} for the literals containing $y$.
-In particular, $T[e]$ substitutes exact values of $y$ ($y=e$), $T[l+\epsilon]$ substitutes the intervals ($l < y$) of possible values of $y$, $T[-\infty]$ substitutes the rest of the literals.
-Consequently, a function $\mathit{LRAProj_{T}}$ is an implementation of the $\mathit{MBP}$ function for~\eqref{eq:formula_rewrite}:%
+%Quantifier elimination of a formula $\exists \vy \such T(\vx,\vy)$ is an expensive procedure that typically proceeds by enumerating all models of an extended formula $T(\vx,\vy)$.
+%However, in some applications, the quantifier-free formula, fully equivalent to $\exists \vy \such T(\vx,\vy)$, is not even needed.
+%Instead, it is enough to operate by (possibly incomplete) sets of models.
+%This idea relies on some notion of projection that under-approximates existential quantification.
+%In this section, we consider a concept of Model-Based Projections (MBP), recently proposed by~\cite{komuravelli2014smt,Dutertre}.
 %
-\begin{equation}
-\begin{aligned}
-\label{case:proj_define}
-&\mathit{LRAProj}_{T}(m) = \left\{
-\begin{array}{ll}
-T[e], 			& \mbox{if}\ (y=e) \in \mathit{lits}(T) \land 
-			m \models (y = e)\\
-T[l+ \epsilon],	& \mbox{else if}\ (l < y) \in \mathit{lits}(T) 
-			\land m \models (l < y) \land \\
-			& \forall (l'\!<\!y)\!\in\!\mathit{lits}(T) \such \!m\!\models\!\big((l'\!<\!y)\!\!\implies\!\!(l'\! \le\! l)\big)\\
-T[-\infty], 		& \mbox{otherwise}	
-\end{array}
-\right.
-\end{aligned}
-\end{equation}
+%%In the following, we use vector notation to denote sets of variables (and set-theoretic operators of \emph{subset} $\vu \subseteq \vx$, \emph{complement} $\vx_{\vu} = \vx \setminus \vu$, \emph{union} $\vx = \vu \cup \vx_{\vu}$).
+%\begin{definition}
+%\label{def:mbp}
+%An $\mathit{MBP}_{\vy}$ is a function from models of
+%$T(\vx,\vy)$ to $\vy$-free formulas
+%iff:
+%\begin{gather}
+%\text{if }m\models T(\vx,\vy) \text{ then } m\models \mathit{MBP}_{\vy}(m,T) \label{mbp.cond1}\\
+%\mathit{MBP}_{\vy}(m,T) \!\implies\! \exists \vy \such T(\vx,\vy) \label{mbp.cond2}
+%\end{gather}
+%\end{definition}
+%
+%There are finitely many MBPs for fixed  $\vy$ and $T$ and different models $m_1,\ldots,m_n$ (for some $n$):
+%$T_{1}(\vx),  \ldots, T_{n}(\vx)$, such that
+%$\exists \vy \such T(\vx,\vy) = \Lor_{i=1}^{n} T_{i}(\vx)$. 
+%
+%A possible way of implementing an MBP-algorithm was proposed in~\cite{komuravelli2014smt}.
+%It is based on Loos-Weispfenning (LW)  quantifier-elimination method~\cite{loos1993applying} for Linear Rational Arithmetic (LRA).
+%Consider formula $\exists \vy \such T(\vx,\vy)$, where $T$ is quantifier-free.
+%In our simplified presentation,
+%$\vy$ is singleton, $T$ is in Negation Normal Form (that allows the operator $\neg$ to be applied only to variables), and $y$ appears in the literals only of the form ${y=e}$, ${l<y}$ or ${y<u}$, where $l,u,e$ are $y$-free.
+%LW states that the equation~\eqref{eq:formula_rewrite} holds:
+%
+%\begin{equation}
+%  \exists y \such T (\vx) \equiv \Big( \Lor_{(y = e) \in \mathit{lits}(T)}{T[e]} \lor
+%  	\Lor_{(l < y) \in \mathit{lits} (T)}{T [l + \epsilon]} \lor
+%	T[-\infty] \Big)\label{eq:formula_rewrite}
+%\end{equation} 
+%\smallskip  
+%
+%In~\eqref{eq:formula_rewrite}, $\mathit{lits}(T)$ denote the set of literals of $T$, $T[\cdot]$ stands for a \emph{virtual substitution} for the literals containing $y$.
+%In particular, $T[e]$ substitutes exact values of $y$ ($y=e$), $T[l+\epsilon]$ substitutes the intervals ($l < y$) of possible values of $y$, $T[-\infty]$ substitutes the rest of the literals.
+%Consequently, a function $\mathit{LRAProj_{T}}$ is an implementation of the $\mathit{MBP}$ function for~\eqref{eq:formula_rewrite}:%
+%%
+%\begin{equation}
+%\begin{aligned}
+%\label{case:proj_define}
+%&\mathit{LRAProj}_{T}(m) = \left\{
+%\begin{array}{ll}
+%T[e], 			& \mbox{if}\ (y=e) \in \mathit{lits}(T) \land 
+%			m \models (y = e)\\
+%T[l+ \epsilon],	& \mbox{else if}\ (l < y) \in \mathit{lits}(T) 
+%			\land m \models (l < y) \land \\
+%			& \forall (l'\!<\!y)\!\in\!\mathit{lits}(T) \such \!m\!\models\!\big((l'\!<\!y)\!\!\implies\!\!(l'\! \le\! l)\big)\\
+%T[-\infty], 		& \mbox{otherwise}	
+%\end{array}
+%\right.
+%\end{aligned}
+%\end{equation}
 
 
 
@@ -184,12 +184,18 @@ into the form ${\exists \vy \such \Psi(\vx, \vy)} \equiv {S(\vx)
   \!\implies\! \exists \vy \such T(\vx,\vy)}$, where $S(\vx)$ has only
 existential quantifiers, and $T(\vx, \vy)$ is quantifier-free.
 %
-\aeval partitions
+To decide validity of a $\forall\exists$-formula, \aeval partitions
 the formula, and searches for a witnessing local Skolem relation of
-each partition.  \aeval iteratively constructs a set of MBPs $\{T_i(\vx)\}$, each of which 
-is connected with a so called local Skolem relation $\phi_i(\vx,\vy)$, such that
-$\phi_i(\vx,\vy) \!\implies\! (T_{i}(\vx) \!\iff\!
-  T(\vx,\vy))$ (i.e., that make the corresponding projections equisatisfiable with $T$).
+each partition.  \aeval iteratively constructs (line~\ref{alg:proj}) a set of Model-Based
+Projections (MBPs): $T_i(\vx)$, such that (a) for each $i$,
+$T_i(\vx) \!\implies\! \exists \vy \such T (\vx, \vy)$, and (b)
+$S(\vx) \!\implies\! \Lor_i T_i(\vx)$.  Each MBP
+$T_i(\vx)$ is connected with the local Skolem $\phi_i(\vx,\vy)$, such that
+$\phi_i(\vx,\vy) \!\implies\! (T_{\vy_i}(\vx) \!\implies\!
+  T(\vx,\vy))$.  \aeval relies on external
+procedure~\cite{DBLP:conf/cav/KomuravelliGC14} to obtain MBPs that is
+based on Loos-Weispfenning quantifier
+elimination~\cite{DBLP:journals/cj/LoosW93}.
 While the pseudocode of \aeval is shown in Alg.~\ref{alg:ae_val}, we refer the reader to~\cite{fedyukovich2015automated} for
 more detail.
 

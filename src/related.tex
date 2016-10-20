@@ -5,8 +5,10 @@ when Zohar Manna and Richard Waldinger first introduced a synthesis procedure
 using theorem proving.~\cite{manna1971toward}. Almost two decades later, Amir
 Pnueli and Roni Rosner were the first to propose a way to synthesize
 implementations for temporal specifications~\cite{Pnueli89}. This work also
-involved the first formal definition of a reactive system's realizability,
-defined by the authors using the term implementability.
+involved the first formal definition of a reactive system's realizability (or implementability) and
+introduces a \emph{Skolem paradigm} on which we heavily rely in this work.
+%i.e., the formula $\forall x \exists y \such f(x,y)$ is equivalent to the formula $\exists \mathit{sk} \; \forall x \such f(x, \mathit{sk}(x))$, which means existence of a Skolem function $\mathit{sk}$, such that $f(x,\mathit{sk}(x))$ holds for every $x$.
+
 
 Since then, a vast variety of techniques have been developed. Efficient
 algorithms were proposed for subsets of propositional LTL
@@ -15,7 +17,7 @@ LTL formulas \cite{Bohy12,hagihara2016simple,Tini03}, as well as other temporal
 logics \cite{benevs2012factorization,monmege2016real,Hamza10}, such as SIS \cite{Aziz95}.
 Component-based approaches have also been explored in~\cite{Chatterjee07,dammyou}.
 
-Sumit Gulwani in 20120 \arie{check date} published a survey on which he discribed the
+Sumit Gulwani in 2010 published a survey on which he discribed the
 potential future directions of program synthesis research~\cite{gulwani2010dimensions}.
 The approaches that have been proposed are many, and differ on many aspects,
 either in terms of the specifications that are being exercised, or the reasoning
