@@ -16,7 +16,9 @@ over quantifiers and incremental search.
 Provided with the assumption that the check queries are satisfiable according to
 the results received by the SMT solver, we proceed to construct a collection of
 Skolem functions using the \aeval Skolemizer%
-\footnote{More info about \aeval can be found at~\url{http://www.inf.usi.ch/phd/fedyukovich/niagara}.}.
+\footnote{More info about \aeval can be found
+  at~\url{http://www.inf.usi.ch/phd/fedyukovich/niagara}.}\arie{Consider
+  removing this footnote since there is a section on \aeval already}.
 \aeval  uses LRA as a background logic, and thus casts all numeric variables to Reals and provides the Skolem relation over Reals as well.%
 \footnote{To increase precision, of the realizability checks over LIA, \jkind has an option to use \textsc{Z3} directly.}
 In future work, we plan to enhance  \aeval for Linear Integer Arithmetic (LIA) to soundly support Skolem relation over Integers.
@@ -27,6 +29,16 @@ translation tool, which we currently call \textsc{SMTLib2C}%
 is available at \url{https://github.com/andrewkatis/SMTLib2C}}. The collection
 of the Skolem functions is given as an input to the compiler, which in turn uses
 them to generate implementations in the C language. We intend to further improve
-the compiler's efficiency as part of an individual future work.
+the compiler's efficiency as part of an individual future
+work. \arie{Elaborate a little on the semantics used. The Skolem
+  functions are over Reals, but the compiled C code is probably over
+  floats. Both overflows and numerical errors can present a
+  problem. This can be mitigated by integrating some testing
+  methodology into synthesis.}
 
 
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "document"
+%%% End:
