@@ -14,27 +14,26 @@
 \newcommand{\aevalalgorithm}{%
 \begin{algorithm2e}[tb]
 \SetAlgoSkip{}
-\SetKwFor{While}{forever}{do}{}
+\SetKwFor{While}{while}{do}{}
 %\SetAlgoNoLine
 \SetKw{KwContinue}{continue}
 \KwIn{$S(\vx), \exists \vy \such T(\vx,\vy)$.}
 \KwOut{Return value $\in \{\valid, \invalid\}$ of ${S(\vx)\!\! \implies\!\! \exists \vy \such T(\vx,\vy)}$.}
-\KwData{$\textsc{SmtSolver}$, counter $i$, models $\{m_i\}$, MBPs $\{T_{i}(\vx)\}$, conditions $\{\phi_i({\vx,\vy})\}$.}
+\KwData{counter $i$, models $\{m_i\}$, MBPs $\{T_{i}(\vx)\}$, conditions $\{\phi_i({\vx,\vy})\}$.}
 \BlankLine
-$\textsc{SmtAdd}(S(\vx))$; \\
+$\textsc{SmtAdd}(S(\vx))$; 
 $i \gets 0$; \\
-\While{}{
-$i$++; \\
+\While{$(i\texttt{\textsc{++}} < \infty)$}{
 %$res \leftarrow \textsc{SmtSolve}()$\label{alg:check_unsat_s}; \\
 \lIf(\label{alg:returnUnsat}){$(\isUnSat(\textsc{SmtSolve}()))$}{\Return \valid }
-$\textsc{SmtPush}()$; \\
+$\textsc{SmtPush}()$; 
 $\textsc{SmtAdd}(T(\vx,\vy))$; \\
 %$res \gets \textsc{SmtSolve}()$\label{alg:find_matching_ass};\\
 \lIf(\label{alg:returnSat}){$(\isUnSat(\textsc{SmtSolve}()))$}{\Return \invalid }
 $m_i \gets \textsc{SmtGetModel}()$\label{alg:model};\\ 
 %$E \leftarrow extrapolate(m)$;\\
 $(T_{i},\phi_i({\vx,\vy}))\! \gets\! \textsc{GetMBP}(\vy, m_i, T(\vx,\vy)))$\label{alg:proj};\\
-$\textsc{SmtPop}()$;\\
+$\textsc{SmtPop}()$;
 $\textsc{SmtAdd}(\neg {T_{i}})$\label{alg:block}; \\
 }
 %\Return $res$;
@@ -78,6 +77,19 @@ $\pi_j(\vx,y_{j}) \gets \textsc{Merge}(U_{\pi_j} , \mathit{MIN}, \pi_j(\vx,y_{j}
 \caption{$\textsc{ExtractSkolemFunction}(y_j, \phi(\vx,\vy)$)}
 \label{alg:loc}
 \end{algorithm2e}
+}
+
+\newcommand{\skolemcases}{%
+\begin{equation}
+\label{case:skolem}
+\mathit{Sk}_{\vy} (\vx, \vy) \equiv
+\begin{cases}
+  \phi_{1} (\vx, \vy)  & \text{if } T_1 (\vx) \\
+    \phi_{2} (\vx, \vy)  & \text{else if } T_2 (\vx)\\
+  \cdots &\text{\qquad else }\cdots \\
+  \phi_{n} (\vx, \vy) & \text{\qquad\qquad else } T_n (\vx) \\
+\end{cases}
+\end{equation}
 }
 
 \section{Witnessing existential quantifiers with \aeval}
@@ -193,49 +205,20 @@ $S(\vx) \!\implies\! \Lor_i T_i(\vx)$.  Each MBP
 $T_i(\vx)$ is connected with the local Skolem $\phi_i(\vx,\vy)$, such that
 $\phi_i(\vx,\vy) \!\implies\! (T_{\vy_i}(\vx) \!\implies\!
   T(\vx,\vy))$.  \aeval relies on external
-procedure~\cite{DBLP:conf/cav/KomuravelliGC14} to obtain MBPs that is
+procedure~\cite{komuravelli2014smt,Dutertre} to obtain MBPs that is
 based on Loos-Weispfenning quantifier
-elimination~\cite{DBLP:journals/cj/LoosW93}.
+elimination~\cite{loos1993applying}.
 While the pseudocode of \aeval is shown in Alg.~\ref{alg:ae_val}, we refer the reader to~\cite{fedyukovich2015automated} for
-more detail.
+more detail.%
 
-%\aeval is shown in Alg.~\ref{alg:ae_val}.  Given formulas
-%$S(\vx)$ and ${\exists \vy \such T(\vx, \vy)}$, it
-%decides validity of ${S(\vx)\! \implies\! \exists \vy \!\such\!
-%  T(\vx, \vy)}$.  \aeval enumerates the
-%models of $S \land T$ and blocks them from $S$.
-%In each iteration $i$, it first checks whether
-%$S$ is non-empty (line~3) and then looks for a model $m_i$ of $S
-%\land T$ (line~\ref{alg:model}).  If $m_i$ is found, \aeval
-%gets a projection $T_i$ of $T$ based on $m_i$ (line~\ref{alg:proj})
-%and blocks all models contained in $T_i$ from $S$
-%(line~\ref{alg:block}).  The algorithm iterates until either it
-%finds a model of $S$ that can not be extended to a
-%model of $T$ (line~\ref{alg:returnSat}), or all models of $S$
-%are blocked (line~\ref{alg:returnUnsat}). In the first case, the input
-%formula is invalid. In the second case, every model of $S$ has been extended
-%to some model of $T$, and the  formula is valid. 
-
-\newcommand{\skolemcases}{%
-\begin{equation}
-\label{case:skolem}
-\mathit{Sk}_{\vy} (\vx, \vy) \equiv
-\begin{cases}
-  \phi_{1} (\vx, \vy)  & \text{if } T_1 (\vx) \\
-    \phi_{2} (\vx, \vy)  & \text{else if } T_2 (\vx)\\
-  \cdots &\text{\qquad else }\cdots \\
-  \phi_{n} (\vx, \vy) & \text{\qquad\qquad else } T_n (\vx) \\
-\end{cases}
-\end{equation}
-}
 
 A Skolem relation
 ${\mathit{Sk}_{\vy} (\vx, \vy)}$ by \aeval maps each
 model of $S(\vx)$ to a corresponding model of $T(\vx,\vy)$.
 Intuitively, $\phi_i$ maps each model of $S \land T_{i}$ to a model of $T$.
 Thus, in order to define the  Skolem relation $\mathit{Sk}_{\vy}(\vx, \vy)$ it is enough to 
-match each $\phi_i$ against the corresponding $T_{i}$:
-
+match each $\phi_i$ against the corresponding $T_{i}$:%
+%
 \skolemcases
 
 
@@ -244,9 +227,7 @@ match each $\phi_i$ against the corresponding $T_{i}$:
 
 \localfactoralg
 
-
-Since \aeval is an extension of the MBP-algorithm mentioned in Sect.~\ref{sec:mbp},
-each $\phi_i$ (in~\eqref{case:skolem}) is constructed from the substitutions made in $T$ to produce $T_{i}$.
+In low-level, \aeval constructs each $\phi_i$ for~\eqref{case:skolem} from the substitutions made in $T$ to produce $T_{i}$.
 Furthermore, 
 %(is a condition under which $T$ is equisatisfiable with $T_{i}$).
 %We assume that each $\phi_i$ is in the Cartesian form, i.e., a conjunction of
@@ -305,7 +286,7 @@ After all substitutions at line~\ref{alg:elim_compl} of Alg.~\ref{alg:loc}, each
 $L_{\pi_j} \land U_{\pi_j} \land M_{\pi_j} \land V_{\pi_j} \land E_{\pi_j} \land N_{\pi_j}$.
 \end{lemma}
 \begin{proof}
-Follows directly from~\eqref{case:proj_define}.
+Follows directly from the MBP algorithm at~\cite{komuravelli2014smt}.
 \qed
 \end{proof}
 
@@ -339,7 +320,7 @@ loss of generality, we assume that each $L_{\pi_j}$ and $U_{\pi_j}$
 have at most one conjunct.
 
 \begin{lemma}
-If $L_{\pi_j}$, $U_{\pi_j}$ consist of one conjunct each, and $E_{\pi_j}$ and $N_{\pi_j}$ are empty then the Skolem can be rewritten into $y_j = \mathit{MID} (l, u)(\vx)$. 
+If each of $L_{\pi_j}$ and $U_{\pi_j}$ consist of one conjunct each, and $E_{\pi_j}$ and $N_{\pi_j}$ are empty then the Skolem can be rewritten into $y_j = \mathit{MID} (l, u)(\vx)$. 
 \end{lemma}
 %Similar for $M_{\pi_j}$ and $V_{\pi_j}$, and for combinations with $L_{\pi_j}$ and $U_{\pi_j}$.
 This primitive is applied (line~\ref{alg:rewrite_mid}) in case if the graph of a Skolem function can be constructed exactly in the middle of the two graphs for the lower- and the upper boundaries for the Skolem relation.
@@ -350,15 +331,15 @@ If $L_{\pi_j}$ consists of one conjunct and the rest of $U_{\pi_j}$, $E_{\pi_j}$
 If $U_{\pi_j}$ consists of one conjunct and the rest of $L_{\pi_j}$, $E_{\pi_j}$ and $N_{\pi_j}$ are empty then the Skolem can be rewritten into $y_j = \mathit{LT} (l)(\vx)$.
 \end{lemma}
 
-Finally, the cases when $N_{\pi_j}$ is not empty, should be handled separately.
-For this, we introduce another higher-order function $\mathit{FMID}$  that for the given $l$, $u$ and $h$ and each $\vx$ outputs either $\mathit{MID}(l,u)$ or  $\mathit{MID}(l,\mathit{MID}(l,u))$ in case if $\mathit{MID}(l,u)$ is equal to $h$.
+Finally, the algorithm handles the cases when $N_{\pi_j}$ is not empty.
+For this, we introduce another operator $\mathit{FMID}$ that for the given $l$, $u$ and $h$ and each $\vx$ outputs either $\mathit{MID}(l,u)$ or $\mathit{MID}(l,\mathit{MID}(l,u))$ in case if $\mathit{MID}(l,u)$ is equal to $h$.
 
 \begin{lemma}
-If each of $L_{\pi_j}$, $U_{\pi_j}$ and $N_{\pi_j}$ consist of one conjunct and $E_{\pi_j}$ and $N_{\pi_j}$ are empty then the Skolem can be rewritten into $y_j = \mathit{FMID} (l, u, h)(\vx)$, where%
+If each of $L_{\pi_j}$,\! $U_{\pi_j}$\! and $N_{\pi_j}$ consist of one conjunct and $E_{\pi_j}$ and $N_{\pi_j}$ are empty then the Skolem can be rewritten into $y_j\! =\! \mathit{FMID} (l,\! u,\! h)(\vx)$, where%
 \begin{align}
-\mathit{FMID}(l, u, h) (\vx) = ite (&\mathit{MID}(l, u) (\vx) = h(\vx),  \notag \\
-                          &\mathit{MID}(l, \mathit{MID}(l, u)) (\vx), \notag \\
-                          &\mathit{MID}(l, u) (\vx)) \notag 
+\mathit{FMID}(l, u, h) (\vx) \triangleq ite \Big(&\mathit{MID}(l, u) (\vx) = h(\vx),  \notag \\
+                          &\mathit{MID}\big(l, \mathit{MID}(l, u)\big) (\vx), \,\,
+                          \mathit{MID}(l, u) (\vx)\Big) \notag 
 \end{align}
 \end{lemma}
 %Similar for $M_{\pi_j}$ and $V_{\pi_j}$. 
