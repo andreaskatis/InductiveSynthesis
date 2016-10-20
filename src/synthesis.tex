@@ -361,24 +361,23 @@ assistant~\cite{Coqmanual}.
  
  Fig.~\ref{fg:example} shows a
  simple but yet representative example to our approach.
- This is an automaton and the requirements for the automaton in the Lustre language.
- There are input variables \texttt{x} and \texttt{state} (the latter variable is added to the inputs since
- otherwise it would be considered as the output in the resulting implementation).
- Variable \texttt{state} is also the output variable (otherwise it would be specified in the list of arguments of the \texttt{--\%REALIZABLE} query).
+ This is the set of requirements  in the Lustre language and an automaton satisfying these requirements.
+ There is an input variable \texttt{x} (used as an argument to the \texttt{--\%REALIZABLE} query) and an output variable \texttt{state}.
  %GRIGORY: I think, it is pretty clear:
  %we use a simple hack that prevents us from explicitly defining how it should
  %be assigned, by adding it as an actual input to the specification.
  %
- There are four properties to be checked along with a
+ There are five properties to be checked along with a
  \jkind-specific query on realizability of the spec. Properties
- \texttt{prop2} and \texttt{prop3} are used to indirectly summarize parts of the
+ \texttt{prop2} and \texttt{prop3} are used to indirectly describe some
  possible transitions in the automaton. Properties \texttt{prop1} and
  \texttt{prop4} are the requirements with respect to two local variables, \texttt{bias}
  and \texttt{bias\char`_max}. Variable \texttt{bias} calculates the number of successive
  ones or zeros read by the automaton, while \texttt{bias\char`_max} is used as a flag
  to indicate that at least two zeros or two ones have been read in a row.
+ Finally, property \texttt{prop5} specifies the range of values of variable \texttt{state}.
  
-\begin{figure}[H]
+\begin{figure}[tb]
 \begin{minipage}[c]{0.35\textwidth}
 \centering
 \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{example}
@@ -400,7 +399,8 @@ let
   prop3 = true ->
   	(pre(state = 0) and not x) => state = 1;
   prop4 = bias_max => state = 3;
-  prop_all = prop1 and prop2 and prop3 and prop4;
+  prop5 = state = 0 or state = 1 or state = 2 or state = 3;
+  prop_all = prop1 and prop2 and prop3 and prop4 and prop5;
   --%PROPERTY prop_all;
   --%REALIZABLE x;
 tel;
@@ -414,7 +414,7 @@ tel;
 %Considering these requirements, we want an answer to whether this model is
 %realizable. We provide the model as an input to \jkind, and observe the results.
 
-Realizability check is needed to identify whether this user-defined model
+Realizability check is needed to identify whether a user-defined model
  has potential conflicts between the requirements.
 The model from the example is obviously realizable and has
 %, and
@@ -427,8 +427,8 @@ the base check, and $k=1$ for the inductive check) are valid, and thus  \aeval
 extracts two witnessing Skolem functions
 %From this process, we receive two Skolem functions, 
 that effectively describe
- assignments to the local variables of the specification, as well as to \texttt{state}.
-\grigory{will try to put a snippet of the formula here.} 
+ assignments to the local variables of the specification, as well as to \texttt{state}
+(see Appendix~\ref{app:ex} for the certain formulas).
 
 The Skolem functions are used to construct the final implementation
 following the outline provided in Alg.~\ref{alg:synt}. 

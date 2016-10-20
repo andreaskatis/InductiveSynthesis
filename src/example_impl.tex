@@ -1,0 +1,83 @@
+\section{Example in more detail}
+\label{app:ex}
+
+Here we consider our example from Fig.~\ref{fg:example} and demonstrate one iteration of the synthesis procedure.
+%
+%Base check:
+%
+%\begin{equation}
+%\begin{aligned}
+%  bias_0 & =0 \land \\
+%  bias\_max_0 &= false \land \\
+%  prop_{10} &=((state_0=0)\implies(bias_0=0)) \land \\
+%  prop_{20} &=true  \land \\
+%  prop_{30}&=true  \land \\
+%  prop_{40} &=(bias\_max_0\implies(state_0=3))  \land \\
+%  prop\_all_0&=(prop_{10} \land prop_{20} \land prop_{30} \land prop_{40}) \implies \\
+%  %
+%  \exists bias_2, bias\_max_2, prop_{12}, state_2, &prop_{22}, prop_{32}, prop_{42}, prop_2 \such \\
+%  bias_2&=0 \land \\
+%  bias\_max_2&=false \land \\ 
+%  prop_{12}&=((state_2=0) \implies (bias_2=0)) \land \\
+%  prop_{22}&=true \land \\
+%  prop_{32}&=true \land \\
+%  prop_{42}&=(bias\_max_2\implies(state_2=3)) \land \\
+%  prop\_all_2 &= (prop_{12} \land prop_{22} \land prop_{32} \land prop_{42} )\land \\
+%  prop\_all_2 &\notag
+%\end{aligned}
+%\end{equation}
+%
+In particular the $\forall\exists$-formula of $\mathit{ExtendCheck}$ is as follows:%
+%
+\begin{equation}
+\begin{aligned}
+   bias_0&=ite(init, 0, ite(x_0, 1, -1)+bias_{-1}) \land \\
+    bias\_max_0&=ite(init, false, ((bias_0\ge 2)\lor (bias_0\le -2))\lor bias\_max_{-1})\land \\
+    prop_{10}&=((state_0=0)\implies(bias_0=0))\land \\
+    prop_{20}&=ite(init, true, ((state_{-1}=0)\land x_0)\implies(state_0=2))\land \\
+    prop_{30}&=ite(init, true, ((state_{-1}=0)\land (\neg x_0))\implies(state_0=1))\land \\
+    prop_{40}&=(bias\_max_0\implies(state_0=3))\land \\
+    prop_{50}&=((state_0=0) \lor (state_0=1) \lor (state_0=2) \lor (state_0=3))\land \\
+    prop\_all_0&=(prop_{10}\land prop_{20}\land prop_{30}\land prop_{40} \land prop_{50})  \land \\
+    prop\_all_0 &\land \\
+    bias_1&=ite(false, 0, ite(x_0, 1, -1)+bias_0)\land \\
+    bias\_max_1&=ite(false, false, ((bias_1\ge 2)\lor (bias_1\le-2))\lor bias\_max_0)\land \\
+    prop_{11}&=((state_1=0)\implies(bias_1=0))\land \\
+    prop_{21}&=ite(false, true, ((state_0=0)\land x_0)\implies(state_1=2))\land \\
+    prop_{31}&=ite(false, true, ((state_0=0)\land (\neg x_0))\implies(state_1=1))\land \\
+    prop_{41}&=(bias\_max_1\implies(state_1=3))\land \\
+    prop_{51}&=((state_1=0) \lor (state_1=1) \lor (state_1=2) \lor (state_1=3))\land \\
+    prop\_all_1&=(prop_{11}\land prop_{21}\land prop_{31}\land prop_{41} \land prop_{51})
+\implies \\
+\exists bias_2, bias\_max_2, &prop_{12}, state_2, prop_{22}, prop_{32}, prop_{42}, prop_{52}, prop\_all_2 \such  \\
+  bias_2&=0\land \\
+  bias\_max_2&=false\land \\
+  prop_{12}&=((state_2=0)\implies(bias_2=0))\land \\
+  prop_{22}&=true\land \\
+  prop_{32}&=true\land \\
+  prop_{42}&=(bias\_max_2\implies(state_2=3))\land \\
+  prop_{52}&=((state_2=0) \lor (state_2=1) \lor (state_2=2) \lor (state_2=3))\land \\
+  prop\_all_2&=(prop_{12}\land prop_{22}\land prop_{32}\land prop_{42} \land prop_{52})\land \\
+  prop\_all_2&\notag
+\end{aligned}
+\end{equation}
+
+\aeval proceeds by constructing MBPs and creating local Skolem functions. 
+In one of the iterations, it obtains the following MBP:%
+\begin{equation}
+\begin{aligned}
+  (x1\land (-1=bias_0)) &\lor ((\neg x_1)\land (1=bias_0)) \land \\
+  \neg bias\_&max_0 \land \\
+  (\neg (state_0=0))\lor (\neg x_1) &\land
+  (\neg (state_0=0))\lor x_1  \notag
+\end{aligned}
+\end{equation}
+
+and the following local Skolem function:%
+\begin{align*}
+  state_2&=0 &
+  bias_2&=0
+\end{align*}
+
+In other words, the pair of the MBP and the local Skolem function is the synthesized implementation for some transitions of the automaton: the MBP specifies the source state, and the Skolem function specifies the destination state.
+From this example, it is clear that the synthesized transitions are from state 1 to state 0, and from state 2 to state 0.
