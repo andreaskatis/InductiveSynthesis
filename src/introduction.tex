@@ -1,4 +1,4 @@
-\newcommand{\toolname}{RealSynth}
+\newcommand{\toolname}{\textsc{RealSynth}}
 
 \mike{What should tool name be?  KindSyn, RealSyn, jsyn ``jason''.  I have defined it by command to make it easy to replace.}
 
@@ -18,16 +18,16 @@ It is more general than previous approaches for temporal synthesis involving the
 
 Our approach is built on previous work determining the {\em realizability} of contracts involving infinite theories such as linear integer/real arithmetic and/or uninterpreted functions~\cite{Katis15:Realizability,katis2015machine}.  The algorithm, explained in Section~\ref{sec:synthesis}, uses a quantified variant of k-induction that can be checked by any SMT solver that supports quantification.  Notionally, it checks whether a sequence of states satisfy the contract of depth $k$ is sufficient to guarantee the existence of a successor state that satisfies the contract for an arbitrary input.  An outer loop of the algorithm increases $k$ until either a solution or counterexample is found.
 
-The step from realizability to synthesis involves moving from the existence of a witness (as can be provided by an SMT solver such as Z3 or CVC4) to the witness itself.  For this, the most important obstacle is the (in)ability of the SMT solver to handle higher-order quantification. Fortunately, interesting directions to solving this problem have already surfaced, either by extending an SMT solver with native synthesis capabilities~\cite{reynoldscounterexample}, or by providing external algorithms that reduce the problem by efficient quantifier elimination methods~\cite{fedyukovichae}.  Our synthesis relies on our previous implementation for realizability checking and the skolemization procedure implemented in the AE-VAL tool~\cite{fedyukovichae}.
+The step from realizability to synthesis involves moving from the existence of a witness (as can be provided by an SMT solver such as Z3 or CVC4) to the witness itself.  For this, the most important obstacle is the (in)ability of the SMT solver to handle higher-order quantification. Fortunately, interesting directions to solving this problem have already surfaced, either by extending an SMT solver with native synthesis capabilities~\cite{reynoldscounterexample}, or by providing external algorithms that reduce the problem by efficient quantifier elimination methods~\cite{fedyukovichae}.  Our synthesis relies on our previous implementation for realizability checking and the skolemization procedure implemented in the \aeval tool~\cite{fedyukovichae}.
 
 
 We combined the above ideas to create a reasonable sequential synthesis
-approach, which we call \toolname.  It applies the realizability checker from~\cite{Katis15:Realizability} and then extracts a Skolem witness formula from the AE-VAL tool that can immediately be turned into a C program.  In order to support synthesis, several changes were required to the quantifier-elimination approach to produce Skolem {\em functions} rather than {\em relations}.  The main contributions of the work are therefore:
+approach, which we call \toolname.  It applies the realizability checker from~\cite{Katis15:Realizability} and then extracts a Skolem witness formula from the \aeval tool that can immediately be turned into a C program.  In order to support synthesis, several changes were required to the quantifier-elimination approach to produce Skolem {\em functions} rather than {\em relations}.  The main contributions of the work are therefore:
 \begin{itemize}
 	\item To the best of our knowledge, the first synthesis procedure from
 	Assume-Guarantee contracts, modulo infinite theories, usable in a broader
 	list of applications when compared to already existing approaches.
-	\item \mike{GRIGORY: Something about improvements to AEVal to support synthesis}
+	\item A framework of extracting fine-grained Skolem functions for $\forall\exists$-formulas in Linear Real Arithmetic
 	\item A prototype tool implementing the algorithm
 	\item An experiment demonstrating the application of the tool on various benchmark examples
 \end{itemize}
@@ -37,7 +37,7 @@ approach, which we call \toolname.  It applies the realizability checker from~\c
 In Section~\ref{sec:synthesis}, we provide the necessary background
 definitions that are used in our synthesis algorithm, as well as an informal
 proof of the algorithm's correctness. Section~\ref{sec:aeval} contains the
-core formal notions on which the AE-VAL Skolemizer is based, as well
+core formal notions on which the \aeval Skolemizer is based, as well
 as the adjustments that were done for it to better support the needs of this
 work. Section~\ref{sec:impl} provides detailed
 source information for each one of the important

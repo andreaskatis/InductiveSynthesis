@@ -50,12 +50,12 @@ In particular the $\forall\exists$-formula of $\mathit{ExtendCheck}$ is as follo
     prop\_all_1&=(prop_{11}\land prop_{21}\land prop_{31}\land prop_{41} \land prop_{51})
 \implies \\
 \exists bias_2, bias\_max_2, &prop_{12}, state_2, prop_{22}, prop_{32}, prop_{42}, prop_{52}, prop\_all_2 \such  \\
-  bias_2&=0\land \\
-  bias\_max_2&=false\land \\
-  prop_{12}&=((state_2=0)\implies(bias_2=0))\land \\
-  prop_{22}&=true\land \\
-  prop_{32}&=true\land \\
-  prop_{42}&=(bias\_max_2\implies(state_2=3))\land \\
+  bias_2&=ite(false, 0, ite(x_1, 1, -1)+bias_0) \land\\
+  bias\_max_2&=ite(false, false, ((bias_2\ge 2) \lor (bias_2\le -2)) \lor bias\_max_0) \land\\
+  prop_{12}&=((state_2=0)\implies (bias_2=0)) \land\\
+  prop_{22}&=ite(false, true, ((state_0=0)\land x_1)\implies (state_2=2)) \land\\
+  prop_{32}&=ite(false, true, ((state_0=0)\land (\neg x_1))\implies (state_2=1)) \land\\
+  prop_{42}&=(bias\_max_2\implies (state_2=2)) \land\\
   prop_{52}&=((state_2=0) \lor (state_2=1) \lor (state_2=2) \lor (state_2=3))\land \\
   prop\_all_2&=(prop_{12}\land prop_{22}\land prop_{32}\land prop_{42} \land prop_{52})\land \\
   prop\_all_2&\notag
@@ -66,7 +66,7 @@ In particular the $\forall\exists$-formula of $\mathit{ExtendCheck}$ is as follo
 In one of the iterations, it obtains the following MBP:%
 \begin{equation}
 \begin{aligned}
-  (x1\land (-1=bias_0)) &\lor ((\neg x_1)\land (1=bias_0)) \land \\
+  (x_1\land (-1=bias_0)) &\lor ((\neg x_1)\land (1=bias_0)) \land \\
   \neg bias\_&max_0 \land \\
   (\neg (state_0=0))\lor (\neg x_1) &\land
   (\neg (state_0=0))\lor x_1  \notag
