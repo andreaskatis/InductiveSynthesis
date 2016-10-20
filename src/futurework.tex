@@ -1,19 +1,17 @@
 \section{Future Work}
 \label{sec:futurework}
 
-\grigory{this paragraph is moved from the experiments section.}
-A particularly interesting way to improve upon this is by switching to a more
-sophisticated algorithm, where we endorse the core idea of Property Directed
-Reachability in terms of finding a proof of realizability, in conjunction with Skolem functions.
-
-\grigory{this paragraph as well}
-For future work, we hope to tackle such cases on three different frontiers. The
-first is again the use of a better algorithm that can effectively reduce the size of
-the transition relation used during the realizability checking algorithm.
-Another interesting idea here is the use of Inductive Validity Cores
-(IVCs)~\cite{Ghass16}, whose main purpose is to effectively pinpoint the
-absolutely necessary model elements in a generated proof. We can potentially use the
-information provided by IVCs as a preprocessing tool to reduce the size of
+The meaningful results of our work so far on the synthesis from Assume-Guarantee
+contracts have also provided a solid ground towards extending and improving the
+involved algorithms in the future. A particularly important milestone is to
+eventually switch to a more efficient algorithm, where we endorse the core
+idea of Property Directed Reachability~\cite{een2011efficient,bradley11},
+using efficient ways to further enhance the algorithm's performance through the
+use of implicit abstractions~\cite{cimatti2014ic3} to further reduce the search
+space of the algorithm. This will also help our original work on realizability
+checking, by improving the unsoundness of our unrealizable results. Another
+promising idea here is the use of Inductive Validity Cores (IVCs)~\cite{Ghass16}, whose main purpose is to effectively pinpoint the absolutely necessary model elements in a generated proof. We can potentially use
+the information provided by IVCs as a preprocessing tool to reduce the size of
 the original specification, and hopefully the complexity of the realizability
 proof. Of course, a few optimizations can be further implemented in terms of
 \aeval's specific support on proofs of realizability and finally, a very
@@ -21,23 +19,13 @@ important subject is the further improvement of the compiler that we created to
 translate the Skolem functions into C implementations, by introducing
 optimizations like common subexpression elimination.
 
-
-While our current approach to program synthesis has been shown to be effective
-in the contracts that we have exercised, there are yet a lot of interesting ways
-to extend and optimize the underlying algorithm, to yield better results in the
-future. An important extension is that of supporting additional theories such as
-integers, which is currently not supported by \aeval's model based projection
-technique. To combat the lack of soundness on unrealizable results, and thus
-missing potential synthesized implementations, we will be developing a new
-algorithm that is mainly based on the idea of generating inductive invariants,
-much like the way that is presented in Property Directed Reachability
-algorithms. Finally, another potential optimization that could effectively
-reduce the algorithm's complexity is the further simplification of the
-transition relation that we are currently using, by reducing its complicated
-form through the mapping of common subexpressions on different conditional
+Another important goal is that of supporting additional theories, and primarily
+LIA, which is currently not fully supported by \aeval's model based projection
+technique. Finally, another potential optimization that could effectively reduce 
+the algorithm's complexity is the further simplification of the transition
+relation that we are currently using, by reducing its complicated form through the
+mapping of common subexpressions on different conditional
 branches. This will also have a direct impact on the skolem relations retrieved
 by \aeval, reducing their individual size and improving, thus, the final
 implementation in terms of readability as well as its usability as an
 intermediate representation to the preferred target language.
-
-\grigory{Altogether, the section is too long. It is not good for the paper to have many TODO items. Otherwise, the reviewers will think that the paper is to raw, and the TODO items should be addressed before the submission.}

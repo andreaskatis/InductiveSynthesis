@@ -1,7 +1,8 @@
 \newcommand{\realizable}{\textsc{realizable}}
 \newcommand{\unrealizable}{\textsc{unrealizable}}
 \newcommand{\skolems}{\textit{Skolems}}
-
+\newcommand{\isValid}{\textsc{isValid}\xspace}
+\newcommand{\isInvalid}{\textsc{isInvalid}\xspace}
 \newcommand{\synthesisalgorithm}{
 \begin{algorithm2e}[tb]
 \SetAlgoSkip{}
@@ -10,28 +11,25 @@
 \KwIn{Assume-Guarantee Contract in Lustre, $(A,G)$}
 \KwOut{Skolem collection \skolems, \\ \hspace{+1.3cm} Return value $\in
 \{\realizable, \unrealizable\}$ of ${(A,G)}$.
-\grigory{currently, it looks like the same job for realizability is performed twice. 
-\aeval also does validity check (i.e., checks that the negated formula is unsat), otherwise no skolems can be generated.
-I suggest to optimize it in the algorithm. Also, what is BaseCheckEngine and ExtendCheckEngine? are they simple two instances of the SMT solver?}
 }
 \BlankLine
 $i \gets 0$;\\
-$\textsc{BaseCheckEngine.SmtAdd}(\lnot BaseCheck(i))$\;
-$\textsc{ExtendCheckEngine.SmtAdd}(\lnot ExtendCheck(i))$;
+$BaseResult \gets \textsc{BaseCheckEngine.\aeval}(BaseCheck(i))$\;
+$ExtendResult \gets \textsc{ExtendCheckEngine.\aeval}(ExtendCheck(i))$;
 \\
-\While{}{
-	$i$++;\\
-	\uIf(\label{alg:returnUnsat}){$(BaseCheckEngine.\isSat(\textsc{SmtSolve}()))$}
+\While{}{	
+	\uIf(\label{alg:returnUnsat}){(\textsc{BaseCheckEngine}.\isValid($BaseResult$))}
 	{
 		\Return
 		\unrealizable 
 	}
-	$\textsc{SkolemsAdd}(\aeval(BaseCheck(i))$;\\
-	\uIf(\label{alg:returnSat}){$(ExtendCheckEngine.\isUnSat(\textsc{SmtSolve}()))$}
+	$Skolems.Add(BaseResult.Skolem)$;\\
+	\uIf(\label{alg:returnSat}){$(\textsc{ExtendCheckEngine}.\isInvalid($ExtendResult$))$}
 	{
-		$\textsc{SkolemsAdd}(\aeval(ExtendCheck(i)))$;\\
+		$Skolems.Add((ExtendResult.Skolem))$;\\
 		\Return \skolems, \realizable
 	}
+	$i$++;
 }
 \caption{Synthesis from Assume-Guarantee Contracts}
 \label{alg:synthesis}
@@ -160,19 +158,18 @@ $\forall\exists$-formulas are valid:%
 \end{equation}
 
 The realizability checking algorithm has been used to effectively find cases
-where the traditional consistency check \grigory{what is the traditional consistency check? How does it help to the further discussion? In general, the smaller background the better.}
-failed to detect conflicts between
-stated requirements in case studies of different complexity and importance. It
-has also been formally verified using the Coq proof assistant in terms of its
+where the traditional consistency check (i.e. the existence of an assignment
+to the input variables for which the output variables satisfy the contract)
+failed to detect conflicts between stated requirements in case studies of
+different complexity and importance. It has also been formally verified using the Coq proof assistant in terms of its
 soundness, for the cases where it reports that a contract is
 realizable~\cite{katis2015machine}.
 
 \subsection{Program Synthesis from Proofs of Realizability}
 
-\grigory{need to clearly say what is new and what is old in the section}
 %While the implemented algorithm on realizability provided us with meaningful
 %results during the verification of several contracts, 
-The most important outcome of the work on realizability is that it 
+The most important outcome of our previous work on realizability is that it 
  can be further used for solving the more complex problem of
 \emph{program synthesis} i.e., to automatically
 derive implementations, from the proof of the contract's
@@ -199,82 +196,20 @@ while solving the validity of~\eqref{eq:sbcheck} and~\eqref{eq:echeck} and is de
 
 \synthesisalgorithm
 
-
-Algorithm~\ref{alg:synthesis} provides a summary of the synthesis algorithm,
-showing how it extends our previous work on realizability checking. During the
-k-induction, 
-\grigory{I suggest to say something like that ``Since proving validity and Skolemization are closely related tasks, we create the $\forall\exists$-formula'' for the \textit{BaseCheck(n)} and push it to the \aeval. The output is valid/invalid, and (in case of valid) also a Skolem function''.}
-and for every step for which the negation of \textit{BaseCheck(n)}
-is not satisfiable, we feed the corresponding $\forall\exists$-formula to
-\aeval. A formula that is not satisfiable means that its negation is valid, and
-as such we expect \aeval to strengthen \textit{BaseCheck(n)}'s
-proof of validity. In addition to this proof, \aeval also returns a
-Skolem function that essentially assigns specific values to the existentially quantified
-variables, i.e. the output variables, in order to traverse into a
-new state, without violating the contract. We keep repeating this process,
-accumulating Skolem functions as long as the corresponding
-\textit{BaseCheck(n)} is true. As soon as the inductive
-step of \textit{ExtendCheck(n)} passes, we have a complete k-inductive proof
-stating that the contract is realizable. We then complete our synthesis
+Algorithm~\ref{alg:synthesis} provides a summary of the synthesis procedure,
+showing how it naturally extends our previous work on realizability checking.
+During the k-induction algorithm, two parallel engines (\textsc{BaseCheckEngine,
+ExtendCheckEngine}) correspondingly handle the base and inductive step checks of
+validity of $\forall\exists$-formulas. The proof of a formula's validity is
+closely tied to the process of Skolemization. As a result, every step for which
+the \textit{BaseCheck(n)} is valid according to \aeval, we also receive a Skolem function
+that can be used as a witness that satisfies the formula. We keep repeating this
+process, accumulating Skolem functions as long as the corresponding \textit{BaseCheck(n)}
+is valid. As soon as the inductive step of \textit{ExtendCheck(n)} passes, we
+have a complete k-inductive proof stating that the contract is realizable. We then complete our synthesis
 procedure by generating a Skolem function that corresponds to the inductive
 step, and return the collection of the Skolem functions to the user.
 
-
-
-%GRIGORY: commented out the translation of A=> B => C into A /\ B => C since it is quite obvious
-
-% Of course, 
-%$\mathit{Extend}_{n}(s)$ as defined in~\eqref{def:extend} cannot
-%be directly used for this purpose due to its form. This is not really an
-%obstacle though, as we can rewrite the definition:
-%
-%\begin{multline*}
-%\forall i_1, s_1, \ldots, i_n, s_n.\\ A(s, i_1) \land G_T(s, i_1, s_1)
-%\land \cdots \land
-%A(s_{n-1}, i_n) \land G_T(s_{n-1}, i_n, s_n)
-%\implies \\
-%\forall i.~ A(s_n, i) \implies \exists s'.~ G_T(s_n, i, s')
-%\end{multline*}
-%
-%into an equivalent formula of the form $\forall \vec{x}.
-%S(\vec{x}) \implies \exists \vec{y}. T(\vec{x},\vec{y})$ : 
-%\begin{multline}
-%	\label{ml:extendable2}
-%		\forall i_1,s_1,\ldots,i_n,s_n,i. \\
-%		A(s,i_1) \wedge G_T(s,i_1,s_1) \wedge \ldots \wedge
-%		A(s_{n-1}, i_n) \wedge G_T(s_{n-1},i_n,s_n) \wedge A(s_n,i) \implies \\
-%		\hspace{+2cm} \exists s'. G_T(s_n,i,s')
-%	\end{multline}
-
-%\begin{figure}
-%\begin{small}
-%\begin{verbatim}
-%// for each variable in I or S,
-%//   create an array of size k.
-%//   then initialize initial state values
-%assign_GI_witness_to_S;
-%update_array_history;
-%
-%// Perform bounded 'base check' synthesis
-%read_inputs;
-%base_check'_1_solution;
-%update_array_history;
-%...
-%read_inputs;
-%base_check'_k_solution;
-%update_array_history;
-%
-%// Perform recurrence from 'extends' check
-%while(1) {
-% read_inputs;
-% \mathit{Extend}_check_k_solution;
-% update_array_history;
-%}
-%\end{verbatim}
-%\end{small}
-%\caption{Algorithm skeleton for synthesis}
-%\label{fig:algorithm}
-%\end{figure}
 
 \begin{algorithm2e}[tb]
 \SetAlgoSkip{}
@@ -286,10 +221,10 @@ step, and return the collection of the Skolem functions to the user.
 \BlankLine
   \textsc{read\_inputs()}; 		\Comment{Transition using BaseCheck
   witness}\\
-  \textsc{Skolems[1]()}\;
+  \textsc{Skolems[0]()}\;
   $\ldots$\\
   \textsc{read\_inputs()}\;
-  \textsc{Skolems[k]()}\;
+  \textsc{Skolems[k-1]()}\;
   
 \BlankLine  
 
@@ -305,10 +240,12 @@ step, and return the collection of the Skolem functions to the user.
 \end{algorithm2e}
 
 Given a collection of Skolems, it remains to plug them into an implementation skeleton of
- shown in Alg.~\ref{alg:synt}.
-The implementation begins (method \textsc{assign\_GI\_witness\_to\_S()}) by
-creating an array for each state variable up to depth $k$, where $k$ is the
-depth at which we found a solution to our realizability algorithm.
+shown in Alg.~\ref{alg:synt}. One of the direct effects of using Lustre in
+conjunction with a k-inductive proof is that we can have properties in the model
+that refer to up to a previous value of a variable, up to $k-1$ steps in the
+past. As such, the implementation begins (method
+\textsc{assign\_GI\_witness\_to\_S()}) by creating an array for each state variable up to depth $k$,
+where $k$ is the depth at which we found a solution to our realizability algorithm.
 In each array, the $i$-th element, with $0\leq i \leq k$, corresponds to the
 value assigned to the variable after the call to $i$-th Skolem function. As
 such, the $k$ elements of the array correspond to the $k$ Skolem
@@ -330,14 +267,6 @@ we add the Skolem function that represents the witness for the
 $\mathit{ExtendCheck}$ instance to describe the recurrent behavior of the implementation, i.e.,
 the next value of outputs in each iteration in the infinite loop.
 
-\grigory{I think, in this section we can skip this paragraph since it clearly belongs to Sect.5}
-For the purposes of this paper, we developed\footnote{You can find the translation tool at
-\url{https://github.com/andrewkatis/SMTLib2C}.} a translation tool to reconstruct
-the collections of Skolem functions returned by our synthesis algorithm, to C
-implementations, following the steps presented by
-Alg.~\ref{alg:synt}. The performance of the resulting implementations are
-being presented in Section~\ref{sec:experiment}.
-
 Finally, to further strengthen our claims regarding the algorithm's
 correctness, we wrote machine-checked proofs regarding the validity of \textit{BaseCheck(n)} and
 \textit{ExtendCheck(n)}, when Skolem functions are used as witness states
@@ -350,14 +279,26 @@ to extend the proofs to capture any arbitrary $k$ as part of our future work.
 The corresponding were written and proved using the Coq proof
 assistant~\cite{Coqmanual}.
 
-\grigory{I suggest to put the main soundness theorem (without a proof) here.}
+\begin{theorem}[Bounded Soundness of BaseCheck and ExtendCheck using Skolem
+Functions] Let $BaseCheck_{Skolem_n}(n)$ and
+$ExtendCheck_{Skolem_n}(n)$, $n \in {0,1}$ be the valid
+variations of the corresponding formulas \textit{BaseCheck(n)} and
+\textit{ExtendCheck(n)}, where the existentially quantified part has been substituted
+with a witnessing Skolem function. We have that:
+\begin{itemize}
+\item $\forall (A,G_{I},G{T}). BaseCheck(n) \Rightarrow BaseCheck_{Skolem_n}(n)$
+\item $\forall (A,G_{I},G{T}). ExtendCheck(n) \Rightarrow
+ExtendCheck_{Skolem_n}(n)$
+\end{itemize}
+\end{theorem}
+\begin{proof}
+The proof uses the definition \textit{$Extend_n(s)$} of an extendable state,
+after replacing the next-step states with corresponding Skolem functions. From there,
+the proof of the two implications is straightforward.
+\qed
+\end{proof}
 
- \subsection{Running Example}
- 
- % GRIGORY: obvious sentence 
- %To further understand the concepts described in this paper, we provide a simple
- %running example that is representative of what happens internally during a
- %single run of the synthesis algorithm. 
+ \subsection{Running Example} 
  
  Fig.~\ref{fg:example} shows a
  simple but yet representative example to our approach.
@@ -367,9 +308,8 @@ assistant~\cite{Coqmanual}.
  %we use a simple hack that prevents us from explicitly defining how it should
  %be assigned, by adding it as an actual input to the specification.
  %
- There are five properties to be checked along with a
- \jkind-specific query on realizability of the spec. Properties
- \texttt{prop2} and \texttt{prop3} are used to indirectly describe some
+ There are five properties.
+ Properties \texttt{prop2} and \texttt{prop3} are used to indirectly describe some
  possible transitions in the automaton. Properties \texttt{prop1} and
  \texttt{prop4} are the requirements with respect to two local variables, \texttt{bias}
  and \texttt{bias\char`_max}. Variable \texttt{bias} calculates the number of successive
@@ -410,21 +350,14 @@ tel;
 \label{fg:example}
 \end{figure}
 
-% GRIGORY: this sentence is too high-level and too application-specific. I'd start with something more general.
-%Considering these requirements, we want an answer to whether this model is
-%realizable. We provide the model as an input to \jkind, and observe the results.
-
-Realizability check is needed to identify whether a user-defined model
- has potential conflicts between the requirements.
-The model from the example is obviously realizable and has
-%, and
-%thus can be further examined in terms of synthesizing a representative
-%implementation. 
-%Using 
-the k-inductive proof of length $k = 1$.
-The two corresponding $\forall\exists$-formulas ($k=0$ for
-the base check, and $k=1$ for the inductive check) are valid, and thus  \aeval
-extracts two witnessing Skolem functions
+Considering these properties, we want to give an answer to whether
+an implementation can be constructed, that is guaranteed to satisfy the
+constraints imposed by the specification. In other words, we want to prove
+that the specification is realizable (--\%REALIZABLE query). It is
+straightforward to conclude that the model from the example realizable, and has
+a k-inductive proof of length $k = 1$. The two corresponding
+$\forall\exists$-formulas ($k=0$ for the base check and $k=1$ for the inductive
+check) are valid, and thus  \aeval extracts two witnessing Skolem functions
 %From this process, we receive two Skolem functions, 
 that effectively describe
  assignments to the local variables of the specification, as well as to \texttt{state}
@@ -435,17 +368,10 @@ following the outline provided in Alg.~\ref{alg:synt}.
 It is 135 lines of code, and due to the space constraints we do not
 present it here%
 \footnote{The implementation for the
-example is available at \url{http://}.}.
+example is available at \url{https://arxiv.org/abs/1610.05867}.}.
 The main idea is to redefine each variable in the model 
 as an array of size equal to $k$ and
 to use the $k$-th element of each array as the corresponding output of the call
 to $k$-th Skolem function. After this initialization process, we use an infinite
 loop to assign new values to the element corresponding to the last Skolem
-function, to cover the inductive step of the original proof. 
-\grigory{I'm not sure what you mean by the last sentence. It is long and difficult to parse. If it has some general observation about the algorithm, maybe it makes sense to move to Sect. 2.4?}
-One of the
-interesting features that come from using Lustre in conjunction with a
-k-inductive proof is that we can possibly have properties in the model that
-refer to up to $k-1$ values of each variable in the past, and as such an update
-process occurs in between each iteration of the infinite loop, to ensure that we
-only keep the $k$ latest values of each array.
+function, to cover the inductive step of the original proof.

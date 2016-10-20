@@ -6,14 +6,12 @@ a Java-implementation of the \textsc{KIND} model
 checker~\cite{Hagen08:kind}. Each model is described using the Lustre
 Specification language, which is used as an intermediate language to formally verify contracts in the
 Assume-Guarantee Reasoning (\textsc{AGREE}) framework~\cite{NFM2012:CoGaMiWhLaLu}.
-Internally, \jkind is using two parallel engines in order to construct a
-k-inductive proof for the property of interest. The first order formulas that
-are being constructed are then fed to the \textsc{Z3} SMT
+Internally, \jkind is using two parallel engines (for \textit{BaseCheck(n) and
+\textit{ExtendCheck}}) in order to construct a k-inductive proof for the
+property of interest.
+The first order formulas that are being constructed are then fed to the \textsc{Z3} SMT
 solver~\cite{DeMoura08:z3} which provides state of the art support for reasoning
 over quantifiers and incremental search.
-\grigory{What are the two parallel engines?}
-
-\grigory{Again, this is confusing why do you use Z3 and then \aeval? \aeval proves valid / invalid anyway. So the same job is performed twice. And \aeval internally calls Z3. If you want to emphasize LRA/LIA business, I would just do it in the footnote.}
 
 Provided with the assumption that the check queries are satisfiable according to
 the results received by the SMT solver, we proceed to construct a collection of
@@ -24,11 +22,11 @@ Skolem functions using the \aeval Skolemizer%
 In future work, we plan to enhance  \aeval for Linear Integer Arithmetic (LIA) to soundly support Skolem relation over Integers.
 
 The final step of our implementation involved the creation of a specific purpose
-translation tool, which is currently called \textsc{SMTLib2C}%
+translation tool, which we currently call \textsc{SMTLib2C}%
 \footnote{The source code
-is available at \url{https://github.com/andrewkatis/SMTLib2C}}. The translation tool
-is still at a very primitive state in terms of optimizations, a goal that we
-eventually want to address as part of our future work.
-\grigory{Never say that something is in ``very primitive state''. Don't under-emphasize your contributions.}
+is available at \url{https://github.com/andrewkatis/SMTLib2C}}. The collection
+of the Skolem functions is given as an input to the compiler, which in turn uses
+them to generate implementations in the C language. We intend to further improve
+the compiler's efficiency as part of an individual future work.
 
 
