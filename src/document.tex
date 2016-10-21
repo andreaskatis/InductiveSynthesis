@@ -43,6 +43,13 @@
 \newcommand{\grigory}[1]{\textcolor{brown}{Grigory: #1}}
 \newcommand{\arie}[1]{\textcolor{purple}{[Arie: #1]}}
 
+\newcounter{template}
+\newenvironment{template}[1][htb]
+  {
+   \begin{algorithm2e}[#1]%
+   \SetAlgorithmName{Template}
+  }{\end{algorithm2e}}
+
 \newenvironment{requirement}
 {\vspace{0.05in}
  \begin{mdframed}[roundcorner=10pt,backgroundcolor=gray!20]}
