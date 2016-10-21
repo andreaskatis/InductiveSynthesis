@@ -171,67 +171,67 @@ extendable using Def.~\ref{def:extend}. The key insights are then 1)
 we can start with a arbitrary state in $G_I$ since it is non-empty, 2)
 we can use witnesses from the proofs of $\mathit{Extend}_k(s)$ in
 $\mathit{BaseCheck}$ to create a valid path of length $n-1$, and 3) we
-can extend that path to arbitrary length using the witness of the
-proof of $\mathit{Extend}_n(s)$ in $\mathit{ExtendCheck}(n)$
+can extend that path to arbitrary length by repeatedly using the
+witness of the proof of $\mathit{Extend}_n(s)$ in
+$\mathit{ExtendCheck}(n)$.
 
-In the first order logic, witnesses for valid
-$\forall\exists$-formulas are represented by the Skolem functions.
-Intuitively, a Skolem function expresses a connection between all
-universally quantified variables in the left-hand side of the
-$\forall\exists$-formulas~\eqref{eq:sbcheck} and~\eqref{eq:echeck} and
-the existentially quantified variable $s'$ within $\mathit{Extend}$ on
-the right-hand side. Our algorithm automatically generates such Skolem
-functions while solving the validity of~\eqref{eq:sbcheck}
-and~\eqref{eq:echeck} and is detailed in Sect.~\ref{sec:aeval}.
+In first-order logic, witnesses for valid $\forall\exists$-formulas
+are represented by Skolem functions. Intuitively, a Skolem function
+expresses a connection between all universally quantified variables in
+the left-hand side of the $\forall\exists$-formulas~\eqref{eq:sbcheck}
+and~\eqref{eq:echeck} and the existentially quantified variable $s'$
+within $\mathit{Extend}$ on the right-hand side. Our algorithm uses
+the \aeval tool, detailed in Sect.~\ref{sec:aeval}, to generate such
+Skolem functions from the validity of~\eqref{eq:sbcheck}
+and~\eqref{eq:echeck}.
 
 %\synthesisalgorithm
 
-Algorithm~\ref{alg:synthesis} provides a summary of the synthesis
-procedure, showing how it naturally extends our previous work on
-realizability checking. During the k-induction algorithm, two parallel
-engines (\textsc{BaseEngine, ExtendEngine}) handle the base and
-inductive step checks of validity of $\forall\exists$-formulas. The
-proof of a formula's validity is closely tied to the process of
-Skolemization: for every step that \textit{BaseCheck(n)} is valid, \aeval
-provides a Skolem function to witness that validity.
+%% During the k-induction algorithm, two parallel
+%% engines (\textsc{BaseEngine, ExtendEngine}) handle the base and
+%% inductive step checks of validity of $\forall\exists$-formulas.
+%% The proof of a formula's validity is closely tied to the process of
+%% Skolemization: for every step that \textit{BaseCheck(n)} is valid,
+%% \aeval provides a Skolem function to witness that validity.
 
-We keep repeating this process, accumulating Skolem functions
-as long as the corresponding \textit{BaseCheck(n)} is valid. As soon
-as the inductive step of \textit{ExtendCheck(n)} passes, we have a
-complete k-inductive proof stating that the contract is realizable. We
-then complete our synthesis procedure by generating a Skolem function
-that corresponds to the inductive step, and return the collection of
-the Skolem functions.
+Algorithm~\ref{alg:synthesis} provides a summary of the synthesis
+procedure. The algorithm repeatedly proves \textit{BaseCheck(i)} and
+accumulates the resulting Skolem functions. If \textit{BaseCheck(i)}
+ever fails, the system is unrealizable. At the same time, the
+algorithm tries to prove \textit{ExtendCheck(i)}. As soon as the
+inductive step of \textit{ExtendCheck(i)} passes, we have a complete
+k-inductive proof stating that the contract is realizable. We then
+complete our synthesis procedure by generating a Skolem function that
+corresponds to the inductive step, and return the collection of the
+Skolem functions.
 
 \begin{figure}
 \begin{minipage}[t]{0.65\textwidth}
     \scalebox{0.9}{
 \begin{algorithm2e}[H]
 \SetAlgoSkip{}
-\SetKwFor{While}{forever}{do}{}
-\SetKw{KwContinue}{continue}
+\SetKwFor{For}{for}{do}{}
 \KwIn{AG-Contract in Lustre, $(A,G)$}
 \KwOut{Result
 $\in \{\realizable, \unrealizable\}$, Skolem collection \skolems
 }
 \BlankLine
-$i \gets 0$;\\
 $Skolems \gets \varnothing$;\\
-\While{}{	
-$BaseResult \gets \textsc{BaseEngine.\aeval}(BaseCheck(i))$\;
-$ExtendResult \gets \textsc{ExtendEngine.\aeval}(ExtendCheck(i))$;
+\For{$(i \gets 0; \mathbf{true}; i \gets i + 1)$}{	
+$BaseResult \gets \textsc{\aeval}(BaseCheck(i))$\;
+$ExtendResult \gets \textsc{\aeval}(ExtendCheck(i))$;
 \\
-\lIf(\label{alg:returnUnsat}){$(\textsc{BaseEngine}.\isInvalid(BaseResult))$}
+\uIf(\label{alg:returnUnsat}){$(\isInvalid(BaseResult))$}
 	{%
 		\Return 
-		\unrealizable, $\varnothing$%
+		\unrealizable, $\varnothing$;%
 	}
-	\eIf(\label{alg:returnSat}){$(\textsc{ExtendEngine}.\isValid($ExtendResult$))$}
-	{
-		$Skolems.Add((ExtendResult.Skolem))$;\\
-		\Return \realizable, \skolems;
-	}{	$Skolems.Add(BaseResult.Skolem)$;}
-	$i$++;
+\uIf(\label{alg:returnSat}){$(\isValid(ExtendResult))$}
+{
+	$Skolems.Add(ExtendResult.Skolem)$;\\
+	\Return \realizable, \skolems;
+}
+$Skolems.Add(BaseResult.Skolem)$;
 }
 \caption{Synthesis from AG-Contracts}
 \label{alg:synthesis}
@@ -246,7 +246,7 @@ $ExtendResult \gets \textsc{ExtendEngine.\aeval}(ExtendCheck(i))$;
   \textsc{assign\_$G_{I}$\_\textsc{witness()}};
 
 \BlankLine
-  \textsc{read\_inputs()}; 		
+  \textsc{read\_inputs()}\; 		
   \textsc{Skolems[0]()}\;
   $\ldots$\\
   \textsc{read\_inputs()}\;
@@ -281,6 +281,11 @@ correspond to the $k-1$ Skolem functions produced by the
 $\mathit{BaseCheck}$ process, while the last element is used by the
 Skolem function generated from the formula corresponding to the
 $\mathit{ExtendCheck}$ process.
+
+\andrew{I think the counts are still off in the previous paragraph. If
+ the first $k-1$ elements correspond to BaseCheck then why does the
+ template run from skolems[0] up to skolems[k-1]. That's $k$ elements.
+ Please double-check and correct if needed.}
 
 The algorithm then uses the Skolem functions generated by \aeval for each
 of the $\mathit{BaseCheck}$ instances to describe the initial behavior of
