@@ -16,9 +16,10 @@ over quantifiers and incremental search.
 Provided with the assumption that the check queries are satisfiable according to
 the results received by the SMT solver, we proceed to construct a collection of
 Skolem functions using the \aeval Skolemizer%.
-\aeval  uses LRA as a background logic, and thus casts all numeric variables to Reals and provides the Skolem relation over Reals as well.%
-\footnote{To increase precision, of the realizability checks over LIA, \jkind has an option to use \textsc{Z3} directly.}
-In future work, we plan to enhance  \aeval for Linear Integer Arithmetic (LIA) to soundly support Skolem relation over Integers.
+\aeval  uses Linear Real Arithmetic (LRA) as a background logic, and thus casts all numeric variables to reals and provides the Skolem relation over reals as well.%
+\footnote{For realizability checks over Linear Integer and Real
+  Arithmetic (LIRA), \jkind has an option to use \textsc{Z3} directly.}
+In future work, we plan to enhance  \aeval for Linear Integer Arithmetic (LIA) to soundly support Skolem relation over integers.
 
 The final step of our implementation involved the creation of a specific purpose
 translation tool, which we currently call \textsc{SMTLib2C}%
