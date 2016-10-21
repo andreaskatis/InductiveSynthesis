@@ -68,27 +68,36 @@ present our program synthesis procedure.
 One popular way to describe software requirements is through Assume-Guarantee contracts, where requirements are expressed using safety properties that are split into two categories. The \emph{assumptions} of the contract correspond to properties that restrict the set of valid inputs a system can process, while the \emph{guarantees} dictate how the system should behave through constraints on the outputs that are produced by the system.
 
 For example, consider the contract with the assumption $A = \{x\neq
-y\}$ and the guarantee $G = \{x \leq y \Rightarrow z =
-\textit{true}, x \geq y \Rightarrow z = \textit{false}\}$, for a component with two inputs $x$ and $y$ and one output $z$.  By assumption, $x \neq y$, so the implemented system should set $z$ to true if $x < y$ and false otherwise.  %Although this contract is trivial to implement, the contract does not provide an implementation, only a specification.
+y\}$ and the guarantee $G = \{x \leq y \Longrightarrow z =
+\textit{true}, x \geq y \Longrightarrow z = \textit{false}\}$, for a component with two inputs $x$ and $y$ and one output $z$.  By assumption, $x \neq y$, so the implemented system should set $z$ to true if $x < y$ and false otherwise.  %Although this contract is trivial to implement, the contract does not provide an implementation, only a specification.
 %
 Determining whether an implementation can be constructed to satisfy the contract for all possible input sequences is the \emph{realizability} problem, while automatically constructing a witness of the proof of
 realizability of the contract is the \emph{program synthesis} problem.  The contract $(A,G)$ above is obviously \emph{realizable}, and therefore an implementation can be constructed.
-Interestingly, if the assumption is omitted then the contract is \emph{unrealizable}, since there is no correct value for $z$ when $x=y$.
+However, if the assumption is omitted then the contract is \emph{unrealizable}, since there is no correct value for $z$ when $x=y$.
 
 \subsection{Formal Preliminaries}
 \label{sec:pre}
 
-We describe a system using the disjoint sets $state$ and $inputs$. Formally, an \emph{implementation}, i.e. a \emph{transition system} can be described using a set of initial states $I(s) : state \rightarrow bool$ and a transition relation $T(s,i,s'): state \rightarrow inputs \rightarrow state \rightarrow bool$.
+We describe a system using the disjoint sets $state$ and $inputs$.
+Formally, an \emph{implementation} is a \emph{transition system}
+described by an initial state predicate $I(s)$ of type $state \to
+bool$ and by a transition relation $T(s,i,s')$ of type $state \to
+inputs \to state \to bool$.
 
-An Assume-Guarantee (AG) contract can be formally defined by two disjoints sets, a set of
-\emph{assumptions} and a set of \emph{guarantees}. The \emph{assumptions} $A: state \rightarrow inputs \rightarrow bool$
-impose constraints over the inputs (which may be modal in terms of the previous state), while the \emph{guarantees} $G$ are used for the corresponding constraints over the outputs of the system and can be expressed as
-two separate subsets $G_I: state \rightarrow bool$ and $G_T: state \rightarrow inputs \rightarrow state \rightarrow bool$, where $G_I$ defines the set of valid
-initial states, and $G_T$ specifies the properties that need to be met during
-each new transition between two states. Note that we do not necessarily expect
-that a contract would be defined over all variables in the transition system,
-but we do not make any distinction between internal state variables and outputs in the formalism.
-This way, we can use state variables to (in some cases) simplify specification of guarantees.
+An Assume-Guarantee (AG) contract can be formally defined by a set of
+\emph{assumptions} and a set of \emph{guarantees}. The
+\emph{assumptions}, $A: state \rightarrow inputs \rightarrow bool$,
+impose constraints over the inputs which may be modal in terms of the
+previous state. The \emph{guarantees} $G$ consist of two separate
+subsets $G_I: state \rightarrow bool$ and $G_T: state \rightarrow
+inputs \rightarrow state \rightarrow bool$, where $G_I$ defines the
+set of valid initial states, and $G_T$ specifies the properties that
+need to be met during each new transition between two states. Note
+that we do not necessarily expect that a contract would be defined
+over all variables in the transition system, but we do not make any
+distinction between internal state variables and outputs in the
+formalism. This way, we can use state variables to (in some cases)
+simplify specification of guarantees.
 
 \subsection{Realizability of Contracts}
 The synthesis algorithm proposed in this paper is built on top of our realizability algorithm
@@ -110,17 +119,16 @@ A(s_{n-1}, i_n) \land G_T(s_{n-1}, i_n, s_n)
 \end{multline*}
 \end{definition}
 
-% \andrew{We need to say something about checking the $G_I$ is
-%   non-empty. We currently don't mention it here or in our algorithm,
-%   but it must play a cruical role, no?}
 The algorithm for realizability uses Def.~\ref{def:extend} in two
 separate checks that correspond to the two traditional cases exercised
-in k-induction. Initially, we prove that the set of initial states is not
-empty, which is simply done by checking for the existance of states that
-satisfy $G_I$. For the $\mathit{BaseCheck}$, we ensure that all initial states
-are extendable in terms of any path of length $k < n$, while the inductive step of $\mathit{ExtendCheck}$ tries to prove that all valid states are extendable. Therefore, we attempt to find the
-smallest $n$, for which the two following $\forall\exists$-formulas
-are valid:%
+in k-induction. Initially, we prove that the set of initial states is
+not empty, which is done by checking for the existence of at least one
+state that satisfies $G_I$. For the $\mathit{BaseCheck}$, we ensure
+that all initial states are extendable for any path of length $k < n$,
+while the inductive step of $\mathit{ExtendCheck}$ tries to prove that
+all valid states are extendable for any path of length $n$. Therefore,
+we attempt to find the smallest $n$, for which the two following
+$\forall\exists$-formulas are valid:%
 %
 \begin{equation}
 \label{eq:sbcheck}
