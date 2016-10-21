@@ -63,12 +63,9 @@ present our program synthesis procedure.
 
 \subsection{Assume-Guarantee Contracts}
 
-In the context of requirements engineering, there have been a lot of proposed
-ideas in terms of how requirements can be represented and expressed during
-system design. \grigory{need for citations with examples of ``a lot'' of ideas?}
-One of the most popular ways to describe these requirements is through
-the notion of an Assume-Guarantee contract, where the requirements are expressed
-using safety properties that are split into two separate categories. The
+One of the most popular ways to describe requirements during the development
+cycle of software, is through the notion of an Assume-Guarantee contract, where
+the requirements are expressed using safety properties that are split into two separate categories. The
 \emph{assumptions} of the contract correspond to properties that restrict the
 set of valid inputs a system can process, while the \emph{guarantees} dictate
 how the system should behave, using properties that precisely describe
@@ -76,7 +73,7 @@ the kinds of valid outputs that it may return to its environment.
 
 As an illustrative example, consider the contract with the assumption $A =
 \{x\neq y\}$ and the guarantee $G = \{\text{if } x \leq y \text{ then } z =
-\text{ true else z } = \text{false}\}$.
+\textit{ true } \text{else } z  = \textit{false}\}$.
 The component to be designed consists of two inputs, $x$ and $y$ and one output $z$. If we restrict our example to the case of integer arithmetic,
 we can see that the contract assumes that the inputs will never have the same value,
 and requires that the output of the component is Boolean 
@@ -209,7 +206,7 @@ procedure by generating a Skolem function that corresponds to the inductive
 step, and return the collection of the Skolem functions to the user.
 
 \begin{figure}
-\begin{minipage}[t]{0.6\textwidth}
+\begin{minipage}[t]{0.55\textwidth}
     \scalebox{0.7}{
 \begin{algorithm2e}[H]
 \SetAlgoSkip{}
