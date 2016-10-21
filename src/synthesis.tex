@@ -71,36 +71,39 @@ set of valid inputs a system can process, while the \emph{guarantees} dictate
 how the system should behave, using properties that precisely describe
 the kinds of valid outputs that it may return to its environment.
 
-As an illustrative example, consider the contract with the assumption $A =
-\{x\neq y\}$ and the guarantee $G = \{\text{if } x \leq y \text{ then } z =
-\textit{ true } \text{else } z  = \textit{false}\}$.
-The component to be designed consists of two inputs, $x$ and $y$ and one output $z$. If we restrict our example to the case of integer arithmetic,
-we can see that the contract assumes that the inputs will never have the same value,
-and requires that the output of the component is Boolean 
-whose value depends on the comparison of the values of $x$ and $y$.
-At this point, it is crucial to notice that we have not discussed anything
-regarding the implementation. This is due to the fact that, during the
-early stages of software development, the implementation is absent or exists only partially.
+For example, consider the contract with the assumption $A = \{x\neq
+y\}$ and the guarantee $G = \{\text{if } x \leq y \text{ then } z =
+\textit{true}, \text{if } x \geq y \text{ then } z =
+\textit{false}\}$. The component to be designed consists of two
+inputs, $x$ and $y$ and one output $z$. If we restrict our example to
+the case of integer arithmetic, we can see that the contract assumes
+that the inputs will never have the same value, and requires that the
+output of the component is Boolean whose value depends on the
+comparison of the values of $x$ and $y$. At this point, it is crucial
+to notice that we have not discussed anything regarding the
+implementation. This is due to the fact that, during the early stages
+of software development, the implementation is absent or exists only
+partially.
 
-Deciding existence of an implementation 
-that satisfies the specific contract for all possible inputs is aimed by the problem of 
-\emph{realizability}, while automatically constructing a witness  of the proof 
-of realizability of the contract is aimed by problem of \emph{program synthesis}.
-The contract $(A,G)$ above is obviously
-\emph{realizable}, and therefore an implementation exists for the specific
-component.
-Interestingly, if the assumption would be omitted then 
-the contract is clearly \emph{unrealizable}, since no implementation 
-is able to provide a correct output in the case where $x=y$.
+Deciding existence of an implementation that satisfies the specific
+contract for all possible inputs is the \emph{realizability} problem,
+while automatically constructing a witness of the proof of
+realizability of the contract is the \emph{program synthesis} problem.
+The contract $(A,G)$ above is obviously \emph{realizable}, and
+therefore an implementation exists for the specific component.
+Interestingly, if the assumption would be omitted then the contract is
+clearly \emph{unrealizable}, since no implementation is able to
+provide a correct output in the case where $x=y$.
 
 \subsection{Formal Preliminaries}
 \label{sec:pre}
 
-For the purposes of this paper, we are describing a system using the types
-$state$ and $inputs$. Formally, an \emph{implementation}, i.e. a
-\emph{transition system} can be described using a set of initial states $I(s)$ of type $state \implies bool$, in addition to a transition relation $T(s,i,s')$ that
-implements the contract and has type $state \implies inputs \implies
-state \implies bool$.
+For the purposes of this paper, we are describing a system using the
+types $state$ and $inputs$. Formally, an \emph{implementation} is a
+\emph{transition system} described by an initial state predicate
+$I(s)$ of type $state \implies bool$ and by a transition relation
+$T(s,i,s')$ of type $state \implies inputs \implies state \implies
+bool$.
  
 An Assume-Guarantee (AG) contract can be formally defined by two sets, a set of
 \emph{assumptions} and a set of \emph{guarantees}. The \emph{assumptions} $A$
@@ -122,7 +125,7 @@ the problem of realizability is expressed using the notion of a state being \emp
 \label{def:extend}
 A state $s$ is extendable after $n$ steps, denoted $\mathit{Extend}_{n}(s)$, if
 any valid path of length $n-1$ starting from $s$ can be extended in response to
-any input.%
+any valid input.%
 %
 \begin{multline*}%
 \mathit{Extend}_{n}(s) \triangleq \forall i_1, s_1, \ldots, i_n, s_n.\\ A(s, i_1) \land G_T(s, i_1, s_1)
@@ -133,17 +136,21 @@ A(s_{n-1}, i_n) \land G_T(s_{n-1}, i_n, s_n)
 \end{multline*}
 \end{definition}
 
+\andrew{We need to say something about checking the $G_I$ is
+  non-empty. We currently don't mention it here or in our algorithm,
+  but it must play a cruical role, no?}
 The algorithm for realizability uses Def.~\ref{def:extend} in two
-separate checks that correspond to the two traditional cases exercised in
-k-induction. For the $\mathit{BaseCheck}$, we ensure that all initial states are
-extendable in terms of any path of length $k\le n$, while the inductive step of
-$\mathit{ExtendCheck}$ tries to prove that all valid states are extendable.
-Therefore, we attempt to find the smallest $n$, for which the two following 
-$\forall\exists$-formulas are valid:%
+separate checks that correspond to the two traditional cases exercised
+in k-induction. For the $\mathit{BaseCheck}$, we ensure that all
+initial states are extendable in terms of any path of length $k < n$,
+while the inductive step of $\mathit{ExtendCheck}$ tries to prove that
+all valid states are extendable. Therefore, we attempt to find the
+smallest $n$, for which the two following $\forall\exists$-formulas
+are valid:%
 %
 \begin{equation}
 \label{eq:sbcheck}
-\mathit{BaseCheck}(n) \triangleq \forall k \leq n. (\forall s. G_I(s)
+\mathit{BaseCheck}(n) \triangleq \forall k < n. (\forall s. G_I(s)
 	  	\implies \mathit{Extend}_k(s))
 \end{equation}%
 %
@@ -164,11 +171,10 @@ realizable~\cite{katis2015machine}.
 
 %While the implemented algorithm on realizability provided us with meaningful
 %results during the verification of several contracts, 
-The most important outcome of our previous work on realizability is that it 
- can be further used for solving the more complex problem of
-\emph{program synthesis} i.e., to automatically
-derive implementations, from the proof of the contract's
-realizability.
+An important outcome of our previous work on realizability is that it
+can be further used for solving the more complex problem of
+\emph{program synthesis}. That is, we should be able to automatically
+derive implementations from the proof of a contract's realizability.
 %The limited power of SMT solvers
 %in terms of solving formulas containing nested quantifiers immediately ruled
 %out the prospect of using one as our primary synthesis tool. Fortunately, 
@@ -176,34 +182,44 @@ realizability.
 %Skolemizing $\forall\exists$-formulas (to be described in Sect.~\ref{sec:aeval}).
 
 The idea behind our approach to solving the synthesis problem is
-simple and elegant. Consider checks~\eqref{eq:sbcheck} and~\eqref{eq:echeck} that
-are used in the realizability checking algorithm. Both checks require
-that the reachable states explored are extendable using
-Def.~\ref{def:extend}.
-The key insight then is to decide if $\mathit{Extend}_{n}(s)$ is valid and generate a witness 
-for each of the $n$ times that we run $\mathit{BaseCheck}$ and a final witness 
-for the inductive case in $\mathit{ExtendCheck}$.
+simple and elegant. Consider checks~\eqref{eq:sbcheck}
+and~\eqref{eq:echeck} that are used in the realizability checking
+algorithm. Both checks require that the reachable states explored are
+extendable using Def.~\ref{def:extend}. The key insights are then 1)
+we can start with a arbitrary state in $G_I$ since it is non-empty, 2)
+we can use witnesses from the proofs of $\mathit{Extend}_k(s)$ in
+$\mathit{BaseCheck}$ to create a valid path of length $n-1$, and 3) we
+can extend that path to arbitrary length using the witness of the
+proof of $\mathit{Extend}_n(s)$ in $\mathit{ExtendCheck}(n)$
 
-In the first order logic, witnesses for valid $\forall\exists$-formulas are represented by the Skolem functions.
-Intuitively, a Skolem function expresses a connection between all universally quantified variables in the left-hand-side of the $\forall\exists$-formulas~\eqref{eq:sbcheck} and~\eqref{eq:echeck} and the existentially quantified variable $s'$ in the right-hand-side of the the formulas.
-Our algorithm automatically generates such Skolem functions
-while solving the validity of~\eqref{eq:sbcheck} and~\eqref{eq:echeck} and is described in details Sect.~\ref{sec:aeval}.
+In the first order logic, witnesses for valid
+$\forall\exists$-formulas are represented by the Skolem functions.
+Intuitively, a Skolem function expresses a connection between all
+universally quantified variables in the left-hand side of the
+$\forall\exists$-formulas~\eqref{eq:sbcheck} and~\eqref{eq:echeck} and
+the existentially quantified variable $s'$ within $\mathit{Extend}$ on
+the right-hand side. Our algorithm automatically generates such Skolem
+functions while solving the validity of~\eqref{eq:sbcheck}
+and~\eqref{eq:echeck} and is detailed in Sect.~\ref{sec:aeval}.
 
 %\synthesisalgorithm
 
-Algorithm~\ref{alg:synthesis} provides a summary of the synthesis procedure,
-showing how it naturally extends our previous work on realizability checking.
-During the k-induction algorithm, two parallel engines (\textsc{BaseEngine,
-ExtendEngine}) correspondingly handle the base and inductive step checks of
-validity of $\forall\exists$-formulas. The proof of a formula's validity is
-closely tied to the process of Skolemization. As a result, every step for which
-the \textit{BaseCheck(n)} is valid according to \aeval, we also receive a Skolem function
-that can be used as a witness that satisfies the formula. We keep repeating this
-process, accumulating Skolem functions as long as the corresponding \textit{BaseCheck(n)}
-is valid. As soon as the inductive step of \textit{ExtendCheck(n)} passes, we
-have a complete k-inductive proof stating that the contract is realizable. We then complete our synthesis
-procedure by generating a Skolem function that corresponds to the inductive
-step, and return the collection of the Skolem functions to the user.
+Algorithm~\ref{alg:synthesis} provides a summary of the synthesis
+procedure, showing how it naturally extends our previous work on
+realizability checking. During the k-induction algorithm, two parallel
+engines (\textsc{BaseEngine, ExtendEngine}) handle the base and
+inductive step checks of validity of $\forall\exists$-formulas. The
+proof of a formula's validity is closely tied to the process of
+Skolemization: for every step that \textit{BaseCheck(n)} is valid, \aeval
+provides a Skolem function to witness that validity.
+
+We keep repeating this process, accumulating Skolem functions
+as long as the corresponding \textit{BaseCheck(n)} is valid. As soon
+as the inductive step of \textit{ExtendCheck(n)} passes, we have a
+complete k-inductive proof stating that the contract is realizable. We
+then complete our synthesis procedure by generating a Skolem function
+that corresponds to the inductive step, and return the collection of
+the Skolem functions.
 
 \begin{figure}
 \begin{minipage}[t]{0.65\textwidth}
@@ -213,12 +229,18 @@ step, and return the collection of the Skolem functions to the user.
 \SetKwFor{While}{forever}{do}{}
 \SetKw{KwContinue}{continue}
 \KwIn{AG-Contract in Lustre, $(A,G)$}
-\KwOut{Return value
+\KwOut{Result
 $\in \{\realizable, \unrealizable\}$, Skolem collection \skolems
 }
 \BlankLine
 $i \gets 0$;\\
-\grigory{Something is wrong here. The counter $i$ is incremented in the loop, but used only outside of the loop.\\}
+\grigory{Something is wrong here. The counter $i$ is incremented in
+  the loop, but used only outside of the loop.\\}
+\andrew{Also, this algorithm uses the negation of the checks we have
+  been describing, but it doesn't explain this or call it out
+  anywhere. I think we shouldn't do this anyway. I'd prefer if we say
+  baseengine is invalid means unrealizable, etc.}\\
+\andrew{Also, Skolems is never initialized}\\
 $BaseResult \gets \textsc{BaseEngine.\aeval}(BaseCheck(i))$\;
 $ExtendResult \gets \textsc{ExtendEngine.\aeval}(ExtendCheck(i))$;
 \\
@@ -258,11 +280,10 @@ $ExtendResult \gets \textsc{ExtendEngine.\aeval}(ExtendCheck(i))$;
 \BlankLine  
 
 \While{}{  
- \textsc{read\_inputs()}; 		
+ \textsc{read\_inputs()}\; 		
  \textsc{Skolems[k]()}\;
- \textsc{update\_history()}\;%
+ \textsc{update\_history()};
 }
-
 \caption{Structure of implementations.}
 \label{alg:synt}
 \end{algorithm2e}}
@@ -270,19 +291,23 @@ $ExtendResult \gets \textsc{ExtendEngine.\aeval}(ExtendCheck(i))$;
 \caption{Synthesis algorithm and structure of implementations}
 \end{figure}
 
-Given a collection of Skolems, it remains to plug them into an implementation skeleton of
-shown in Alg.~\ref{alg:synt}. One of the direct effects of using Lustre in
-conjunction with a k-inductive proof is that we can have properties in the model
-that refer to up to a previous value of a variable, up to $k-1$ steps in the
-past. As such, the implementation begins (method
-\textsc{assign\_$G_{I}$\_witness()}) by creating an array for each state
-variable up to depth $k$, where $k$ is the depth at which we found a solution to our realizability algorithm.
-In each array, the $i$-th element, with $0\leq i \leq k$, corresponds to the
-value assigned to the variable after the call to $i$-th Skolem function. As
-such, the $k-1$ elements of each array correspond to the $k-1$ Skolem
-functions produced by the $\mathit{BaseCheck}$ process, while the last element
-is used by the Skolem function generated from the formula corresponding to
-the $\mathit{ExtendCheck}$ process.
+\andrew{This numbers are off here. Skolems looks like it has length
+  $k+1$ from the algorithm.}
+Given a collection of Skolem functions, it remains to plug them into
+an implementation skeleton as shown in Alg.~\ref{alg:synt}. One of the
+direct effects of using Lustre in conjunction with a k-inductive proof
+is that we can have properties in the model that refer to the
+previous value of a variable up to $k-1$ steps in the past. As such,
+the implementation begins (method \textsc{assign\_$G_{I}$\_witness()})
+by creating an array for each state variable up to depth $k$, where
+$k$ is the depth at which we found a solution to our realizability
+algorithm. In each array, the $i$-th element, with $0\leq i \leq k$,
+corresponds to the value assigned to the variable after the call to
+$i$-th Skolem function. As such, the $k-1$ elements of each array
+correspond to the $k-1$ Skolem functions produced by the
+$\mathit{BaseCheck}$ process, while the last element is used by the
+Skolem function generated from the formula corresponding to the
+$\mathit{ExtendCheck}$ process.
 
 The algorithm then uses the Skolem functions generated by \aeval for each
 of the $\mathit{BaseCheck}$ instances to describe the initial behavior of
@@ -329,24 +354,22 @@ the proof of the two implications is straightforward.
 \qed
 \end{proof}
 
- \subsection{Running Example} 
+\subsection{Running Example} 
  
- Fig.~\ref{fg:example} shows a
- simple but yet representative example to our approach.
- This is the set of requirements  in the Lustre language and an automaton satisfying these requirements.
- There is an input variable \texttt{x} (used as an argument to the \texttt{--\%REALIZABLE} query) and an output variable \texttt{state}.
- %GRIGORY: I think, it is pretty clear:
- %we use a simple hack that prevents us from explicitly defining how it should
- %be assigned, by adding it as an actual input to the specification.
- %
- There are five properties.
- Properties \texttt{prop2} and \texttt{prop3} are used to indirectly describe some
- possible transitions in the automaton. Properties \texttt{prop1} and
- \texttt{prop4} are the requirements with respect to two local variables, \texttt{bias}
- and \texttt{bias\char`_max}. Variable \texttt{bias} calculates the number of successive
- ones or zeros read by the automaton, while \texttt{bias\char`_max} is used as a flag
- to indicate that at least two zeros or two ones have been read in a row.
- Finally, property \texttt{prop5} specifies the range of values of variable \texttt{state}.
+Fig.~\ref{fg:example} shows an example contract as specified in
+Lustre. There are two unassigned variables \texttt{x} and
+\texttt{state}. The \texttt{{-}{-}\%REALIZABLE} statement specifies
+that \texttt{x} is a system input, and by its absence, that
+\texttt{state} is a system output. There are five properties.
+Properties \texttt{prop2} and \texttt{prop3} are used to indirectly
+describe some possible transitions in the automaton. Properties
+\texttt{prop1} and \texttt{prop4} are the requirements with respect to
+two local variables, \texttt{bias} and \texttt{bias\char`_max}.
+Variable \texttt{bias} calculates the number of successive ones or
+zeros read by the automaton, while \texttt{bias\char`_max} is used as
+a flag to indicate that at least two zeros or two ones have been read
+in a row. Finally, property \texttt{prop5} specifies the range of
+values of variable \texttt{state}.
  
 \begin{figure}[tb]
 \begin{minipage}[c]{0.35\textwidth}
@@ -381,14 +404,13 @@ tel;
 \label{fg:example}
 \end{figure}
 
-The \texttt{--\%REALIZABLE} query enables the realizability check that 
-succeeds with a k-inductive proof of length $k = 1$. The two corresponding
-$\forall\exists$-formulas ($k=0$ for the base check and $k=1$ for the inductive
-check) are valid, and thus  \aeval extracts two witnessing Skolem functions
-%From this process, we receive two Skolem functions, 
-that effectively describe
- assignments to the local variables of the specification, as well as to \texttt{state}
-(see Appendix~\ref{app:ex} for the certain formulas).
+The realizability check on this example succeeds with a k-inductive
+proof of length $k = 1$. The two corresponding
+$\forall\exists$-formulas ($k=0$ for the base check and $k=1$ for the
+inductive check) are valid, and thus \aeval extracts two witnessing
+Skolem functions that effectively describe assignments to the local
+variables of the specification, as well as to \texttt{state} (see
+Appendix~\ref{app:ex} for the particular formulas).
 
 The Skolem functions are used to construct the final implementation
 following the outline provided in Alg.~\ref{alg:synt}. 
@@ -402,6 +424,8 @@ to use the $k$-th element of each array as the corresponding output of the call
 to $k$-th Skolem function. After this initialization process, we use an infinite
 loop to assign new values to the element corresponding to the last Skolem
 function, to cover the inductive step of the original proof.
+
+\andrew{We need to double check indicies and lengths in the previous paragraph}
 
 \grigory{consider this paragraph. This is based on my chat with Andreas yesterday.}
 Recall that the user-defined model specifies explicitly two transitions (via \texttt{prop2} and \texttt{prop3}) only, while the set of implicitly defined transitions (via \texttt{prop1} and \texttt{prop4}) is incomplete.
