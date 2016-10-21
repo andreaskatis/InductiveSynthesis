@@ -9,21 +9,21 @@ Here we consider our example from Fig.~\ref{fg:example} and demonstrate one iter
 %\begin{aligned}
 %  bias_0 & =0 \land \\
 %  bias\_max_0 &= false \land \\
-%  prop_{10} &=((state_0=0)\implies(bias_0=0)) \land \\
-%  prop_{20} &=true  \land \\
-%  prop_{30}&=true  \land \\
-%  prop_{40} &=(bias\_max_0\implies(state_0=3))  \land \\
-%  prop\_all_0&=(prop_{10} \land prop_{20} \land prop_{30} \land prop_{40}) \implies \\
+%  guarantee_{10} &=((state_0=0)\implies(bias_0=0)) \land \\
+%  guarantee_{20} &=true  \land \\
+%  guarantee_{30}&=true  \land \\
+%  guarantee_{40} &=(bias\_max_0\implies(state_0=3))  \land \\
+%  guarantee\_all_0&=(guarantee_{10} \land guarantee_{20} \land guarantee_{30} \land guarantee_{40}) \implies \\
 %  %
-%  \exists bias_2, bias\_max_2, prop_{12}, state_2, &prop_{22}, prop_{32}, prop_{42}, prop_2 \such \\
+%  \exists bias_2, bias\_max_2, guarantee_{12}, state_2, &guarantee_{22}, guarantee_{32}, guarantee_{42}, guarantee_2 \such \\
 %  bias_2&=0 \land \\
 %  bias\_max_2&=false \land \\ 
-%  prop_{12}&=((state_2=0) \implies (bias_2=0)) \land \\
-%  prop_{22}&=true \land \\
-%  prop_{32}&=true \land \\
-%  prop_{42}&=(bias\_max_2\implies(state_2=3)) \land \\
-%  prop\_all_2 &= (prop_{12} \land prop_{22} \land prop_{32} \land prop_{42} )\land \\
-%  prop\_all_2 &\notag
+%  guarantee_{12}&=((state_2=0) \implies (bias_2=0)) \land \\
+%  guarantee_{22}&=true \land \\
+%  guarantee_{32}&=true \land \\
+%  guarantee_{42}&=(bias\_max_2\implies(state_2=3)) \land \\
+%  guarantee\_all_2 &= (guarantee_{12} \land guarantee_{22} \land guarantee_{32} \land guarantee_{42} )\land \\
+%  guarantee\_all_2 &\notag
 %\end{aligned}
 %\end{equation}
 %
@@ -33,32 +33,32 @@ In particular the $\forall\exists$-formula of $\mathit{ExtendCheck}$ is as follo
 \begin{aligned}
    bias_0&=ite(init, 0, ite(x_0, 1, -1)+bias_{-1}) \land \\
     bias\_max_0&=ite(init, false, ((bias_0\ge 2)\lor (bias_0\le -2))\lor bias\_max_{-1})\land \\
-    prop_{10}&=((state_0=0)\implies(bias_0=0))\land \\
-    prop_{20}&=ite(init, true, ((state_{-1}=0)\land x_0)\implies(state_0=2))\land \\
-    prop_{30}&=ite(init, true, ((state_{-1}=0)\land (\neg x_0))\implies(state_0=1))\land \\
-    prop_{40}&=(bias\_max_0\implies(state_0=3))\land \\
-    prop_{50}&=((state_0=0) \lor (state_0=1) \lor (state_0=2) \lor (state_0=3))\land \\
-    prop\_all_0&=(prop_{10}\land prop_{20}\land prop_{30}\land prop_{40} \land prop_{50})  \land \\
-    prop\_all_0 &\land \\
+    guarantee_{10}&=((state_0=0)\implies(bias_0=0))\land \\
+    guarantee_{20}&=ite(init, true, ((state_{-1}=0)\land x_0)\implies(state_0=2))\land \\
+    guarantee_{30}&=ite(init, true, ((state_{-1}=0)\land (\neg x_0))\implies(state_0=1))\land \\
+    guarantee_{40}&=(bias\_max_0\implies(state_0=3))\land \\
+    guarantee_{50}&=((state_0=0) \lor (state_0=1) \lor (state_0=2) \lor (state_0=3))\land \\
+    guarantee\_all_0&=(guarantee_{10}\land guarantee_{20}\land guarantee_{30}\land guarantee_{40} \land guarantee_{50})  \land \\
+    guarantee\_all_0 &\land \\
     bias_1&=ite(false, 0, ite(x_0, 1, -1)+bias_0)\land \\
     bias\_max_1&=ite(false, false, ((bias_1\ge 2)\lor (bias_1\le-2))\lor bias\_max_0)\land \\
-    prop_{11}&=((state_1=0)\implies(bias_1=0))\land \\
-    prop_{21}&=ite(false, true, ((state_0=0)\land x_0)\implies(state_1=2))\land \\
-    prop_{31}&=ite(false, true, ((state_0=0)\land (\neg x_0))\implies(state_1=1))\land \\
-    prop_{41}&=(bias\_max_1\implies(state_1=3))\land \\
-    prop_{51}&=((state_1=0) \lor (state_1=1) \lor (state_1=2) \lor (state_1=3))\land \\
-    prop\_all_1&=(prop_{11}\land prop_{21}\land prop_{31}\land prop_{41} \land prop_{51})
+    guarantee_{11}&=((state_1=0)\implies(bias_1=0))\land \\
+    guarantee_{21}&=ite(false, true, ((state_0=0)\land x_0)\implies(state_1=2))\land \\
+    guarantee_{31}&=ite(false, true, ((state_0=0)\land (\neg x_0))\implies(state_1=1))\land \\
+    guarantee_{41}&=(bias\_max_1\implies(state_1=3))\land \\
+    guarantee_{51}&=((state_1=0) \lor (state_1=1) \lor (state_1=2) \lor (state_1=3))\land \\
+    guarantee\_all_1&=(guarantee_{11}\land guarantee_{21}\land guarantee_{31}\land guarantee_{41} \land guarantee_{51})
 \implies \\
-\exists bias_2, bias\_max_2, &prop_{12}, state_2, prop_{22}, prop_{32}, prop_{42}, prop_{52}, prop\_all_2 \such  \\
+\exists bias_2, bias\_max_2, &guarantee_{12}, state_2, guarantee_{22}, guarantee_{32}, guarantee_{42}, guarantee_{52}, guarantee\_all_2 \such  \\
   bias_2&=ite(false, 0, ite(x_1, 1, -1)+bias_0) \land\\
   bias\_max_2&=ite(false, false, ((bias_2\ge 2) \lor (bias_2\le -2)) \lor bias\_max_0) \land\\
-  prop_{12}&=((state_2=0)\implies (bias_2=0)) \land\\
-  prop_{22}&=ite(false, true, ((state_0=0)\land x_1)\implies (state_2=2)) \land\\
-  prop_{32}&=ite(false, true, ((state_0=0)\land (\neg x_1))\implies (state_2=1)) \land\\
-  prop_{42}&=(bias\_max_2\implies (state_2=2)) \land\\
-  prop_{52}&=((state_2=0) \lor (state_2=1) \lor (state_2=2) \lor (state_2=3))\land \\
-  prop\_all_2&=(prop_{12}\land prop_{22}\land prop_{32}\land prop_{42} \land prop_{52})\land \\
-  prop\_all_2&\notag
+  guarantee_{12}&=((state_2=0)\implies (bias_2=0)) \land\\
+  guarantee_{22}&=ite(false, true, ((state_0=0)\land x_1)\implies (state_2=2)) \land\\
+  guarantee_{32}&=ite(false, true, ((state_0=0)\land (\neg x_1))\implies (state_2=1)) \land\\
+  guarantee_{42}&=(bias\_max_2\implies (state_2=2)) \land\\
+  guarantee_{52}&=((state_2=0) \lor (state_2=1) \lor (state_2=2) \lor (state_2=3))\land \\
+  guarantee\_all_2&=(guarantee_{12}\land guarantee_{22}\land guarantee_{32}\land guarantee_{42} \land guarantee_{52})\land \\
+  guarantee\_all_2&\notag
 \end{aligned}
 \end{equation}
 

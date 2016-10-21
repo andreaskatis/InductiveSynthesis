@@ -15,7 +15,7 @@
 \usepackage{placeins}
 \usepackage{amsmath,amssymb}
 \usepackage{xspace}
-\usepackage{caption} 
+\usepackage{caption}
 \captionsetup[table]{skip=10pt}
 %to solve the hyperref problem of jumping to wrong places
 \usepackage[all]{hypcap}
@@ -40,6 +40,7 @@
 \newcommand{\andreas}[1]{\textcolor{blue}{Andreas: #1}}
 \newcommand{\mike}[1]{\textcolor{red}{Mike: #1}}
 \newcommand{\andrew}[1]{\textcolor{green}{Andrew: #1}}
+\newcommand{\john}[1]{\textcolor{orange}{John: #1}}
 \newcommand{\grigory}[1]{\textcolor{brown}{Grigory: #1}}
 \newcommand{\arie}[1]{\textcolor{purple}{[Arie: #1]}}
 
@@ -72,7 +73,7 @@ Department of Computer Science and Engineering,\\
 Computer Science and Engineering, University of Washington, Seattle, WA,
 USA\\
 \email{grigory@cs.washington.edu}
-\and 
+\and
 Rockwell Collins Advanced Technology Center\\
 400 Collins Rd. NE, Cedar Rapids, IA, 52498, USA\\
 \email{\{andrew.gacek,john.backes\}@rockwellcollins.com}
@@ -95,9 +96,9 @@ We implemented the approach for requirements in the form of Assume-Guarantee con
 Lustre specification language.
 It naturally extends the realizability check by the \jkind model checker.
 Furthermore, we developed a compiler to translate pure Skolem-containing implementations to the C programming language.
-For a vast variety of models, we test their corresponding
+For a variety of benchmark models, we test their corresponding
 implementations against the ones provided by the \lustrev compiler, yielding
-meaningful results.
+competitive performance with hand-written implementations.
 
 %Program synthesis is a particularly interesting area of research in
 %artificial intelligence, and more recently in formal verification. The main idea
@@ -130,7 +131,7 @@ meaningful results.
 %We have incorporated the main synthesis algorithm as an extension to the
 %realizability check provided in the \jkind model checker, and furthermore
 %developed a compiler to translate these primitive implementations to the C
-%language. 
+%language.
 
 \end{abstract}
 

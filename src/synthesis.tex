@@ -26,7 +26,7 @@
 % 	\uIf(\label{alg:returnUnsat}){(\textsc{BaseCheckEngine}.\isValid($BaseResult$))}
 % 	{
 % 		\Return
-% 		\unrealizable 
+% 		\unrealizable
 % 	}
 % 	$Skolems.Add(BaseResult.Skolem)$;\\
 % 	\uIf(\label{alg:returnSat}){$(\textsc{ExtendCheckEngine}.\isInvalid($ExtendResult$))$}
@@ -54,8 +54,8 @@ In this section we provide %a summary of the formal background
 %Assume-Guarantee contract. Our approach supports the Linear Real
 %Arithmetic (LRA) theory.
 %mainly due to the limitations imposed by the underlying machinery.
-% We begin with 
-a brief background on Assume-Guarantee contracts, 
+% We begin with
+a brief background on Assume-Guarantee contracts,
 proceed with summarizing our earlier results on realizability
 checking of contracts, and finally
 present our program synthesis procedure.
@@ -65,57 +65,30 @@ present our program synthesis procedure.
 
 \subsection{Assume-Guarantee Contracts}
 
-One of the most popular ways to describe requirements during the development
-cycle of software, is through the notion of an Assume-Guarantee contract, where
-the requirements are expressed using safety properties that are split into two separate categories. The
-\emph{assumptions} of the contract correspond to properties that restrict the
-set of valid inputs a system can process, while the \emph{guarantees} dictate
-how the system should behave, using properties that precisely describe
-the kinds of valid outputs that it may return to its environment.
+One popular way to describe software requirements is through Assume-Guarantee contracts, where requirements are expressed using safety properties that are split into two categories. The \emph{assumptions} of the contract correspond to properties that restrict the set of valid inputs a system can process, while the \emph{guarantees} dictate how the system should behave through constraints on the outputs that are produced by the system.
 
 For example, consider the contract with the assumption $A = \{x\neq
-y\}$ and the guarantee $G = \{\text{if } x \leq y \text{ then } z =
-\textit{true}, \text{if } x \geq y \text{ then } z =
-\textit{false}\}$. The component to be designed consists of two
-inputs, $x$ and $y$ and one output $z$. If we restrict our example to
-the case of integer arithmetic, we can see that the contract assumes
-that the inputs will never have the same value, and requires that the
-output of the component is Boolean whose value depends on the
-comparison of the values of $x$ and $y$. At this point, it is crucial
-to notice that we have not discussed anything regarding the
-implementation. This is due to the fact that, during the early stages
-of software development, the implementation is absent or exists only
-partially.
-
-Deciding existence of an implementation that satisfies the specific
-contract for all possible inputs is the \emph{realizability} problem,
-while automatically constructing a witness of the proof of
-realizability of the contract is the \emph{program synthesis} problem.
-The contract $(A,G)$ above is obviously \emph{realizable}, and
-therefore an implementation exists for the specific component.
-Interestingly, if the assumption would be omitted then the contract is
-clearly \emph{unrealizable}, since no implementation is able to
-provide a correct output in the case where $x=y$.
+y\}$ and the guarantee $G = \{x \leq y \Rightarrow z =
+\textit{true}, x \geq y \Rightarrow z = \textit{false}\}$, for a component with two inputs $x$ and $y$ and one output $z$.  By assumption, $x \neq y$, so the implemented system should set $z$ to true if $x < y$ and false otherwise.  %Although this contract is trivial to implement, the contract does not provide an implementation, only a specification.
+%
+Determining whether an implementation can be constructed to satisfy the contract for all possible input sequences is the \emph{realizability} problem, while automatically constructing a witness of the proof of
+realizability of the contract is the \emph{program synthesis} problem.  The contract $(A,G)$ above is obviously \emph{realizable}, and therefore an implementation can be constructed.
+Interestingly, if the assumption is omitted then the contract is \emph{unrealizable}, since there is no correct value for $z$ when $x=y$.
 
 \subsection{Formal Preliminaries}
 \label{sec:pre}
 
-For the purposes of this paper, we describe a system using the types
-$state$ and $inputs$. Formally, an \emph{implementation}, i.e. a
-\emph{transition system} can be described using a set of initial states $I(s)$ of type $state \implies bool$, in addition to a transition relation $T(s,i,s')$ that
-implements the contract and has type $state \implies inputs \implies
-state \implies bool$.
- 
-An Assume-Guarantee (AG) contract can be formally defined by two sets, a set of
-\emph{assumptions} and a set of \emph{guarantees}. The \emph{assumptions} $A$
-impose constraints over the inputs, while the \emph{guarantees} $G$ are used for
-the corresponding constraints over the outputs of the system and can be expressed as
-two separate subsets $G_I$ and $G_T$, where $G_I$ defines the set of valid
+We describe a system using the disjoint sets $state$ and $inputs$. Formally, an \emph{implementation}, i.e. a \emph{transition system} can be described using a set of initial states $I(s) : state \rightarrow bool$ and a transition relation $T(s,i,s'): state \rightarrow inputs \rightarrow state \rightarrow bool$.
+
+An Assume-Guarantee (AG) contract can be formally defined by two disjoints sets, a set of
+\emph{assumptions} and a set of \emph{guarantees}. The \emph{assumptions} $A: state \rightarrow inputs \rightarrow bool$
+impose constraints over the inputs (which may be modal in terms of the previous state), while the \emph{guarantees} $G$ are used for the corresponding constraints over the outputs of the system and can be expressed as
+two separate subsets $G_I: state \rightarrow bool$ and $G_T: state \rightarrow inputs \rightarrow state \rightarrow bool$, where $G_I$ defines the set of valid
 initial states, and $G_T$ specifies the properties that need to be met during
 each new transition between two states. Note that we do not necessarily expect
 that a contract would be defined over all variables in the transition system,
 but we do not make any distinction between internal state variables and outputs in the formalism.
-This way, we can use state variables to, in some cases, simplify statements of guarantees.
+This way, we can use state variables to (in some cases) simplify specification of guarantees.
 
 \subsection{Realizability of Contracts}
 The synthesis algorithm proposed in this paper is built on top of our realizability algorithm
@@ -171,15 +144,15 @@ realizable~\cite{katis2015machine}.
 \subsection{Program Synthesis from Proofs of Realizability}
 
 %While the implemented algorithm on realizability provided us with meaningful
-%results during the verification of several contracts, 
+%results during the verification of several contracts,
 An important outcome of our previous work on realizability is that it
 can be further used for solving the more complex problem of
 \emph{program synthesis}. That is, we should be able to automatically
 derive implementations from the proof of a contract's realizability.
 %The limited power of SMT solvers
 %in terms of solving formulas containing nested quantifiers immediately ruled
-%out the prospect of using one as our primary synthesis tool. Fortunately, 
-%we are able to exploit our prior results in the scope of solving validity and 
+%out the prospect of using one as our primary synthesis tool. Fortunately,
+%we are able to exploit our prior results in the scope of solving validity and
 %Skolemizing $\forall\exists$-formulas (to be described in Sect.~\ref{sec:aeval}).
 
 The idea behind our approach to solving the synthesis problem is
@@ -270,10 +243,10 @@ $ExtendResult \gets \textsc{ExtendEngine.\aeval}(ExtendCheck(i))$;
   $\ldots$\\
   \textsc{read\_inputs()}\;
   \textsc{Skolems[k-1]()}\;
-  
-\BlankLine  
 
-\While{}{  
+\BlankLine
+
+\While{}{
  \textsc{read\_inputs()}\; 		
  \textsc{Skolems[k]()}\;
  \textsc{update\_history()};
@@ -304,7 +277,7 @@ $\mathit{ExtendCheck}$ process.
 The algorithm then uses the Skolem functions generated by \aeval for each
 of the $\mathit{BaseCheck}$ instances to describe the initial behavior of
 the implementation up to depth $k$.  This process starts from the memory-free
-description of the initial state ($G_I$). 
+description of the initial state ($G_I$).
 There are two ``helper'' operations:
 \textsc{update\_history()} shifts each element in the arrays one position
 forward (the $(0)$'th value is simply forgotten), and \textsc{read\_inputs()} reads the
@@ -328,15 +301,16 @@ The theorems were written and proved using the Coq proof
 assistant~\cite{Coqmanual}.
 
 \begin{theorem}[Bounded Soundness of BaseCheck and ExtendCheck using Skolem
-Functions] Let $BaseCheck_{Skolem_n}(n)$ and
-$ExtendCheck_{Skolem_n}(n)$, $n \in {0,1}$ be the valid
+Functions] Let $BaseCheck_{S(s_n,i,s')}(n)$ and
+$ExtendCheck_{S(s_n,i,s')}(n)$, $n \in {0,1}$ be the valid
 variations of the corresponding formulas \textit{BaseCheck(n)} and
-\textit{ExtendCheck(n)}, where the existentially quantified part has been substituted
-with a witnessing Skolem function. We have that:
+\textit{ExtendCheck(n)}, where the existentially quantified part $\exists s'.~
+G_T(s_n, i, s')$ has been substituted with a witnessing Skolem function 
+$S(s_n,i,s')$.  We have that:
 \begin{itemize}
-\item $\forall (A,G_{I},G{T}). BaseCheck(n) \Rightarrow BaseCheck_{Skolem_n}(n)$
+\item $\forall (A,G_{I},G{T}). BaseCheck(n) \Rightarrow BaseCheck_{S(s_n,i,s')}(n)$
 \item $\forall (A,G_{I},G{T}). ExtendCheck(n) \Rightarrow
-ExtendCheck_{Skolem_n}(n)$
+ExtendCheck_{S(s_n,i,s')}(n)$
 \end{itemize}
 \end{theorem}
 \begin{proof}
@@ -346,6 +320,7 @@ the proof of the two implications is straightforward.
 \qed
 \end{proof}
 
+
 \subsection{Running Example} 
 \label{sec:example}
 
@@ -353,42 +328,46 @@ Fig.~\ref{fg:example} shows an example contract as specified in
 Lustre. There are two unassigned variables \texttt{x} and
 \texttt{state}. The \texttt{{-}{-}\%REALIZABLE} statement specifies
 that \texttt{x} is a system input, and by its absence, that
-\texttt{state} is a system output. There are five properties.
-Properties \texttt{prop2} and \texttt{prop3} are used to indirectly
-describe some possible transitions in the automaton. Properties
-\texttt{prop1} and \texttt{prop4} are the requirements with respect to
+\texttt{state} is a system output. There are five guarantees.
+Guarantees \texttt{guarantee2} and \texttt{guarantee3} are used to indirectly
+describe some possible transitions in the automaton. guarantees
+\texttt{guarantee1} and \texttt{guarantee4} are the requirements with respect to
 two local variables, \texttt{bias} and \texttt{bias\char`_max}.
 Variable \texttt{bias} calculates the number of successive ones or
 zeros read by the automaton, while \texttt{bias\char`_max} is used as
 a flag to indicate that at least two zeros or two ones have been read
-in a row. Finally, property \texttt{prop5} specifies the range of
+in a row. Finally, guarantee \texttt{guarantee5} specifies the range of
 values of variable \texttt{state}.
- 
+
 \begin{figure}[tb]
 \begin{minipage}[c]{0.35\textwidth}
 \centering
 \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{example}
 \end{minipage}
-\begin{minipage}[c]{0.7\textwidth}
+\begin{minipage}[c]{0.6\textwidth}
  \begin{Verbatim}[fontsize=\scriptsize]
 node top(x : bool; state: int) returns (  );
 var
   bias : int;
-  prop1, prop2, prop3, prop4, prop5, prop_all : bool;
+  guarantee1, guarantee2, guarantee3,
+  guarantee4, guarantee5, guarantee_all : bool;
   bias_max : bool;
 let
   bias = 0 -> (if x then 1 else -1) + pre(bias);
   bias_max = false ->
 	(bias >= 2 or bias <= -2) or pre(bias_max);
-  prop1 = (state = 0 => (bias = 0));
-  prop2 = true ->
+  guarantee1 = (state = 0 => (bias = 0));
+  guarantee2 = true ->
   	(pre(state = 0) and x) => state = 2;
-  prop3 = true ->
+  guarantee3 = true ->
   	(pre(state = 0) and not x) => state = 1;
-  prop4 = bias_max => state = 3;
-  prop5 = state = 0 or state = 1 or state = 2 or state = 3;
-  prop_all = prop1 and prop2 and prop3 and prop4 and prop5;
-  --%PROPERTY prop_all;
+  guarantee4 = bias_max => state = 3;
+  guarantee5 = state = 0 or state = 1 or state = 2 or 
+  		state = 3;
+  guarantee_all = guarantee1 and guarantee2 and
+  		guarantee3 and guarantee4 and 
+  		guarantee5;
+  --%PROPERTY guarantee_all;
   --%REALIZABLE x;
 tel;
  \end{Verbatim}
@@ -406,12 +385,12 @@ variables of the specification, as well as to \texttt{state} (see
 Appendix~\ref{app:ex} for the particular formulas).
 
 The Skolem functions are used to construct the final implementation
-following the outline provided in Alg.~\ref{alg:synt}. 
+following the outline provided in Alg.~\ref{alg:synt}.
 It is 135 lines of code, and due to the space constraints we do not
 present it here%
 \footnote{The implementation for the
 example is available at \url{https://arxiv.org/abs/1610.05867} \grigory{isn't it easier to upload just a single C-file somewhere?}.}.
-The main idea is to redefine each variable in the model 
+The main idea is to redefine each variable in the model
 as an array of size equal to $k$ and
 to use the $k$-th element of each array as the corresponding output of the call
 to $k$-th Skolem function. After this initialization process, we use an infinite
@@ -419,11 +398,12 @@ loop to assign new values to the element corresponding to the last Skolem
 function, to cover the inductive step of the original proof.
 
 \grigory{consider this paragraph. This is based on my chat with Andreas yesterday.}
-Recall that the user-defined model specifies explicitly two transitions (via \texttt{prop2} and \texttt{prop3}) only, while the set of implicitly defined transitions (via \texttt{prop1} and \texttt{prop4}) is incomplete.
+Recall that the user-defined model specifies explicitly two transitions (via \texttt{guarantee2} and \texttt{guarantee3}) only, while the set of implicitly defined transitions (via \texttt{guarantee1} and \texttt{guarantee4}) is incomplete.
 Indeed, the specification does not have any incoming transition to (\texttt{state = 0}).
 In contrast, the synthesized implementation turns all implicit transitions into explicit ones which makes them able to execute, and furthermore adds the missing ones (e.g., from \texttt{state = 1} to \texttt{state = 0}).
 
-\grigory{I suggest to re-run this experiment with prop5 (added yesterday). I'm curious to see the C-implementation.}
+\grigory{I suggest to re-run this experiment with guarantee5 (added yesterday).
+I'm curious to see the C-implementation.}
 
 %%% Local Variables:
 %%% mode: latex
