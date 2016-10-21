@@ -18,18 +18,18 @@
 %\SetAlgoNoLine
 \SetKw{KwContinue}{continue}
 \KwIn{$S(\vx), \exists \vy \such T(\vx,\vy)$.}
-\KwOut{Return value $\in \{\valid, \invalid\}$ of ${S(\vx)\!\! \implies\!\! \exists \vy \such T(\vx,\vy)}$.}
-\KwData{counter $i$, models $\{m_i\}$, MBPs $\{T_{i}(\vx)\}$, conditions $\{\phi_i({\vx,\vy})\}$.}
+\KwOut{Return value $\in \{\valid, \invalid\}$ of ${S(\vx)\!\! \implies\!\! \exists \vy \such T(\vx,\vy)}$, Skolem.}
+\KwData{counter $i$, models $\{m_i\}$, MBPs $\{T_{i}(\vx)\}$, local Skolems $\{\phi_i({\vx,\vy})\}$.}
 \BlankLine
 $\textsc{SmtAdd}(S(\vx))$; 
 $i \gets 0$; \\
 \While{$(i\texttt{\textsc{++}} < \infty)$}{
 %$res \leftarrow \textsc{SmtSolve}()$\label{alg:check_unsat_s}; \\
-\lIf(\label{alg:returnUnsat}){$(\isUnSat(\textsc{SmtSolve}()))$}{\Return \valid }
+\lIf(\label{alg:returnUnsat}){$(\isUnSat(\textsc{SmtSolve}()))$}{\Return \valid, $\mathit{Sk}_{\vy} (\vx, \vy)$ from~\eqref{case:skolem}}
 $\textsc{SmtPush}()$; 
 $\textsc{SmtAdd}(T(\vx,\vy))$; \\
 %$res \gets \textsc{SmtSolve}()$\label{alg:find_matching_ass};\\
-\lIf(\label{alg:returnSat}){$(\isUnSat(\textsc{SmtSolve}()))$}{\Return \invalid }
+\lIf(\label{alg:returnSat}){$(\isUnSat(\textsc{SmtSolve}()))$}{\Return \invalid, $\varnothing$}
 $m_i \gets \textsc{SmtGetModel}()$\label{alg:model};\\ 
 %$E \leftarrow extrapolate(m)$;\\
 $(T_{i},\phi_i({\vx,\vy}))\! \gets\! \textsc{GetMBP}(\vy, m_i, T(\vx,\vy)))$\label{alg:proj};\\
