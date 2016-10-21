@@ -11,11 +11,21 @@ compare the synthesized implementations to handwritten programs.
 We compared the C implementations by \jkindsynt against the original models, after they had been translated
 to C using the \lustrev compiler~\cite{lustrev6}.
 
-\begin{figure}[]
+% \begin{figure}[]
+% 	\centering
+% 	\includegraphics[width=0.6\textwidth,height=\textheight,keepaspectratio]{overhead}    	
+% 	\caption{Overhead of synthesis to realizability checking}
+% 	\label{fg:overhead}
+% \end{figure}
+
+
+\begin{figure}[h!]
 	\centering
-	\includegraphics[width=0.6\textwidth,height=\textheight,keepaspectratio]{overhead}    	
-	\caption{Overhead of synthesis to realizability checking}
-	\label{fg:overhead}
+	\subfloat[]{\includegraphics[width=0.4\textwidth,height=\textheight,keepaspectratio]{overhead}\label{fg:overhead}}\hspace{5mm}
+	\subfloat[]{\includegraphics[width=0.4\textwidth,height=\textheight,keepaspectratio]{performance}\label{fg:performance}}\hfill
+	\subfloat[]{\includegraphics[width=0.4\textwidth,height=\textheight,keepaspectratio]{loc}\label{fg:loc}}    	
+	\caption{Experimental results}
+	\label{fig:expfigs} 
 \end{figure}
 
 Fig.~\ref{fg:overhead} shows the overhead of \jkindsynt. The overhead is at
@@ -26,12 +36,12 @@ exceptions where it has a significant impact to the overall performance.
 %Reachability in terms of finding a proof of realizability, in conjunction with
 %AE-VAL's skolemization procedure.
 
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=0.6\textwidth,height=\textheight,keepaspectratio]{performance}    	
-	\caption{Performance of synthesized and handwritten implementations}
-	\label{fg:performance}
-\end{figure}
+% \begin{figure}[H]
+% 	\centering
+% 	\includegraphics[width=0.6\textwidth,height=\textheight,keepaspectratio]{performance}    	
+% 	\caption{Performance of synthesized and handwritten implementations}
+% 	\label{fg:performance}
+% \end{figure}
 
 Fig.~\ref{fg:performance} provides a scatter plot of the results of our
 experiments in terms of the performance of the synthesized programs against the original, handwritten
@@ -47,13 +57,12 @@ with a noticeable gap. We attribute these results mainly due to the
 simplicity of the requirements expressed in majority of the models, as all of
 them were proved realizable for $k=0$ by \jkind, except for the running example, which was proved for $k=1$.
 
-
-\begin{figure}[]
-	\centering
-	\includegraphics[width=0.6\textwidth,height=\textheight,keepaspectratio]{loc}    	
-	\caption{Lines of code of synthesized and handwritten implementations}
-	\label{fg:loc}
-\end{figure}
+% \begin{figure}[]
+% 	\centering
+% 	\includegraphics[width=0.6\textwidth,height=\textheight,keepaspectratio]{loc}    	
+% 	\caption{Lines of code of synthesized and handwritten implementations}
+% 	\label{fg:loc}
+% \end{figure}
 
 Fig.~\ref{fg:loc} provides another interesting, as well as important metric in
 our experiments, which is the lines of code in each pair of implementations.
