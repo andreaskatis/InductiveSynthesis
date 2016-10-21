@@ -13,3 +13,6 @@ out/document.synctex.gz
 *.pdf
 *.pdf
 *.pdf
+*.pdf
+out/document.pdf
+*.pdf
