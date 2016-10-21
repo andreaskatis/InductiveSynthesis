@@ -102,7 +102,7 @@ $state$ and $inputs$. Formally, an \emph{implementation}, i.e. a
 implements the contract and has type $state \implies inputs \implies
 state \implies bool$.
  
-An Assume-Guarantee contract can be formally defined by two sets, a set of
+An Assume-Guarantee (AG) contract can be formally defined by two sets, a set of
 \emph{assumptions} and a set of \emph{guarantees}. The \emph{assumptions} $A$
 impose constraints over the inputs, while the \emph{guarantees} $G$ are used for
 the corresponding constraints over the outputs of the system and can be expressed as
@@ -206,40 +206,41 @@ procedure by generating a Skolem function that corresponds to the inductive
 step, and return the collection of the Skolem functions to the user.
 
 \begin{figure}
-\begin{minipage}[t]{0.55\textwidth}
-    \scalebox{0.7}{
+\begin{minipage}[t]{0.65\textwidth}
+    \scalebox{0.9}{
 \begin{algorithm2e}[H]
 \SetAlgoSkip{}
 \SetKwFor{While}{forever}{do}{}
 \SetKw{KwContinue}{continue}
-\KwIn{Assume-Guarantee Contract in Lustre, $(A,G)$}
-\KwOut{Skolem collection \skolems, \hspace{+1cm}Return value
-$\in \{\realizable, \unrealizable\}$.
+\KwIn{AG-Contract in Lustre, $(A,G)$}
+\KwOut{Return value
+$\in \{\realizable, \unrealizable\}$, Skolem collection \skolems
 }
 \BlankLine
 $i \gets 0$;\\
+\grigory{Something is wrong here. The counter $i$ is incremented in the loop, but used only outside of the loop.\\}
 $BaseResult \gets \textsc{BaseEngine.\aeval}(BaseCheck(i))$\;
 $ExtendResult \gets \textsc{ExtendEngine.\aeval}(ExtendCheck(i))$;
 \\
 \While{}{	
-	\uIf(\label{alg:returnUnsat}){(\textsc{BaseEngine}.\isValid($BaseResult$))}
-	{
+	\lIf(\label{alg:returnUnsat}){$(\textsc{BaseEngine}.\isValid(BaseResult))$}
+	{%
 		\Return
-		\unrealizable 
+		\unrealizable, $\varnothing$%
 	}
 	$Skolems.Add(BaseResult.Skolem)$;\\
 	\uIf(\label{alg:returnSat}){$(\textsc{ExtendEngine}.\isInvalid($ExtendResult$))$}
 	{
 		$Skolems.Add((ExtendResult.Skolem))$;\\
-		\Return \skolems, \realizable
+		\Return \realizable, \skolems;
 	}
 	$i$++;
 }
-\caption{Synthesis from Assume-Guarantee Contracts}
+\caption{Synthesis from AG-Contracts}
 \label{alg:synthesis}
 \end{algorithm2e}}
 \end{minipage}
-\begin{minipage}[t]{0.4\textwidth}
+\begin{minipage}[t]{0.33\textwidth}
 \scalebox{.9}{
 \begin{algorithm2e}[H]
 \SetAlgoSkip{}
@@ -259,7 +260,7 @@ $ExtendResult \gets \textsc{ExtendEngine.\aeval}(ExtendCheck(i))$;
 \While{}{  
  \textsc{read\_inputs()}; 		
  \textsc{Skolems[k]()}\;
- \textsc{update\_history()}\;
+ \textsc{update\_history()}\;%
 }
 
 \caption{Structure of implementations.}
