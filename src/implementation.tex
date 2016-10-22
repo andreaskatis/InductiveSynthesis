@@ -14,7 +14,7 @@ solver~\cite{DeMoura08:z3} which provides state of the art support for reasoning
 over quantifiers and incremental search.
 
 Provided with the assumption that the check queries are satisfiable according to
-the results received by the SMT solver, we proceed to construct a collection of
+the results received by the SMT solver, we proceed to construct a list of
 Skolem functions using the \aeval Skolemizer%.
 \aeval  uses Linear Real Arithmetic (LRA) as a background logic, and thus casts all numeric variables to reals and provides the Skolem relation over reals as well.%
 \footnote{For realizability checks over Linear Integer and Real
@@ -24,7 +24,7 @@ In future work, we plan to enhance  \aeval for Linear Integer Arithmetic (LIA) t
 The final step of our implementation involved the creation of a specific purpose
 translation tool, which we currently call \textsc{SMTLib2C}%
 \footnote{The source code
-is available at \url{https://github.com/andrewkatis/SMTLib2C}}. The collection
+is available at \url{https://github.com/andrewkatis/SMTLib2C}}. The list
 of the Skolem functions is given as an input to the compiler, which in turn uses
 them to generate implementations in the C language. An important remark to be
 made at this point is the fact that during this translation process, real
