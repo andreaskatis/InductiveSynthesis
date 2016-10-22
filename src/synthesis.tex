@@ -240,7 +240,7 @@ $Skolems.Add(BaseResult.Skolem)$;\\
 \end{minipage}
 \hspace{-1.5cm}
 \begin{minipage}[t]{0.38\textwidth}
-\scalebox{.8}{
+\scalebox{.65}{
 \begin{template}[H]
 \SetAlgoSkip{}
 \SetKwFor{While}{forever}{do}{}
@@ -257,8 +257,12 @@ $Skolems.Add(BaseResult.Skolem)$;\\
 \BlankLine
 
 \While{}{
- \textsc{read\_inputs()}\; 		
- \textsc{Skolems[abs(k-1)]()}\;
+ \textsc{read\_inputs()}\;
+ \eIf(){$k = 0$}
+	{%
+		\textsc{Skolems[1]();}
+	}{ 		
+ \textsc{Skolems[k-1]()}\;}
  \textsc{update\_history()};
 }
 \caption*{Structure of implementations}

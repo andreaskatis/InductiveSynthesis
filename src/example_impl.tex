@@ -38,8 +38,9 @@ In particular the $\forall\exists$-formula of $\mathit{ExtendCheck}$ is as follo
     guarantee_{30}&=ite(init, true, ((state_{-1}=0)\land (\neg x_0))\implies(state_0=1))\land \\
     guarantee_{40}&=(bias\_max_0\implies(state_0=3))\land \\
     guarantee_{50}&=((state_0=0) \lor (state_0=1) \lor (state_0=2) \lor (state_0=3))\land \\
-    guarantee\_all_0&=(guarantee_{10}\land guarantee_{20}\land guarantee_{30}\land guarantee_{40} \land guarantee_{50})  \land \\
-    guarantee\_all_0 &\land \\
+    guarantee\_all_0&=(guarantee_{10}\land guarantee_{20}\land
+    guarantee_{30}\land guarantee_{40} \land \\ &\qquad {} guarantee_{50}) 
+    \land guarantee\_all_0 &\land \\
     bias_1&=ite(false, 0, ite(x_0, 1, -1)+bias_0)\land \\
     bias\_max_1&=ite(false, false, ((bias_1\ge 2)\lor (bias_1\le-2))\lor bias\_max_0)\land \\
     guarantee_{11}&=((state_1=0)\implies(bias_1=0))\land \\
@@ -48,8 +49,10 @@ In particular the $\forall\exists$-formula of $\mathit{ExtendCheck}$ is as follo
     guarantee_{41}&=(bias\_max_1\implies(state_1=3))\land \\
     guarantee_{51}&=((state_1=0) \lor (state_1=1) \lor (state_1=2) \lor (state_1=3))\land \\
     guarantee\_all_1&=(guarantee_{11}\land guarantee_{21}\land guarantee_{31}\land guarantee_{41} \land guarantee_{51})
-\implies \\
-\exists bias_2, bias\_max_2, &guarantee_{12}, state_2, guarantee_{22}, guarantee_{32}, guarantee_{42}, guarantee_{52}, guarantee\_all_2 \such  \\
+\implies \\ &\qquad {}
+\exists bias_2, bias\_max_2, guarantee_{12}, state_2, guarantee_{22},
+guarantee_{32}, \\ &\qquad {} guarantee_{42}, guarantee_{52}, guarantee\_all_2
+\such  \\
   bias_2&=ite(false, 0, ite(x_1, 1, -1)+bias_0) \land\\
   bias\_max_2&=ite(false, false, ((bias_2\ge 2) \lor (bias_2\le -2)) \lor bias\_max_0) \land\\
   guarantee_{12}&=((state_2=0)\implies (bias_2=0)) \land\\
@@ -58,7 +61,7 @@ In particular the $\forall\exists$-formula of $\mathit{ExtendCheck}$ is as follo
   guarantee_{42}&=(bias\_max_2\implies (state_2=2)) \land\\
   guarantee_{52}&=((state_2=0) \lor (state_2=1) \lor (state_2=2) \lor (state_2=3))\land \\
   guarantee\_all_2&=(guarantee_{12}\land guarantee_{22}\land guarantee_{32}\land guarantee_{42} \land guarantee_{52})\land \\
-  guarantee\_all_2&\notag
+  &\qquad {} guarantee\_all_2&\notag
 \end{aligned}
 \end{equation}
 
