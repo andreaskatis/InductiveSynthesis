@@ -6,33 +6,34 @@ a Java-implementation of the \textsc{KIND} model
 checker~\cite{Hagen08:kind}. Each model is described using the Lustre
 Specification language, which is used as an intermediate language to formally verify contracts in the
 Assume-Guarantee Reasoning (\textsc{AGREE}) framework~\cite{NFM2012:CoGaMiWhLaLu}.
-Internally, \jkind is using two parallel engines (for \textit{BaseCheck(n) and
-\textit{ExtendCheck}}) in order to construct a k-inductive proof for the
+Internally, \jkind uses two parallel engines (for $\mathit{BaseCheck}$ and
+$\mathit{ExtendCheck}$) in order to construct a k-inductive proof for the
 property of interest.
 The first order formulas that are being constructed are then fed to the \textsc{Z3} SMT
 solver~\cite{DeMoura08:z3} which provides state of the art support for reasoning
 over quantifiers and incremental search.
 
-Provided with the assumption that the check queries are satisfiable according to
-the results received by the SMT solver, we proceed to construct a list of
-Skolem functions using the \aeval Skolemizer%.
-\aeval  uses Linear Real Arithmetic (LRA) as a background logic, and thus casts all numeric variables to reals and provides the Skolem relation over reals as well.%
+For all valid $\forall\exists$-formulas, \jkindsynt proceeds to construct a list of
+Skolem functions using the \aeval Skolemizer.
+\aeval uses LRA as a background logic, and thus casts all numeric variables to reals and provides the Skolem relation over reals as well.%
 \footnote{For realizability checks over Linear Integer and Real
   Arithmetic (LIRA), \jkind has an option to use \textsc{Z3} directly.}
-In future work, we plan to enhance  \aeval for Linear Integer Arithmetic (LIA) to soundly support Skolem relation over integers.
+In future work, we plan to enhance \aeval for Linear Integer Arithmetic (LIA) to soundly support Skolem relation over integers.
 
 The final step of our implementation involved the creation of a specific purpose
 translation tool, which we currently call \textsc{SMTLib2C}%
 \footnote{The source code
 is available at \url{https://github.com/andrewkatis/SMTLib2C}}. The list
 of the Skolem functions is given as an input to the compiler, which in turn uses
-them to generate implementations in the C language. An important remark to be
-made at this point is the fact that during this translation process, real
-variables in Skolem functions are being defined as floats in C. This is of
-course a candidate source of problems regarding overflow and representation
-errors in the final implementation. We intend to further improve on this, and
-many other aspects of the compiler's performance as part of an individual
-future work.
+them to generate implementations in the C language. 
+Note that during this translation process, real
+variables in Skolem functions are being defined as floats in C. This might cause some
+overflow errors in the final implementation. 
+Improving on this is our primary goal in future work.
+%In future work,
+%we intend to further improve on this, and
+%many other aspects of the compiler's performance as part of an individual
+%future work.
 
 
 
