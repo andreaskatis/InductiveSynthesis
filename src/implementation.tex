@@ -2,12 +2,11 @@
 \label{sec:impl}
 
 We develop \jkindsynt, our synthesis algorithm on top of \jkind~\cite{jkind},
-a Java-implementation of the \textsc{KIND} model
+a Java implementation of the \textsc{KIND} model
 checker~\cite{Hagen08:kind}. Each model is described using the Lustre
-Specification language, which is used as an intermediate language to formally verify contracts in the
-Assume-Guarantee Reasoning (\textsc{AGREE}) framework~\cite{NFM2012:CoGaMiWhLaLu}.
-Internally, \jkind is using two parallel engines (for \textit{BaseCheck(n) and
-\textit{ExtendCheck}}) in order to construct a k-inductive proof for the
+Specification language, which is used as an intermediate language to formally verify contracts in the Assume-Guarantee Reasoning (\textsc{AGREE}) framework~\cite{NFM2012:CoGaMiWhLaLu}.
+Internally, \jkind is using two parallel engines (for \textit{BaseCheck(n)} and
+\textit{ExtendCheck(n)}) in order to construct a k-inductive proof for the
 property of interest.
 The first order formulas that are being constructed are then fed to the \textsc{Z3} SMT
 solver~\cite{DeMoura08:z3} which provides state of the art support for reasoning
