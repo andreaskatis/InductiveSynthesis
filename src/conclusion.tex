@@ -1,9 +1,9 @@
 \section{Conclusion}
 \label{sec:conclusion}
-In  this paper, we contributed the approach to program synthesis guided by the proofs of realizability of Assume-Guarantee contracts.
-Our approach is based on the notion of realizability, the proving of which requires k-induction-based reasoning to decide validity of a set of $\forall\exists$-formulas.
-Whenever a contract is proven realizable, our approach employs the Skolemization procedure and extracts a fine-grained witness to the realizability.
-The Skolem functions are finally encoded into a desirable implementation.
-We implemented the technique in \jkind and evaluated for the set of
-Lustre models of different complexity.
+In this paper, we contributed the approach to program synthesis guided by the proofs of realizability of Assume-Guarantee contracts.
+To check realizability, it performs k-induction-based reasoning to decide validity of a set of $\forall\exists$-formulas.
+Whenever a contract is proven realizable, it further employs the Skolemization procedure and extracts a fine-grained witness to the realizability.
+Those Skolem functions are finally encoded into a desirable implementation.
+We implemented the technique in the \jkindsynt tool and evaluated it for the set
+of Lustre models of different complexity.
 The experimental results provided fruitful conclusions on the overall efficacy of the the approach.
