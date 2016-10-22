@@ -1,5 +1,3 @@
-\newcommand{\toolname}{\textsc{RealSynth}}
-
 
 \section{Introduction}
 Automated synthesis research is concerned with discovering efficient algorithms to construct candidate programs that are guaranteed to comply with predefined temporal specifications.  This problem has been well studied for propositional specifications, especially for (subsets of) LTL~\cite{gulwani2010dimensions}.  More recently, the problem of synthesizing programs for richer theories has been examined, including work in {\em template synthesis}~\cite{srivastava2013template}, which attempts to find programs that match a certain shape (the template), and {\em inductive synthesis}, which attempts to use counterexample-based refinement to solve synthesis problems~\cite{flener2001inductive}.  Such techniques have been widely used for stateless formulas over arithmetic domains~\cite{reynoldscounterexample}.
@@ -21,7 +19,8 @@ The step from realizability to synthesis involves moving from the existence of a
 
 
 We combined the above ideas to create a reasonable sequential synthesis
-approach, which we call \toolname.  It applies the realizability checker from~\cite{Katis15:Realizability} and then extracts a Skolem witness formula from the \aeval tool that can immediately be turned into a C program.  In order to support synthesis, several changes were required to the quantifier-elimination approach to produce Skolem {\em functions} rather than {\em relations}.  The main contributions of the work are therefore:
+approach, which we call \jkindsynt.  It applies the realizability checker
+from~\cite{Katis15:Realizability} and then extracts a Skolem witness formula from the \aeval tool that can immediately be turned into a C program.  In order to support synthesis, several changes were required to the quantifier-elimination approach to produce Skolem {\em functions} rather than {\em relations}.  The main contributions of the work are therefore:
 \begin{itemize}
 	\item To the best of our knowledge, the first synthesis procedure from
 	Assume-Guarantee contracts, modulo infinite theories, usable in a broader

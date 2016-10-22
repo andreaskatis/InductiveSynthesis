@@ -14,16 +14,15 @@
 \newcommand{\aevalalgorithm}{%
 \begin{algorithm2e}[tb]
 \SetAlgoSkip{}
-\SetKwFor{While}{while}{do}{}
+\SetKwFor{For}{for}{do}{}
 %\SetAlgoNoLine
 \SetKw{KwContinue}{continue}
 \KwIn{$S(\vx), \exists \vy \such T(\vx,\vy)$.}
 \KwOut{Return value $\in \{\valid, \invalid\}$ of ${S(\vx)\!\! \implies\!\! \exists \vy \such T(\vx,\vy)}$, Skolem.}
-\KwData{counter $i$, models $\{m_i\}$, MBPs $\{T_{i}(\vx)\}$, local Skolems $\{\phi_i({\vx,\vy})\}$.}
+\KwData{ models $\{m_i\}$, MBPs $\{T_{i}(\vx)\}$, local Skolems $\{\phi_i({\vx,\vy})\}$.}
 \BlankLine
-$\textsc{SmtAdd}(S(\vx))$; 
-$i \gets 0$; \\
-\While{$(i\texttt{\textsc{++}} < \infty)$}{
+$\textsc{SmtAdd}(S(\vx))$\; 
+\For{$(i \gets 0; \mathbf{true}; i \gets i + 1)$}{	
 %$res \leftarrow \textsc{SmtSolve}()$\label{alg:check_unsat_s}; \\
 \lIf(\label{alg:returnUnsat}){$(\isUnSat(\textsc{SmtSolve}()))$}{\Return \valid, $\mathit{Sk}_{\vy} (\vx, \vy)$ from~\eqref{case:skolem}}
 $\textsc{SmtPush}()$; 
@@ -53,7 +52,7 @@ $\textsc{SmtAdd}(\neg {T_{i}})$\label{alg:block}; \\
 }
 \KwOut{Local Skolem function $y_j = f_j(\vx)$.}
 \BlankLine
-\For{$(i = n; i > j; i\texttt{-}\texttt{-})$}{
+\For{$(i \gets n; i > j; i \gets i - 1)$}{	
   $\psi_j(\vx,y_{j},\ldots,y_{n}) \gets \textsc{Substitute}(\psi_j(\vx,y_{j},\ldots,y_{n}) , y_i, f_i(\vx))$\label{alg:loc_subst};\\
 }
 \BlankLine

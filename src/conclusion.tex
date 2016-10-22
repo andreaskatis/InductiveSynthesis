@@ -1,12 +1,9 @@
 \section{Conclusion}
 \label{sec:conclusion}
-We presented a novel synthesis algorithm for
-to automatically synthesize implementations, using requirements expressed in the
-form of an Assume-Guarantee contract. Our approach supports the theory of
-rational arithmetic and combines the advantages of a model checking approach
-that is very similar to k-induction, with the strength of a sophisticated solver
-that can effectively decide on the validity of formulas on realizability, as
-well as extract witnesses capable of being directly used as the core fragments
-of a synthesized implementation. Finally, we excercised our final tool against
-models of different contract complexity, with results that gave us fruitful
-conclusions on the algorithm's overall performance.
+In  this paper, we contributed the approach to program synthesis guided by the proofs of realizability of Assume-Guarantee contracts.
+Our approach is based on the notion of realizability, the proving of which requires k-induction-based reasoning to decide validity of a set of $\forall\exists$-formulas.
+Whenever a contract is proven realizable, our approach employs the Skolemization procedure and extracts a fine-grained witness to the realizability.
+The Skolem functions are finally encoded into a desirable implementation.
+We implemented the technique in \jkind and evaluated for the set of
+Lustre models of different complexity.
+The experimental results provided fruitful conclusions on the overall efficacy of the the approach.
