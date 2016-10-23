@@ -40,7 +40,7 @@ In particular the $\forall\exists$-formula of $\mathit{ExtendCheck}$ is as follo
     guarantee_{50}&=((state_0=0) \lor (state_0=1) \lor (state_0=2) \lor (state_0=3))\land \\
     guarantee\_all_0&=(guarantee_{10}\land guarantee_{20}\land
     guarantee_{30}\land guarantee_{40} \land \\ &\qquad {} guarantee_{50}) 
-    \land guarantee\_all_0 &\land \\
+    \land guarantee\_all_0 \land \\
     bias_1&=ite(false, 0, ite(x_0, 1, -1)+bias_0)\land \\
     bias\_max_1&=ite(false, false, ((bias_1\ge 2)\lor (bias_1\le-2))\lor bias\_max_0)\land \\
     guarantee_{11}&=((state_1=0)\implies(bias_1=0))\land \\
@@ -65,8 +65,8 @@ guarantee_{32}, \\ &\qquad {} guarantee_{42}, guarantee_{52}, guarantee\_all_2
 \end{aligned}
 \end{equation}
 
-\aeval proceeds by constructing MBPs and creating local Skolem functions. 
-In one of the iterations, it obtains the following MBP:%
+\aeval proceeds by constructing $\mbp$-s and creating local Skolem functions. 
+In one of the iterations, it obtains the following $\mbp$:%
 \begin{equation}
 \begin{aligned}
   (x_1\land (-1=bias_0)) &\lor ((\neg x_1)\land (1=bias_0)) \land \\
@@ -78,14 +78,14 @@ In one of the iterations, it obtains the following MBP:%
 
 and the following local Skolem function:%
 \begin{align*}
-  state_2&=0 &
-  bias_2&=0 &
+  state_2&=0 \land&
+  bias_2&=0 \land&
   bias\_max_2&=0
 \end{align*}
 
-In other words, the pair of the MBP and the local Skolem function is the synthesized implementation for some transitions of the automaton: the MBP specifies the source state, and the Skolem function specifies the destination state.
+In other words, the pair of the $\mbp$ and the local Skolem function is the synthesized implementation for some transitions of the automaton: the $\mbp$ specifies the source state, and the Skolem function specifies the destination state.
 From this example, it is clear that the synthesized transitions are from state 1 to state 0, and from state 2 to state 0.
-These MBP and Skolem are further encoded into the snippet of C code that after slight simplifications looks as follows:
+These $\mbp$ and the local Skolem are further encoded into the snippet of C code that after slight simplifications looks as follows:
 
 \begin{figure}[h]
 \begin{lstlisting}[language=C]{Name=test2}

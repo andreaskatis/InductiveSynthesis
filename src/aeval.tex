@@ -196,7 +196,7 @@ into the form ${\exists \vy \such \Psi(\vx, \vy)} \equiv {S(\vx)
 existential quantifiers, and $T(\vx, \vy)$ is quantifier-free.
 %
 To decide validity of a $\forall\exists$-formula, \aeval partitions
-the formula, and searches for a witnessing local Skolem relation of
+the formula, and searches for a witnessing \emph{local} Skolem relation of
 each partition.  \aeval iteratively constructs (line~\ref{alg:proj}) a set of Model-Based
 Projections (MBPs): $T_i(\vx)$, such that (a) for each $i$,
 $T_i(\vx) \!\implies\! \exists \vy \such T (\vx, \vy)$, and (b)
@@ -242,11 +242,11 @@ each MBP in \aeval is constructed iteratively for each variable $y_j \in \vy$.
 Thus, $y_j$ may depend on the variables of $y_{j+1},\ldots, y_{n}$ that are still not eliminated in the current iteration $j$.
 %Each $\psi_j(\vx,y_{j},\ldots,y_{n})$ is the conjunction $\psi_j(\vx,y_{j},\ldots,y_{n}) = \Land_{i}(cl_i(\vx,y_{j},\ldots,y_{n}))$, where each $cl_i$ is  an (in)equality.
 
-Inequalities in a Skolem relation are the enemies of program synthesis.
+Inequalities and disequalities in a Skolem relation are the enemies of program synthesis.
 Indeed, the final implementation should contain assignments to each
 existentially quantified variable, which for the current algorithm is difficult to
 get.
-The Skolem relation provided by \aeval should be post-processed to get rid of inequalities.
+The Skolem relation provided by \aeval should be post-processed to get rid of inequalities and disequalities.
 We formalize this procedure as finding a Skolem function $f_j(\vx)$ for each $y_j\in \vy$, such that $(y_j = f_j(\vx)) \!\implies\! \exists y_{j+1},\ldots,y_{n} \such \psi_j(\vx,y_{j},\ldots,y_{n})$.
 
 The key idea is presented in Alg.~\ref{alg:loc}.
@@ -360,6 +360,11 @@ Iterative application of Alg.~\ref{alg:loc} to all variables $y_n,\ldots,y_1$ re
 Follows from the case analysis that applies the lemmas above.
 \qed
 \end{proof}
+
+Recall that the presented technique is designed to effectively remove inequalities and disequalities from local Skolem relations.
+The resulting local Skolem functions enjoy more fine-grained and easy-to-understand form.
+We admit that for further simplifications (that would benefit the synthesis procedure), we can exploit techniques to rewrite $\mbp$-s into compact \emph{guards}, as proposed in~\cite{fedyukovich2015automated}.
+
 
 %%% Local Variables:
 %%% mode: latex
