@@ -79,8 +79,24 @@ In one of the iterations, it obtains the following MBP:%
 and the following local Skolem function:%
 \begin{align*}
   state_2&=0 &
-  bias_2&=0
+  bias_2&=0 &
+  bias\_max_2&=0
 \end{align*}
 
 In other words, the pair of the MBP and the local Skolem function is the synthesized implementation for some transitions of the automaton: the MBP specifies the source state, and the Skolem function specifies the destination state.
 From this example, it is clear that the synthesized transitions are from state 1 to state 0, and from state 2 to state 0.
+These MBP and Skolem are further encoded into the snippet of C code that after slight simplifications looks as follows:
+
+\begin{figure}[h]
+\begin{lstlisting}[language=C]{Name=test2}
+...
+if (((x[1] && (-1 == bias[0])) || (!x[1] && (1 == bias[0])))
+     && !bias_max[0] 
+     && (state[0] != 0 || !x[1]) && (!state[0] != 0 || x[1])) {
+  bias_max[1] = 0;
+  bias[1] = 0;
+  state[1] = 0;
+}
+...
+\end{lstlisting}
+\end{figure}
