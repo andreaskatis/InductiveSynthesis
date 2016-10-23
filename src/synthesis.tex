@@ -240,9 +240,9 @@ $Skolems.Add(BaseResult.Skolem)$;\\
 \label{alg:synthesis}
 \end{algorithm2e}}
 \end{minipage}
-\hspace{-1.5cm}
+\hspace{-0.8cm}
 \begin{minipage}[t]{0.38\textwidth}
-\scalebox{.65}{
+\scalebox{.68}{
 \begin{template}[H]
 \SetAlgoSkip{}
 \SetKwFor{While}{forever}{do}{}
@@ -262,12 +262,12 @@ $Skolems.Add(BaseResult.Skolem)$;\\
  \textsc{read\_inputs()}\;
  \eIf(){$k = 0$}
 	{%
-		\textsc{Skolems[1]();}
+		\textsc{Skolems}[1]();
 	}{ 		
- \textsc{Skolems[k-1]()}\;}
+ \textsc{Skolems}[k-1]()\;}
  \textsc{update\_history()};
 }
-\caption*{Structure of implementations}
+\caption{Structure of an implementation}
 \label{alg:synt}
 \end{template}}
 \end{minipage}
@@ -396,6 +396,7 @@ tel;
  \end{Verbatim}
 \end{minipage}
 \caption{Automaton and Requirements for running example}
+\vspace{-1em}
 \label{fg:example}
 \end{figure}
 
@@ -409,10 +410,6 @@ Appendix~\ref{app:ex} for the particular formulas).
 
 The Skolem functions are used to construct the final implementation
 following the outline provided in Template~\ref{alg:synt}. 
-It is 144 lines of code, and due to the space constraints we do not
-present it here%
-\footnote{The implementation for the
-example is available at \url{https://arxiv.org/abs/1610.05867}}.
 The main idea is to redefine each variable in the model
 as an array of size equal to $k$ and
 to use the $k$-th element of each array as the corresponding output of the call
@@ -420,10 +417,27 @@ to $k$-th Skolem function. After this initialization process, we use an infinite
 loop to assign new values to the element corresponding to the last Skolem
 function, to cover the inductive step of the original proof.
 
+It is 144 lines of code%
+\footnote{Due to the space constraints, full file can be found at \url{http://www.inf.usi.ch/phd/fedyukovich/extended_example.c}},
+a snippet of which is presented below.
+Each Skolem is represented by an $\mathit{ite}$-statement (to be explained in Sect.~\ref{sec:aeval}), each branch of which is further encoded into the C-code like the following.
+
+\begin{figure}[h]
+\vspace{-2em}
+\begin{lstlisting}[language=C]{Name=test2}
+if (((x[1] && (-1 == bias[0])) || (!x[1] && (1 == bias[0])))
+     && !bias_max[0] 
+     && (state[0] != 0 || !x[1]) && (!state[0] != 0 || x[1])) {
+  bias_max[1] = 0; bias[1] = 0; state[1] = 0;
+}
+\end{lstlisting}%
+\vspace{-2em}
+\end{figure}%
+
+
 Recall that the user-defined model specifies explicitly two transitions (via \texttt{guarantee2} and \texttt{guarantee3}) only, while the set of implicitly defined transitions (via \texttt{guarantee1} and \texttt{guarantee4}) is incomplete.
 For example, the model does not specify an incoming transition to (\texttt{state = 0}).
-In contrast, the synthesized implementation turns all implicit transitions into explicit ones which makes them able to execute, and furthermore adds the missing ones (e.g., from \texttt{state = 1} to \texttt{state = 0}).
-
+In contrast, the synthesized implementation turns all implicit transitions into explicit ones which makes them able to execute, and furthermore adds the missing ones (e.g., as in the aforementioned snippet, from \texttt{state = 1} to \texttt{state = 0}).
 
 %%% Local Variables:
 %%% mode: latex
