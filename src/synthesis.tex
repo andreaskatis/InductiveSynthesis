@@ -417,10 +417,9 @@ to $k$-th Skolem function. After this initialization process, we use an infinite
 loop to assign new values to the element corresponding to the last Skolem
 function, to cover the inductive step of the original proof.
 
-It is 144 lines of code%
-\footnote{Due to the space constraints, full file can be found at \url{http://www.inf.usi.ch/phd/fedyukovich/extended_example.c}},
-a snippet of which is presented below.
-Each Skolem is represented by an $\mathit{ite}$-statement (to be explained in Sect.~\ref{sec:aeval}), each branch of which is further encoded into the C-code like the following.
+The final code, a snippet of which is presented below, takes 144 lines%
+\footnote{Due to the space constraints, full file can be found at \url{http://www.inf.usi.ch/phd/fedyukovich/extended_example.c}}.
+Since each Skolem is represented by an $\mathit{ite}$-statement (to be explained in Sect.~\ref{sec:aeval}), each its branch is further encoded into a C-code, for example:
 
 \begin{figure}[h]
 \vspace{-2em}
