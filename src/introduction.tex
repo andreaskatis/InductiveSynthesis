@@ -22,9 +22,9 @@ We combined the above ideas to create a reasonable sequential synthesis
 approach, which we call \jkindsynt.  It applies the realizability checker
 from~\cite{Katis15:Realizability} and then extracts a Skolem witness formula from the \aeval tool that can immediately be turned into a C program.  In order to support synthesis, several changes were required to the quantifier-elimination approach to produce Skolem {\em functions} rather than {\em relations}.  The main contributions of the work are therefore:
 \begin{itemize}
-	\item To the best of our knowledge, the first synthesis procedure from
-	Assume-Guarantee contracts, modulo infinite theories, usable in a broader
-	list of applications when compared to already existing approaches.
+	\item To the best of our knowledge, the first template-free procedure modulo
+	infinite theories, to synthesize implementations from Assume-Guarantee
+	contracts containing temporal safety properties
 	\item A framework of extracting fine-grained Skolem functions for $\forall\exists$-formulas in Linear Real Arithmetic
 	\item A prototype tool implementing the algorithm
 	\item An experiment demonstrating the application of the tool on various benchmark examples
