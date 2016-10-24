@@ -198,10 +198,10 @@ Alg.~\ref{alg:synthesis} provides a summary of the synthesis
 procedure. The algorithm repeatedly proves $\mathit{BaseCheck_k}
 \triangleq \forall s. G_I(s) \implies \mathit{Extend}_k(s)$ and
 accumulates the resulting Skolem functions. If
-$\mathit{BaseCheck_k}$ ever fails, we know $\mathit{BaseCheck(i)}$
+$\mathit{BaseCheck_k}$ ever fails, we know $\mathit{BaseCheck(k)}$
 would also fail and so the system is unrealizable. At the same time,
-the algorithm tries to prove $\mathit{ExtendCheck(i)}$. As soon as the
-inductive step of $\mathit{ExtendCheck(i)}$ passes, we have a complete
+the algorithm tries to prove $\mathit{ExtendCheck(k)}$. As soon as the
+inductive step of $\mathit{ExtendCheck(k)}$ passes, we have a complete
 k-inductive proof stating that the contract is realizable. We then
 complete our synthesis procedure by generating a Skolem function that
 corresponds to the inductive step, and return the list of the Skolem
