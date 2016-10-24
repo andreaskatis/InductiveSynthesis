@@ -1,8 +1,11 @@
 \newcommand{\realizable}{\textsc{realizable}}
 \newcommand{\unrealizable}{\textsc{unrealizable}}
 \newcommand{\skolems}{\textit{Skolems}}
+\newcommand{\init}{\textit{Init}}
 \newcommand{\isValid}{\textsc{isValid}\xspace}
 \newcommand{\isInvalid}{\textsc{isInvalid}\xspace}
+%\newcommand{\isSat}{\textsc{isSat}\xspace}
+\newcommand{\isUnsat}{\textsc{isUnsat}\xspace}
 
 
 % \newcommand{\synthesisalgorithm}{
@@ -155,16 +158,15 @@ realizable~\cite{katis2015machine}.
 %results during the verification of several contracts,
 An important outcome of our previous work on realizability is that it
 can be further used for solving the more complex problem of
-\emph{program synthesis}. That is, we should be able to automatically
+\emph{program synthesis}. That is, we can automatically
 derive implementations from the proof of a contract's realizability.
 %The limited power of SMT solvers
 %in terms of solving formulas containing nested quantifiers immediately ruled
 %out the prospect of using one as our primary synthesis tool. Fortunately,
 %we are able to exploit our prior results in the scope of solving validity and
 %Skolemizing $\forall\exists$-formulas (to be described in Sect.~\ref{sec:aeval}).
-
-The idea behind our approach to solving the synthesis problem is
-simple and elegant. Consider checks~\eqref{eq:sbcheck}
+%The idea is simple.  
+Consider checks~\eqref{eq:sbcheck}
 and~\eqref{eq:echeck} that are used in the realizability checking
 algorithm. Both checks require that the reachable states explored are
 extendable using Def.~\ref{def:extend}. The key insights are then 1)
@@ -194,18 +196,8 @@ and~\eqref{eq:echeck}.
 %% Skolemization: for every step that \textit{BaseCheck(n)} is valid,
 %% \aeval provides a Skolem function to witness that validity.
 
-Alg.~\ref{alg:synthesis} provides a summary of the synthesis
-procedure. The algorithm repeatedly proves $\mathit{BaseCheck_k(i)}
-\triangleq \forall s. G_I(s) \implies \mathit{Extend}_k(s)$ and
-accumulates the resulting Skolem functions. If
-$\mathit{BaseCheck_k(i)}$ ever fails, we know $\mathit{BaseCheck(i)}$
-would also fail and so the system is unrealizable. At the same time,
-the algorithm tries to prove $\mathit{ExtendCheck(i)}$. As soon as the
-inductive step of $\mathit{ExtendCheck(i)}$ passes, we have a complete
-k-inductive proof stating that the contract is realizable. We then
-complete our synthesis procedure by generating a Skolem function that
-corresponds to the inductive step, and return the list of the Skolem
-functions.
+
+
 
 \begin{figure}[t]
 \begin{minipage}{0.65\textwidth}
@@ -213,27 +205,33 @@ functions.
 \begin{algorithm2e}[H]
 \SetAlgoSkip{}
 \SetKwFor{For}{for}{do}{}
-\KwIn{AG-Contract in Lustre, $(A,G)$}
-\KwOut{Result
-$\in \{\realizable, \unrealizable\}$, Skolem list \skolems
+\KwOut{$Result: \{\realizable, \unrealizable\}$, \init: state,
+\skolems: Skolem list
 }
 \BlankLine
-$Skolems \gets \varnothing$;\\
+$Skolems \gets \langle \rangle$; \\ 
+$InitResult \gets $\sc{Sat?}$(G_I)$; \\
+\uIf(\label{alg:initState}){$(\isUnsat(InitResult))$}
+	{%
+		\Return
+		\unrealizable, $\emptyset$, $\langle \rangle$;%
+	}
+$\init \gets InitResult.model$; \\
 \For{$(i \gets 0; \mathbf{true}; i \gets i + 1)$}{	
-$BaseResult \gets \textsc{\aeval}(BaseCheck_{k}(i))$\;
 $ExtendResult \gets \textsc{\aeval}(ExtendCheck(i))$;
 \\
-\uIf(\label{alg:returnUnsat}){$(\isInvalid(BaseResult))$}
-	{%
-		\Return 
-		\unrealizable, $\varnothing$;%
-	}
-$Skolems.Add(BaseResult.Skolem)$;\\
 \uIf(\label{alg:returnSat}){$(\isValid(ExtendResult))$}
 {
 	$Skolems.Add(ExtendResult.Skolem)$;\\
-	\Return \realizable, \skolems;
+	\Return \realizable, \init, \skolems;
 }
+$BaseResult \gets \textsc{\aeval}(BaseCheck_{k}(i))$\;
+\uIf(\label{alg:returnUnsat}){$(\isInvalid(BaseResult))$}
+	{%
+		\Return
+		\unrealizable, $\emptyset$, $\langle \rangle$;%
+	}
+$Skolems.Add(BaseResult.Skolem)$;\\
 
 }
 \caption{Synthesis from AG-Contracts}
@@ -242,12 +240,12 @@ $Skolems.Add(BaseResult.Skolem)$;\\
 \end{minipage}
 \hspace{-0.8cm}
 \begin{minipage}[t]{0.38\textwidth}
-\scalebox{.68}{
+\scalebox{.8}{
 \begin{template}[H]
 \SetAlgoSkip{}
 \SetKwFor{While}{forever}{do}{}
 \BlankLine
-  \textsc{assign\_$G_{I}$\_\textsc{witness()}};
+  \textsc{assign\_Init()};
 
 \BlankLine
   \textsc{read\_inputs()}\; 		
@@ -260,11 +258,7 @@ $Skolems.Add(BaseResult.Skolem)$;\\
 
 \While{}{
  \textsc{read\_inputs()}\;
- \eIf(){$k = 0$}
-	{%
-		\textsc{Skolems}[1]();
-	}{ 		
- \textsc{Skolems}[k]()\;}
+ \textsc{Skolems}[k]()\;
  \textsc{update\_history()};
 }
 \caption{Structure of an implementation}
@@ -275,48 +269,69 @@ $Skolems.Add(BaseResult.Skolem)$;\\
 %\label{fig:synthalg}
 \end{figure}
 
+Alg.~\ref{alg:synthesis} provides a summary of the synthesis
+procedure. The algorithm first determines whether the set of initial states $G_I$ is non-empty.
+Second, it repeatedly attempts to inductively show the realizability of the system, using
+\aeval\ to find Skolem witnesses.  The algorithm
+repeatedly proves $\mathit{BaseCheck_k(i)}
+\triangleq \forall s. G_I(s) \implies \mathit{Extend}_i(s)$ and
+accumulates the resulting Skolem functions. If
+$\mathit{BaseCheck_k(i)}$ ever fails, we know $\mathit{BaseCheck(i)}$
+would also fail and so the system is unrealizable. At the same time,
+the algorithm tries to prove $\mathit{ExtendCheck(i)}$. As soon as the
+inductive step of $\mathit{ExtendCheck(i)}$ passes, we have a complete
+k-inductive proof stating that the contract is realizable. We then
+complete our synthesis procedure by generating a Skolem function that
+corresponds to the inductive step, and return the list of the Skolem
+functions.  Note that in algorithm 1 for a particular depth $k$,
+we perform the extends check prior to the base check.
+The intuition is that $\mathit{BaseCheck(i)}$ checks
+$\forall k < i$; thus, it is one step ``smaller'' than the extends
+check and this avoids a special case at $k=0$.
+
 Given a list of Skolem functions, it remains to plug them into
-an implementation skeleton as shown in Template~\ref{alg:synt}. 
+an implementation skeleton as shown in Template~\ref{alg:synt}.
 Combination of Lustre models and k-inductive proofs
 allow the properties in the model to manipulate the
  values of variables up to $k-1$ steps in the past. Thus,
-the first step of an implementation  (method \textsc{assign\_$G_{I}$\_witness()})
- is creating an array for each state variable up to $k$, where
-$k$ is the depth at which a solution to Alg.~\ref{alg:synthesis} has been delivered.
+the first step of an implementation  (method \textsc{assign\_Init()})
+ creates an array for each state variable of size $k+1$, where
+$k$ is the depth of the solution to Alg.~\ref{alg:synthesis}.
+This array represents the depth of history necessary to compute 
+the recurrent Skolem function produced by the $\mathit{ExtendCheck}$ process.
+The $\mathit{BaseCheck}$ Skolem functions initialize this history.
+
 In each array, the $i$-th element, with $0\leq i \leq k-1$,
 corresponds to the value assigned to the variable after the call to
 $i$-th Skolem function. As such, the first $k-1$ elements of each array
 correspond to the $k-1$ Skolem functions produced by the
 $\mathit{BaseCheck}$ process, while the last element is used by the
 Skolem function generated from the formula corresponding to the
-$\mathit{ExtendCheck}$ process. For the special case of $k=0$, we still use
-both the base and the inductive step Skolem functions.
-This is to ensure that we capture cases where the initial state guarantees $G_I$ differ from the
-transitional guarantees $G_T$.
+$\mathit{ExtendCheck}$ process. 
 
-The template then uses the Skolem functions generated by \aeval for each
+The template uses the Skolem functions generated by \aeval for each
 of the $\mathit{BaseCheck}$ instances to describe the initial behavior of
-the implementation up to depth $k$.  This process starts from the memory-free
-description of the initial state ($G_I$).
+the implementation prior to depth $k$.  This process starts from the memory-free
+witness $\init$ to the initial guarantee $G_I$, which is assigned in method \textsc{assign\_Init()}.
 There are two ``helper'' operations:
 \textsc{update\_history()} shifts each element in the arrays one position
 forward (the 0-th value is simply forgotten), and \textsc{read\_inputs()} reads the
-current values of inputs into the $i$-th element of the input variable arrays,
+current values of inputs into the $i$-th element of the variable arrays,
 where $i$ represents the $i$-th step of the process.
-Once the history is entirely initialized using the $\mathit{BaseCheck}$ witness values,
-we add the Skolem function that represents the witness for the
-$\mathit{ExtendCheck}$ instance to describe the recurrent behavior of the implementation, i.e.,
-the next value of outputs in each iteration in the infinite loop.
+Once the history is entirely initialized using the $\mathit{BaseCheck}$ Skolem functions,
+we add the Skolem function for the $\mathit{ExtendCheck}$ instance to describe the 
+recurrent behavior of the implementation, i.e., the next value of outputs in each 
+iteration in the infinite loop.
 
-Finally, to further strengthen our claims regarding the correctness of the algorithm,
-we wrote machine-checked proofs regarding the validity of $\mathit{BaseCheck(n)}$ and
-$\mathit{ExtendCheck(n)}$, when Skolem functions are used as witness states
-towards synthesizing the implementations. The entirety of the models explored in
+To establish the correctness of the algorithm,
+we have constructed machine-checked proofs as to the validity of $\mathit{BaseCheck(n)}$ and
+$\mathit{ExtendCheck(n)}$ using the Skolem functions. 
+The entirety of the models explored in
 this paper only involved proofs of realizability of length $k$ equal to 0 or
 1%
 \footnote{The proofs can be found at \url{https://github.com/andrewkatis/Coq}.}.
-As such, we limited our proofs of soundness to these two specific cases. We hope
-to extend the proofs to capture any arbitrary $k$ as part of our future work.
+As such, we limited our proofs of soundness to these two specific cases. We will
+extend the proofs to capture any arbitrary $k$ as part of our future work.
 The theorems were written and proved using the Coq proof
 assistant~\cite{Coqmanual}.
 
@@ -325,7 +340,7 @@ Functions] Let $\mathit{BaseCheck}_{S(s_n,i,s')}(n)$ and
 $\mathit{ExtendCheck}_{S(s_n,i,s')}(n)$, $n \in {0,1}$ be the valid
 variations of the corresponding formulas $\mathit{BaseCheck(n)}$ and
 $\mathit{ExtendCheck(n)}$, where the existentially quantified part $\exists s'.~
-G_T(s_n, i, s')$ has been substituted with a witnessing Skolem function 
+G_T(s_n, i, s')$ has been substituted with a witnessing Skolem function
 $S(s_n,i,s')$.  We have that:
 \begin{itemize}
 \item $\forall (A,G_{I},G{T}). \mathit{BaseCheck}(n) \Rightarrow \mathit{BaseCheck}_{S(s_n,i,s')}(n)$
@@ -341,7 +356,7 @@ the proof of the two implications is straightforward.
 \end{proof}
 
 
-\subsection{Running Example} 
+\subsection{Running Example}
 \label{sec:example}
 
 Fig.~\ref{fg:example} shows an example contract as specified in
@@ -385,10 +400,10 @@ let
   guarantee3 = true ->
   	(pre(state = 0) and not x) => state = 1;
   guarantee4 = bias_max => state = 3;
-  guarantee5 = state = 0 or state = 1 or state = 2 or 
+  guarantee5 = state = 0 or state = 1 or state = 2 or
   		state = 3;
   guarantee_all = guarantee1 and guarantee2 and
-  		guarantee3 and guarantee4 and 
+  		guarantee3 and guarantee4 and
   		guarantee5;
   --%PROPERTY guarantee_all;
   --%REALIZABLE x;
@@ -409,7 +424,7 @@ variables of the specification, as well as to \texttt{state} (see
 Appendix~\ref{app:ex} for the particular formulas).
 
 The Skolem functions are used to construct the final implementation
-following the outline provided in Template~\ref{alg:synt}. 
+following the outline provided in Template~\ref{alg:synt}.
 The main idea is to redefine each variable in the model
 as an array of size equal to $k$ and
 to use the $k$-th element of each array as the corresponding output of the call
@@ -425,7 +440,7 @@ Since each Skolem is represented by an $\mathit{ite}$-statement (to be explained
 \vspace{-2em}
 \begin{lstlisting}[language=C]{Name=test2}
 if (((x[1] && (-1 == bias[0])) || (!x[1] && (1 == bias[0])))
-     && !bias_max[0] 
+     && !bias_max[0]
      && (state[0] != 0 || !x[1]) && (!state[0] != 0 || x[1])) {
   bias_max[1] = 0; bias[1] = 0; state[1] = 0;
 }

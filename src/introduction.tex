@@ -3,7 +3,7 @@
 Automated synthesis research is concerned with discovering efficient algorithms to construct candidate programs that are guaranteed to comply with predefined temporal specifications.  This problem has been well studied for propositional specifications, especially for (subsets of) LTL~\cite{gulwani2010dimensions}.  More recently, the problem of synthesizing programs for richer theories has been examined, including work in {\em template synthesis}~\cite{srivastava2013template}, which attempts to find programs that match a certain shape (the template), and {\em inductive synthesis}, which attempts to use counterexample-based refinement to solve synthesis problems~\cite{flener2001inductive}.  Such techniques have been widely used for stateless formulas over arithmetic domains~\cite{reynoldscounterexample}.
 \textit{Functional synthesis} has also been effectively used to synthesize
 subcomponents of already existing partial
-implementations~\cite{kuncak2013functional}. 
+implementations~\cite{kuncak2013functional}.
 
 In this paper,
 we propose a new approach that can synthesize programs for arbitrary {\em
@@ -22,9 +22,7 @@ We combined the above ideas to create a reasonable sequential synthesis
 approach, which we call \jkindsynt.  It applies the realizability checker
 from~\cite{Katis15:Realizability} and then extracts a Skolem witness formula from the \aeval tool that can immediately be turned into a C program.  In order to support synthesis, several changes were required to the quantifier-elimination approach to produce Skolem {\em functions} rather than {\em relations}.  The main contributions of the work are therefore:
 \begin{itemize}
-	\item To the best of our knowledge, the first template-free procedure modulo
-	infinite theories, to synthesize implementations from Assume-Guarantee
-	contracts containing temporal safety properties
+	\item To the best of our knowledge, the first approach to synthesize implementations from Assume-Guarantee contracts containing temporal safety properties involving theories.
 	\item A framework of extracting fine-grained Skolem functions for $\forall\exists$-formulas in Linear Real Arithmetic
 	\item A prototype tool implementing the algorithm
 	\item An experiment demonstrating the application of the tool on various benchmark examples
@@ -95,7 +93,7 @@ provide an informal proof of the algorithm's correctness regarding the
 implementations that it produces, and discuss our experimental results.
 \grigory{need more info here. some executive summary of the evaluation section.}
 
-\fi 
+\fi
 
 %%% Local Variables:
 %%% mode: latex
