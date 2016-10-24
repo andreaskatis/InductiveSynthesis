@@ -368,19 +368,18 @@ values of variable \texttt{state};
 \texttt{guarantee1} and \texttt{guarantee4} are the requirements with respect to
 two local variables \texttt{bias} and \texttt{bias\char`_max} where
  \texttt{bias} calculates the number of successive ones or
-zeros read by the automaton, and \texttt{bias\char`_max} is used as
-a flag to indicate that at least two zeros or two ones have been read
+zeros read by the automaton, and \texttt{bias\char`_max} indicates that at least two zeros or two ones have been read
 in a row.
 
 \begin{figure}[tb]
 \centering
 \scalebox{.7}{
-\begin{minipage}[H]{0.4\textwidth}
+\begin{minipage}[H]{0.5\textwidth}
 \centering
-\includegraphics[width=\textwidth,height=0.7\textheight,keepaspectratio]{example}
+\includegraphics[width=\textwidth,height=0.8\textheight,keepaspectratio]{example}
 \end{minipage}}
-\begin{minipage}[c][4.5cm]{0.5\textwidth}
- \begin{Verbatim}[fontsize=\tiny]
+\begin{minipage}[c]{0.6\textwidth}
+ \begin{Verbatim}[fontsize=\scriptsize]
 node top(x : bool; state: int) returns (  );
 var
   bias : int;
@@ -397,18 +396,18 @@ let
   guarantee3 = true ->
   	(pre(state = 0) and not x) => state = 1;
   guarantee4 = bias_max => state = 3;
-  guarantee5 = state = 0 or state = 1 or state = 2 or
-  		state = 3;
+  guarantee5 = state = 0 or state = 1 
+                    or state = 2 or state = 3;
   guarantee_all = guarantee1 and guarantee2 and
-  		guarantee3 and guarantee4 and
-  		guarantee5;
+          guarantee3 and guarantee4 and guarantee5;
   --%PROPERTY guarantee_all;
   --%REALIZABLE x;
 tel;
  \end{Verbatim}
 \end{minipage}
+\vspace{-0.5em}
 \caption{Automaton and Requirements for running example}
-\vspace{-1em}
+\vspace{-2.5em}
 \label{fg:example}
 \end{figure}
 
@@ -447,8 +446,8 @@ if (((x[1] && (-1 == bias[0])) || (!x[1] && (1 == bias[0])))
 
 
 Recall that the user-defined model specifies explicitly two transitions (via \texttt{guarantee2} and \texttt{guarantee3}) only, while the set of implicitly defined transitions (via \texttt{guarantee1} and \texttt{guarantee4}) is incomplete.
-For example, the model does not specify an incoming transition to (\texttt{state = 0}).
-In contrast, the synthesized implementation turns all implicit transitions into explicit ones which makes them able to execute, and furthermore adds the missing ones (e.g., as in the aforementioned snippet, from \texttt{state = 1} to \texttt{state = 0}).
+%For example, the model does not specify an incoming transition to (\texttt{state = 0}).
+Interestingly, our synthesized implementation turns all implicit transitions into explicit ones which makes them able to execute, and furthermore adds the missing ones (e.g., as in the aforementioned snippet, from \texttt{state = 1} to \texttt{state = 0}).
 
 %%% Local Variables:
 %%% mode: latex

@@ -91,6 +91,8 @@ $\pi_j(\vx,y_{j}) \gets \textsc{Merge}(U_{\pi_j} , \mathit{MIN}, \pi_j(\vx,y_{j}
 \end{equation}
 }
 
+\vspace{-1em}
+
 \section{Witnessing existential quantifiers with \aeval}
 \label{sec:aeval}
 
@@ -168,13 +170,10 @@ In this section, we briefly describe the prior work on \aeval to be able (in Sec
 
 
 
-
 \subsection{Validity and Skolem extraction}
 \label{sim:check}
 
-\aevalalgorithm  
-
-Skolemization (i.e., introducing Skolem functions) is a well-known
+Skolemization  is a well-known
 technique for removing existential quantifiers in first order formulas.
 %More specifically:
 %
@@ -219,12 +218,12 @@ Thus, in order to define the  Skolem relation $\mathit{Sk}_{\vy}(\vx, \vy)$ it i
 match each $\phi_i$ against the corresponding $T_{i}$:%
 %
 \skolemcases
+\aevalalgorithm  
 
-
+\vspace{-2em}
 \subsection{Refining Skolem Relations into Skolem Functions}
 \label{sec:new}
 
-\localfactoralg
 
 In low-level, \aeval constructs each $\phi_i$ for~\eqref{case:skolem} from the substitutions made in $T$ to produce $T_{i}$.
 Furthermore, 
@@ -269,6 +268,8 @@ E_{\pi_j} &\triangleq \Land_{e \in C({\pi_j})}(y_j = e(\vx))  &
 N_{\pi_j} &\triangleq \Land_{h \in C({\pi_j})}(y_j \neq h(\vx))  
 \end{align*}
 \end{definition}
+
+\localfactoralg
 
 In the rest of the section, we present several primitives needed to construct $y_j = f_j(\vx)$ out of $\pi_j(\vx,y_{j})$.
 For simplicity, we omit some straightforward details on dealing with
